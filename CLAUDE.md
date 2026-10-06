@@ -36,6 +36,7 @@ python scripts/04_siniestros.py        # fallecidos/lesionados, cobertura del po
 python scripts/05_indicadores.py       # tabla larga equipo × mes × indicador × medio
 python scripts/06_reportes.py          # Excel ANSV + HTML en outputs/
 python scripts/07_revision_geocodificacion.py  # listas para revisar la geocodificación a mano
+python scripts/08_reporte_ejecutivo.py # informe ejecutivo (gerencia) + Excel para copiar a la plataforma ANSV (+15 m)
 ```
 Los insumos de `data/raw/` los copia Santiago (`docs/ingesta.md`). `SAST_RAW=<carpeta>` corre el
 pipeline contra otra carpeta de insumos (ensayos), sin tocar `data/raw/`.
@@ -110,3 +111,7 @@ Decisiones del 2026-10-06 (tarde), Santiago:
 23. **EQUIPO071 sin comparendos SAST:** inició el 02/10/2026 y el export corta el 04/10/2026; según
     Santiago, en esa zona no se hacía ese tipo de control.
 24. **El repo se mantiene privado y sin remoto** por ahora.
+25. **Cifra oficial reportada a la ANSV = zona + 15 m para todo** (Santiago, 2026-10-06; reemplaza la
+    decisión 15 solo para el reporte). El informe técnico (`06_reportes.py`) se deja como está, con
+    el criterio mixto y las sensibilidades. El informe ejecutivo para gerencia y el Excel para
+    copiar en la plataforma (`08_reporte_ejecutivo.py`) usan +15 m.
