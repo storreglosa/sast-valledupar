@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pandas as pd
 
 RAIZ = Path(__file__).resolve().parents[2]
-RAW = RAIZ / "data" / "raw"
+# SAST_RAW permite ensayar el pipeline contra otra carpeta de insumos sin tocar data/raw/
+RAW = Path(os.environ.get("SAST_RAW", RAIZ / "data" / "raw"))
 PROCESSED = RAIZ / "data" / "processed"
 OUTPUTS = RAIZ / "outputs"
 DOCS = RAIZ / "docs"

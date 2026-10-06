@@ -19,6 +19,7 @@ import pandas as pd
 from shapely import Point
 
 import _entorno  # noqa: F401
+from sast.equipos import leer_excel
 from sast.geocodificacion import Geocodificador
 from sast.rutas import CRS_GEO, CRS_METRICO, DISCORDANCIA_M, DOCS, OUTPUTS, PROCESSED, RAW
 from sast.ubicacion.geocodificar import MARGEN_CABECERA_M, acuerdo_referencias, preparar_ejes
@@ -46,7 +47,10 @@ def referencias():
 def main() -> None:
     c = pd.read_parquet(PROCESSED / "comparendos.parquet")
     ejes, zona_urbana = referencias()
-    geo = Geocodificador(ejes)
+    eq = leer_excel()
+    pe = gpd.GeoSeries(gpd.points_from_xy(eq["lon"], eq["lat"]), crs=CRS_GEO).to_crs(CRS_METRICO)
+    geo = Geocodificador(ejes, dict(zip(eq["direccion"], pe)))
+    print(f"Direcciones oficiales de equipos SAST como puntos conocidos: {len(eq)}")
 
     dirs = c["direccion"].fillna("").unique()
     print(f"{len(c):,} comparendos, {len(dirs):,} direcciones distintas")
@@ -54,7 +58,7 @@ def main() -> None:
     for t in dirs:
         r = geo.ubicar(t)
         filas.append({"direccion": t, "metodo_dir": r.metodo, "tipo_direccion": r.tipo_direccion,
-                      "vias": r.vias, "detalle": r.detalle, "n_candidatos": len(r.candidatos),
+                      "vias": r.vias, "alias": r.alias, "detalle": r.detalle, "n_candidatos": len(r.candidatos),
                       "candidatos": [(p.x, p.y) for p in r.candidatos]})
     cache = pd.DataFrame(filas)
     (PROCESSED / "cache").mkdir(exist_ok=True)
@@ -74,7 +78,7 @@ def main() -> None:
     dist_gps = np.full(len(c), np.nan)
     for i, (met, cand) in enumerate(zip(c["metodo_dir"], c["candidatos"])):
         tiene_gps = gps_ok.iat[i]
-        if met in ("cruce", "cruce_aproximado", "domiciliaria", "domiciliaria_cuadra"):
+        if met in ("cruce", "cruce_hueco", "punto_equipo", "cruce_aproximado", "domiciliaria", "domiciliaria_cuadra"):
             x[i], y[i] = cand[0]
             ubic[i] = "direccion"
         elif met == "ambigua" and tiene_gps:

@@ -25,7 +25,19 @@
 - `outputs/` — HTML y Excel de entrega. `docs/` — metodología y fichas.
 
 ## Comandos frecuentes
-(se completa al construir el pipeline)
+```bash
+source .venv/bin/activate
+python scripts/00_snapshot_portal.py   # siniestros del portal ANSV (solo lectura) -> data/raw/portal/
+python scripts/00_manifiesto.py        # congela/verifica SHA-256 de data/raw/ (docs/manifiesto_raw.csv)
+python scripts/01_equipos.py           # equipos operativos + zonas (data/processed/equipos_sast.gpkg)
+python scripts/02_comparendos.py       # lectura sin datos personales, duplicados, medio
+python scripts/03_geocodificar.py      # ubicación de comparendos (~1,5 min)
+python scripts/04_siniestros.py        # fallecidos/lesionados, cobertura del portal
+python scripts/05_indicadores.py       # tabla larga equipo × mes × indicador × medio
+python scripts/06_reportes.py          # Excel ANSV + HTML en outputs/
+```
+Los insumos de `data/raw/` los copia Santiago (`docs/ingesta.md`). `SAST_RAW=<carpeta>` corre el
+pipeline contra otra carpeta de insumos (ensayos), sin tocar `data/raw/`.
 
 ## Decisiones tomadas
 Acordadas con Santiago el 2026-10-06:
@@ -45,3 +57,20 @@ Acordadas con Santiago el 2026-10-06:
    conteo.
 6. **Fallecidos y lesionados** se cuentan como personas (`cantidad_muertos`,
    `cantidad_heridos`), no como siniestros.
+
+Reglas de geocodificación (2026-10-06, `src/sast/geocodificacion.py`), cada una motivada por un caso
+real de los datos:
+7. **Diagonal ausente de la referencia → calle homónima** («DIAGONAL 16» → CL 16): el IGAC rotula
+   «CALLE 16 B (DIAG. 16B)» y el equipo 041 es «DIAGONAL 16 - CARRERA 12» en el Excel y «CALLE 16 -
+   CARRERA 12» en sus comparendos.
+8. **Cruce con hueco ≤ 100 m** (`cruce_hueco`): vías que en IGAC+OSM no se tocan por poco (CR 16 ×
+   CL 20 a 49 m, 1.530 comparendos). El original solo llegaba a 30 m.
+9. **Dirección oficial de un equipo → su coordenada** si la referencia no da el cruce a ≤ 150 m
+   (`punto_equipo`). Solo aplica a «TRANSVERSAL 12 - CALLE 20B» (032), cuyo cruce teórico queda a 265 m.
+10. **Placa sobre diagonal o transversal** («DIAGONAL 21 # 18B-6»): se infiere la vía generadora
+    (DG → CR, luego TV; TV → CL, luego DG).
+11. **Prueba independiente:** las 8 direcciones de los comparendos SAST deben caer en la zona de su
+    propio equipo (verificado el 2026-10-06).
+12. **Duplicados:** por (número, código). Mismo número con dos códigos = dos infracciones. Del par
+    repetido se conserva la fila con coordenada útil y luego la de resolución más completa.
+    La coordenada (1, 1) es un marcador de «sin coordenada».
