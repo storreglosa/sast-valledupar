@@ -125,3 +125,53 @@
     `~/Claude_code/sast-valledupar`, privado y sin remoto.
 
 - **Generado:** 2026-10-06 | **Validado por:** Santiago Torreglosa
+
+---
+
+## Cifra oficial reportada a la ANSV (decisión 25, 2026-10-06)
+
+Santiago decidió que la cifra que se reporta a la ANSV usa la **zona de influencia + 15 m para
+siniestros y comparendos**, en lugar del criterio mixto del informe técnico. El informe técnico
+queda como está, como soporte.
+
+- **Entregables oficiales** (versionados en git):
+
+  | Archivo | Contenido | SHA-256 |
+  |---|---|---|
+  | `outputs/2026-10-04_sttv_linea-base-sast_plataforma-ansv.xlsx` | Una hoja por equipo con los bloques Año 1, 2 y 3 en el orden del formulario de la plataforma, más Resumen e Instrucciones | `0026f38fb16811e711ffc5f18941f84802a6ef179e702d540a0aeea716b2738d` |
+  | `outputs/2026-10-04_sttv_linea-base-sast_ejecutivo.html` | Informe ejecutivo para gerencia, con mapa interactivo | `0c80ac4e0d58c0604c3a2bb06da4df1639930ee79a9effefa5e235ad61c88a76` |
+
+- **Script:** `scripts/08_reporte_ejecutivo.py` (plantilla en `src/sast/ejecutivo.py`), commit
+  `2feda89d804d22d8d08f54209abbf5929c5e800c` (2feda89). Lee la tabla larga de la etapa 5, criterio
+  `buffer15`. Los insumos y las transformaciones son los mismos de esta ficha.
+- **Control:** las sumas de las hojas del Excel coinciden con la tabla del informe ejecutivo.
+- **Totales oficiales por equipo** (36 meses previos al inicio de cada equipo; «—» = código no
+  aprobado para el equipo):
+
+| Equipo | Inicio de operación | Fallecidos | Lesionados | C02 | C03 | C24 | C29 | C32 | C35 | D02 | D03 | D04 | D05 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| EQUIPO021 | 02/09/2026 | 0 | 0 | 11 | 1 | 2 | 0 | 3 | 6 | 6 | — | 20 | 21 |
+| EQUIPO022 | 02/09/2026 | 0 | 0 | 7 | 0 | 0 | 0 | 1 | 6 | 5 | — | 12 | 22 |
+| EQUIPO031 | 27/08/2026 | 2 | 3 | 326 | 0 | 17 | — | 3 | 16 | 20 | — | 3 | 2 |
+| EQUIPO032 | 27/08/2026 | 3 | 5 | 357 | 0 | 5 | — | 3 | 25 | 26 | — | 1 | 4 |
+| EQUIPO041 | 18/08/2026 | 0 | 0 | 1.331 | 1 | 20 | — | 16 | 74 | 85 | — | 91 | 16 |
+| EQUIPO042 | 17/06/2026 | 0 | 0 | 1.451 | 5 | 60 | — | 17 | 82 | 89 | — | 92 | 17 |
+| EQUIPO051 | 27/08/2026 | 0 | 3 | 2.404 | 0 | 10 | — | 9 | 167 | 139 | — | 4 | 5 |
+| EQUIPO052 | 27/08/2026 | 0 | 0 | 1.766 | 2 | 7 | — | 12 | 99 | 93 | — | 11 | 2 |
+| EQUIPO071 | 02/10/2026 | 0 | 1 | 3 | 0 | 11 | — | 3 | 6 | 4 | 0 | 0 | 1 |
+
+- **Totales por punto, sin doble conteo:**
+
+  | Punto | Comparendos | Fallecidos | Lesionados |
+  |---|---|---|---|
+  | Los Manguitos | 78 | 0 | 0 |
+  | Mercado Público | 635 | 3 | 5 |
+  | Colegio Loperena | 2.900 | 0 | 0 |
+  | La Viña | 3.663 | 0 | 3 |
+  | U. Área Andina | 28 | 0 | 1 |
+  | **Total** | **7.304** | **3** | **9** |
+
+- **Salvedad propia de este criterio:** con +15 m, el 041 incluye completo el cruce vecino
+  Cra 13 × Cl 16, donde termina su polígono. Por eso su cifra C02 casi duplica la del polígono
+  estricto. Las demás salvedades de esta ficha siguen vigentes.
+- **Validado por:** Santiago Torreglosa.
