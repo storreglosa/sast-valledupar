@@ -1,0 +1,23 @@
+# Equipos SAST en operación y datos que no trae el Excel de equipos.
+# Los códigos aprobados, nombres y coordenadas se leen del Excel (data/raw/equipos/).
+#
+# fecha_inicio: inicio de operación según la plataforma ANSV («Fecha inicio de operación:
+#   2 de Septiembre de 2026», formulario del equipo 12374). Se asume igual para todos
+#   mientras Santiago no confirme otra por equipo.
+# id_ansv: identificador del equipo en fotodeteccion-app.ansv.gov.co (pendiente; 12374 es
+#   uno de ellos, sin confirmar a cuál corresponde).
+
+solicitudes_operativas: [2, 3, 4, 5, 7]
+
+fecha_inicio_defecto: 2026-09-02
+
+equipos:
+  EQUIPO021: {fecha_inicio: null, id_ansv: null}
+  EQUIPO022: {fecha_inicio: null, id_ansv: null}
+  EQUIPO031: {fecha_inicio: null, id_ansv: null}
+  EQUIPO032: {fecha_inicio: null, id_ansv: null}
+  EQUIPO041: {fecha_inicio: null, id_ansv: null}
+  EQUIPO042: {fecha_inicio: null, id_ansv: null}
+  EQUIPO051: {fecha_inicio: null, id_ansv: null}
+  EQUIPO052: {fecha_inicio: null, id_ansv: null}
+  EQUIPO071: {fecha_inicio: null, id_ansv: null}

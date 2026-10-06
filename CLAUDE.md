@@ -28,3 +28,20 @@
 (se completa al construir el pipeline)
 
 ## Decisiones tomadas
+Acordadas con Santiago el 2026-10-06:
+1. **Período:** el HTML muestra la serie mensual de ene-2023 a sep-2026. El Excel
+   ANSV cubre los 36 meses de sep-2023 a ago-2026 (Año 1, 2 y 3; inicio de
+   operación el 2-sep-2026). Los comparendos generados por las cámaras SAST se
+   excluyen de la línea base y se informan aparte.
+2. **Fotodetección previa no SAST** (2024–2026, casi todo C02): entra en la línea
+   base, pero siempre desglosada por medio (agente / fotodetección previa).
+3. **Criterio espacial:** zona de influencia con buffer de 15 m (calculado en
+   EPSG:9377). La cifra con el polígono estricto se informa como sensibilidad.
+4. **Coordenada contra dirección:** manda la dirección geocodificada. Si
+   discrepan en más de 100 m, el registro se marca. La coordenada GPS se usa solo
+   cuando la dirección no se puede ubicar y la coordenada cae en el perímetro urbano.
+5. **Solapes:** un evento que cae en zonas de dos equipos cuenta para cada uno,
+   porque la ANSV pide el dato por equipo. El total por punto se calcula sin doble
+   conteo.
+6. **Fallecidos y lesionados** se cuentan como personas (`cantidad_muertos`,
+   `cantidad_heridos`), no como siniestros.
