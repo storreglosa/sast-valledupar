@@ -140,27 +140,6 @@ def excel_ansv(equipos: list[dict], resumen: pd.DataFrame, instrucciones: list[s
 # --------------------------------------------------------------------------------------------
 # Informe ejecutivo HTML
 # --------------------------------------------------------------------------------------------
-def barras(valores: list[int], meses: list[pd.Period], aria: str) -> str:
-    """Barras mensuales de los 36 meses, con separación de años (Año 1-3)."""
-    W, H, izq, aba, arr = 340, 92, 4, 18, 6
-    n = len(valores)
-    mx = max(valores + [1])
-    ancho = (W - izq * 2) / n
-    out = [f'<svg viewBox="0 0 {W} {H}" class="mini" role="img" aria-label="{esc(aria)}">']
-    for a in (1, 2):
-        x = izq + a * 12 * ancho
-        out.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="{arr}" y2="{H - aba}" class="sep"/>')
-    for a in range(3):
-        out.append(f'<text x="{izq + (a * 12 + 6) * ancho:.1f}" y="{H - 4}" class="eje" text-anchor="middle">Año {a + 1}</text>')
-    for i, v in enumerate(valores):
-        h = (H - aba - arr) * v / mx
-        x = izq + i * ancho + 0.6
-        out.append(f'<rect x="{x:.1f}" y="{H - aba - h:.1f}" width="{max(ancho - 1.2, 1):.1f}" height="{max(h, 0.5 if v else 0):.1f}" '
-                   f'class="barra"><title>{esc(mes_corto(meses[i]))}: {fmt(v)} comparendos</title></rect>')
-    out.append(f'<line x1="{izq}" x2="{W - izq}" y1="{H - aba}" y2="{H - aba}" class="base"/></svg>')
-    return "".join(out)
-
-
 CSS = """
 /* Layout: una columna editorial con bandas a todo el ancho (cifras, mapa) y una retícula de
    fichas por punto. Acento único: el naranja de la plataforma ANSV; la línea amarilla
@@ -168,7 +147,7 @@ CSS = """
 :root{
   --paper:#f4f5f2; --surface:#ffffff; --ink:#1c2227; --ink-2:#48525a; --ink-3:#78828a;
   --line:#dde1dc; --accent:#c95a24; --accent-soft:#f6e7de; --signal:#e5b100;
-  --dead:#b8332a; --hurt:#d08a16; --comp:#2f6fb2;
+  --dead:#b8332a; --hurt:#d08a16; --comp:#2f6fb2; --s-ag:#2a78d6; --s-fo:#eb6834; --base:#f3e3d6;
   --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
   --body:"Public Sans","Segoe UI",system-ui,sans-serif;
   color-scheme:light;
@@ -176,11 +155,11 @@ CSS = """
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --paper:#13171a; --surface:#1b2024; --ink:#eef1ee; --ink-2:#b9c1c6; --ink-3:#8b959c;
   --line:#2c343a; --accent:#e5824f; --accent-soft:#3a2a22; --signal:#d9a900;
-  --dead:#e0635a; --hurt:#e2a43a; --comp:#5d9be0; color-scheme:dark}}
+  --dead:#e0635a; --hurt:#e2a43a; --comp:#5d9be0; --s-ag:#3987e5; --s-fo:#d95926; --base:#33261e; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#13171a; --surface:#1b2024; --ink:#eef1ee; --ink-2:#b9c1c6; --ink-3:#8b959c;
   --line:#2c343a; --accent:#e5824f; --accent-soft:#3a2a22; --signal:#d9a900;
-  --dead:#e0635a; --hurt:#e2a43a; --comp:#5d9be0; color-scheme:dark}
+  --dead:#e0635a; --hurt:#e2a43a; --comp:#5d9be0; --s-ag:#3987e5; --s-fo:#d95926; --base:#33261e; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--paper);color:var(--ink);font:16px/1.6 var(--body);-webkit-font-smoothing:antialiased}
@@ -210,40 +189,58 @@ section{display:grid;gap:18px;padding-block:44px 0}
 .cifra.muertos .n{color:var(--dead)} .cifra.heridos .n{color:var(--hurt)}
 @media (max-width:760px){.cifras{grid-template-columns:repeat(2,minmax(0,1fr))}
   .cifra:nth-child(3){border-left:0}.cifra:nth-child(n+3){border-top:1px solid var(--line)}}
-#botones{display:flex;flex-wrap:wrap;gap:8px}
-#botones button{font:600 .9rem var(--body);padding:7px 14px;border:1px solid var(--line);border-radius:6px;
+.fila-botones{display:flex;flex-wrap:wrap;gap:8px}
+.fila-botones.sub{padding-left:14px;border-left:3px solid var(--accent)}
+.fila-botones.sub button{font-size:.84rem;padding:5px 12px}
+.fila-botones button{font:600 .9rem var(--body);padding:7px 14px;border:1px solid var(--line);border-radius:6px;
   background:var(--surface);color:var(--ink);cursor:pointer}
-#botones button:hover,#botones button:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
-#botones button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.fila-botones button:hover,.fila-botones button:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+.fila-botones button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 #mapa{height:min(68vh,600px);min-height:380px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .leyenda{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:.88rem;color:var(--ink-2)}
 .leyenda span{display:inline-flex;align-items:center;gap:8px}
 .sw{width:12px;height:12px;border-radius:50%;display:inline-block}
 .sw.eq{border-radius:3px;background:var(--ink)} .sw.zona{border-radius:3px;background:var(--accent-soft);border:2px solid var(--accent)}
-.sw.comp{background:var(--comp)} .sw.muerto{background:var(--dead)} .sw.herido{background:var(--hurt)}
+.sw.comp{background:var(--comp)} .sw.ag{background:var(--s-ag);border-radius:3px} .sw.fo{background:var(--s-fo);border-radius:3px}
+.sw.mu{background:var(--dead);border-radius:3px} .sw.he{background:var(--hurt);border-radius:3px} .sw.muerto{background:var(--dead)} .sw.herido{background:var(--hurt)}
 .placa-mapa span{display:block;background:#1c2227;color:#fff;font:700 12px/20px "Barlow Condensed",Arial,sans-serif;
   letter-spacing:.04em;text-align:center;border-radius:4px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45)}
-.puntos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:18px}
-.punto{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px;display:grid;gap:14px;align-content:start;min-width:0}
-.punto header{display:grid;gap:4px}
-.punto .sol{font-size:.8rem;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
-.placas{display:flex;flex-wrap:wrap;gap:8px}
-.placa{display:grid;gap:1px;border:1.5px solid var(--ink);border-radius:6px;padding:5px 10px;min-width:0}
-.placa b{font:700 1.05rem/1 var(--display);letter-spacing:.03em}
-.placa small{font-size:.72rem;color:var(--ink-3);line-height:1.2}
-.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border-block:1px solid var(--line);padding-block:12px}
-.trio div{display:grid;gap:0}
-.trio .n{font:700 1.9rem/1 var(--display);font-variant-numeric:tabular-nums}
-.trio .r{font-size:.78rem;color:var(--ink-3)}
-.trio .m .n{color:var(--dead)} .trio .h .n{color:var(--hurt)}
-.mini{width:100%;height:auto;display:block}
-.mini .barra{fill:var(--comp)} .mini .base{stroke:var(--ink-3)} .mini .sep{stroke:var(--line);stroke-dasharray:3 3}
-.mini .eje{fill:var(--ink-3);font:11px var(--body)}
-.top{display:grid;gap:6px;font-size:.88rem;margin:0;padding:0;list-style:none}
-.top li{display:grid;grid-template-columns:3.2em 1fr auto;gap:8px;align-items:baseline}
-.top code{font:700 .95rem var(--display);color:var(--accent)}
-.top span:last-child{font-variant-numeric:tabular-nums;font-weight:600}
-.ventana{font-size:.86rem;color:var(--ink-2)}
+.estado-mapa{font-size:.86rem;color:var(--ink-3)}
+.tablero{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:clamp(16px,3vw,28px);display:grid;gap:22px;min-width:0}
+.filtros{display:grid;gap:10px}
+.t-cab{display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:18px}
+.t-cab>div{min-width:0}
+.t-sol{font-size:.8rem;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
+.t-cab h3{font-size:clamp(1.6rem,3vw,2.1rem);margin-block:2px 6px}
+.t-meta{font-size:.9rem;color:var(--ink-2)}
+.t-kpis{display:flex;gap:28px}
+.t-kpis div{display:grid}
+.t-kpis .n{font:700 2.4rem/1 var(--display);font-variant-numeric:tabular-nums}
+.t-kpis .r{font-size:.8rem;color:var(--ink-3)}
+.t-kpis .m .n{color:var(--dead)} .t-kpis .h .n{color:var(--hurt)}
+.t-bloque{display:grid;gap:8px;min-width:0}
+.t-bloque h4{margin:0;font:600 .8rem var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.graf-env{position:relative;min-width:0}
+.graf-env svg{width:100%;height:auto;display:block;overflow:visible}
+.graf-env .grid{stroke:var(--line)} .graf-env .eje{fill:var(--ink-3);font:12px var(--body)}
+.graf-env .base{stroke:var(--ink-3)} .graf-env .ventana{fill:var(--base)}
+.graf-env .anio{fill:var(--accent);font:600 12px var(--body)} .graf-env .sepa{stroke:var(--accent);stroke-dasharray:4 4;opacity:.6}
+.graf-env .inicio{stroke:var(--ink);stroke-width:1.5;stroke-dasharray:5 4} .graf-env .inicio-t{fill:var(--ink);font:600 12px var(--body)}
+.graf-env .hit{fill:transparent;cursor:crosshair} .graf-env .col:hover .hit{fill:var(--line);opacity:.6}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font-size:.82rem;line-height:1.45;
+  padding:8px 11px;border-radius:7px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:5}
+.tip b{font-weight:600} .tip .sw{width:9px;height:9px;margin-right:6px}
+.cods{display:grid;gap:4px}
+.cod{display:grid;grid-template-columns:3.4em minmax(0,15em) minmax(60px,1fr) 4.5em;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.cod:last-child{border-bottom:0}
+.cod code{font:700 1.05rem var(--display);color:var(--accent)}
+.cod .desc{color:var(--ink-2);line-height:1.3}
+.cod .bar{display:flex;height:12px;border-radius:3px;overflow:hidden;background:var(--paper)}
+.cod .bar i{display:block;height:100%} .cod .bar .ag{background:var(--s-ag)} .cod .bar .fo{background:var(--s-fo)}
+.cod .tot{text-align:right;font:700 1.15rem var(--display);font-variant-numeric:tabular-nums}
+.cod .det{grid-column:2/-1;font-size:.78rem;color:var(--ink-3);margin-top:-4px}
+.cod.cero{opacity:.55}
+@media (max-width:640px){.cod{grid-template-columns:3em minmax(0,1fr) 4em}.cod .bar{grid-column:2/-1;grid-row:2}.cod .det{grid-row:3}}
 .tabla{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.92rem}
 th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -267,31 +264,13 @@ td.na{color:var(--ink-3)} td.vm{color:var(--dead);font-weight:600} td.vh{color:v
 .traza code{font-size:.85rem;background:var(--paper);padding:1px 6px;border-radius:4px}
 .pie{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:.82rem;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:8px 24px}
 .leaflet-tooltip{font:13px/1.4 var(--body)}
-@media (prefers-reduced-motion:no-preference){.punto{transition:border-color .2s}.punto:hover{border-color:var(--ink-3)}}
 """
 
 
 def pagina(c: dict, leaflet_css: str) -> str:
     """c: diccionario con todas las cifras y textos ya calculados."""
     datos = json.dumps(c["mapa"], ensure_ascii=False, separators=(",", ":"))
-    tarjetas = []
-    for p in c["puntos"]:
-        placas = "".join(
-            f'<div class="placa"><b>{esc(e["corto"])}</b><small>{esc(e["codigo_unico"])}<br>inicio {esc(e["inicio"])}</small></div>'
-            for e in p["equipos"])
-        top = "".join(f'<li><code>{esc(k)}</code><span>{esc(INFRACCIONES.get(k, ""))}</span><span>{fmt(v)}</span></li>'
-                      for k, v in p["top"])
-        tarjetas.append(f"""
-<article class="punto">
-  <header><span class="sol">Solicitud {esc(p["solicitud"])}</span><h3>{esc(p["nombre"])}</h3></header>
-  <div class="placas">{placas}</div>
-  <p class="ventana">Línea base: {esc(p["ventana"])}</p>
-  <div class="trio"><div><span class="n">{fmt(p["comparendos"])}</span><span class="r">comparendos</span></div>
-    <div class="m"><span class="n">{fmt(p["fallecidos"])}</span><span class="r">fallecidos</span></div>
-    <div class="h"><span class="n">{fmt(p["lesionados"])}</span><span class="r">lesionados</span></div></div>
-  {p["grafico"]}
-  <ul class="top">{top}</ul>
-</article>""")
+    tablero = json.dumps(c["tablero"], ensure_ascii=False, separators=(",", ":"))
     cods = c["codigos_tabla"]
     filas = []
     for e in c["tabla"]:
@@ -338,18 +317,36 @@ def pagina(c: dict, leaflet_css: str) -> str:
 <section id="mapa-seccion">
   <div><span class="eyebrow">Mapa interactivo</span><h2>Dónde están los equipos y qué pasó a su alrededor</h2></div>
   <p class="lead">Cada placa negra es un equipo. El área naranja es su zona de influencia. Los puntos muestran los comparendos y los
-    siniestros con víctimas de la línea base. Use los botones para acercarse a cada punto y pase el cursor sobre los elementos para ver el detalle.</p>
-  <div id="botones" role="group" aria-label="Centrar el mapa"></div>
+    siniestros con víctimas de la línea base. Elija un punto y luego uno de sus equipos para ver solo su zona; acerque o aleje con la
+    rueda del mouse y pase el cursor sobre los elementos para ver el detalle.</p>
+  <div class="filtros"><div id="botones" class="fila-botones" role="group" aria-label="Filtrar el mapa por punto"></div>
+    <div id="botones-eq" class="fila-botones sub" role="group" aria-label="Filtrar el mapa por equipo" hidden></div></div>
   <div id="mapa" aria-label="Mapa de equipos SAST, zonas de influencia y hechos de la línea base"></div>
   <div class="leyenda"><span><i class="sw eq"></i>Equipo SAST</span><span><i class="sw zona"></i>Zona de influencia</span>
     <span><i class="sw comp"></i>Comparendo</span><span><i class="sw muerto"></i>Siniestro con fallecidos</span>
     <span><i class="sw herido"></i>Siniestro con lesionados</span></div>
+  <p class="estado-mapa" id="estado-mapa"></p>
 </section>
 
-<section>
-  <div><span class="eyebrow">Por punto</span><h2>Los cinco puntos de control</h2></div>
-  <p class="lead">Comparendos por mes en los tres años de línea base de cada punto y las infracciones más frecuentes.</p>
-  <div class="puntos">{"".join(tarjetas)}</div>
+<section id="tablero-sec">
+  <div><span class="eyebrow">Tablero por punto y equipo</span><h2>Comportamiento mes a mes</h2></div>
+  <p class="lead">Elija un punto y, si quiere, uno de sus equipos. La franja sombreada son los 36 meses de la línea base, dividida en
+    sus tres años; la línea punteada marca el inicio de operación. Pase el cursor sobre cada mes para ver el detalle.</p>
+  <div class="tablero">
+    <div class="filtros"><div id="t-puntos" class="fila-botones" role="group" aria-label="Elegir punto"></div>
+      <div id="t-equipos" class="fila-botones sub" role="group" aria-label="Elegir equipo"></div></div>
+    <div class="t-cab"><div><span class="t-sol" id="t-sol"></span><h3 id="t-nombre"></h3><p class="t-meta" id="t-meta"></p></div>
+      <div class="t-kpis"><div><span class="n" id="k-comp"></span><span class="r">comparendos en la línea base</span></div>
+        <div class="m"><span class="n" id="k-fall"></span><span class="r">fallecidos</span></div>
+        <div class="h"><span class="n" id="k-les"></span><span class="r">lesionados</span></div></div></div>
+    <div class="t-bloque"><h4>Comparendos por mes</h4>
+      <div class="leyenda"><span><i class="sw ag"></i>Agentes de tránsito</span><span><i class="sw fo"></i>Fotodetección anterior a los equipos SAST</span></div>
+      <div class="graf-env" id="g-comp"></div></div>
+    <div class="t-bloque"><h4>Personas fallecidas y lesionadas por mes</h4>
+      <div class="leyenda"><span><i class="sw mu"></i>Fallecidos</span><span><i class="sw he"></i>Lesionados</span></div>
+      <div class="graf-env" id="g-vict"></div></div>
+    <div class="t-bloque"><h4>Comparendos por infracción en la línea base</h4><div class="cods" id="t-cods"></div></div>
+  </div>
 </section>
 
 <section>
@@ -393,30 +390,123 @@ def pagina(c: dict, leaflet_css: str) -> str:
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 const D={datos};
+const T={tablero};
+const css=getComputedStyle(document.documentElement);const col=v=>css.getPropertyValue(v).trim();
+const num=n=>Number(n).toLocaleString('es-CO');
+const MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const mesTxt=m=>MES[+m.slice(5)-1]+' '+m.slice(0,4);
+function botonera(cont,items,alElegir){{
+  cont.innerHTML='';const bs=[];
+  items.forEach((it,i)=>{{const b=document.createElement('button');b.type='button';b.textContent=it.t;b.setAttribute('aria-pressed','false');
+    b.onclick=()=>{{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');alElegir(it,i);}};
+    cont.appendChild(b);bs.push(b);}});
+  return bs;
+}}
+
+// ---------------- mapa ----------------
 (function(){{
   const el=document.getElementById('mapa');
   if(!window.L){{el.innerHTML='<p style="padding:20px">El mapa necesita conexión a internet.</p>';return;}}
-  const css=getComputedStyle(document.documentElement);const c=v=>css.getPropertyValue(v).trim();
   // la vista se fija antes de agregar capas: sin centro, Leaflet falla al dibujar los círculos
-  const m=L.map(el,{{scrollWheelZoom:false}}).setView([10.47,-73.257],14);
+  const m=L.map(el,{{scrollWheelZoom:true}}).setView([10.47,-73.257],14);
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{{z}}/{{y}}/{{x}}',
     {{maxZoom:19,attribution:'Fondo © Esri, HERE, Garmin, OpenStreetMap contributors'}}).addTo(m);
-  const zonas=L.geoJSON(D.zonas,{{style:{{color:c('--accent'),weight:2,fillColor:c('--accent'),fillOpacity:.16}},
-    onEachFeature:(f,l)=>l.bindTooltip('Zona de influencia '+f.properties.equipo)}}).addTo(m);
-  D.comparendos.forEach(p=>L.circleMarker([p[1],p[0]],{{radius:4,weight:1,color:'#fff',fillColor:c('--comp'),fillOpacity:.85}})
-    .bindTooltip(p[2]+' · '+p[3]+' · '+p[4]).addTo(m));
-  D.siniestros.forEach(p=>{{const mu=p[3]>0;L.circleMarker([p[1],p[0]],{{radius:8,weight:2,color:'#fff',
-    fillColor:mu?c('--dead'):c('--hurt'),fillOpacity:.95}})
-    .bindTooltip('Siniestro del '+p[2]+'<br>'+(p[3]?p[3]+' fallecido'+(p[3]>1?'s':'')+'<br>':'')+(p[4]?p[4]+' lesionado'+(p[4]>1?'s':''):''))
-    .addTo(m);}});
-  D.equipos.forEach(p=>L.marker([p[1],p[0]],{{icon:L.divIcon({{className:'placa-mapa',html:'<span>'+p[2]+'</span>',iconSize:[38,24]}}),zIndexOffset:1000}})
-    .bindTooltip('<b>Equipo '+p[2]+'</b> · '+p[3]+'<br>'+p[4]+'<br>Código único '+p[5]+' · inicio '+p[6]).addTo(m));
-  const todo=()=>m.fitBounds(zonas.getBounds(),{{padding:[30,30]}});todo();
-  const cont=document.getElementById('botones');const botones=[];
-  const boton=(t,f)=>{{const b=document.createElement('button');b.type='button';b.textContent=t;b.setAttribute('aria-pressed','false');
-    b.onclick=()=>{{botones.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');f();}};cont.appendChild(b);botones.push(b);}};
-  boton('Toda la ciudad',todo);botones[0].setAttribute('aria-pressed','true');
-  D.puntos.forEach(p=>boton(p.nombre,()=>m.fitBounds(L.latLngBounds(p.limites),{{padding:[40,40],maxZoom:18}})));
+  const gZ=L.layerGroup().addTo(m),gC=L.layerGroup().addTo(m),gS=L.layerGroup().addTo(m),gE=L.layerGroup().addTo(m);
+  const estado=document.getElementById('estado-mapa');
+  function dibujar(sel,rotulo){{
+    [gZ,gC,gS,gE].forEach(g=>g.clearLayers());
+    const ok=l=>!sel||l.some(e=>sel.includes(e));
+    L.geoJSON(D.zonas,{{filter:f=>!sel||sel.includes(f.properties.equipo),
+      style:{{color:col('--accent'),weight:2,fillColor:col('--accent'),fillOpacity:.16}},
+      onEachFeature:(f,l)=>l.bindTooltip('Zona de influencia '+f.properties.equipo)}}).addTo(gZ);
+    let nc=0,ns=0;
+    D.comparendos.forEach(p=>{{if(!ok(p[5]))return;nc++;
+      L.circleMarker([p[1],p[0]],{{radius:4,weight:1,color:'#fff',fillColor:col('--comp'),fillOpacity:.85}})
+        .bindTooltip(p[2]+' · '+p[3]+' · '+p[4]).addTo(gC);}});
+    D.siniestros.forEach(p=>{{if(!ok(p[5]))return;ns++;const mu=p[3]>0;
+      L.circleMarker([p[1],p[0]],{{radius:8,weight:2,color:'#fff',fillColor:mu?col('--dead'):col('--hurt'),fillOpacity:.95}})
+        .bindTooltip('Siniestro del '+p[2]+'<br>'+(p[3]?p[3]+' fallecido'+(p[3]>1?'s':'')+'<br>':'')+(p[4]?p[4]+' lesionado'+(p[4]>1?'s':''):''))
+        .addTo(gS);}});
+    D.equipos.forEach(p=>{{const act=!sel||sel.includes(p[7]);
+      L.marker([p[1],p[0]],{{icon:L.divIcon({{className:'placa-mapa',html:'<span>'+p[2]+'</span>',iconSize:[38,24]}}),
+        zIndexOffset:act?1000:0,opacity:act?1:.35}})
+        .bindTooltip('<b>Equipo '+p[2]+'</b> · '+p[3]+'<br>'+p[4]+'<br>Código único '+p[5]+' · inicio '+p[6]).addTo(gE);}});
+    estado.textContent=rotulo+': '+num(nc)+' comparendos y '+ns+' siniestros con víctimas en la línea base.';
+  }}
+  const todo=()=>m.fitBounds(L.geoJSON(D.zonas).getBounds(),{{padding:[30,30]}});
+  const cajaEq=document.getElementById('botones-eq');
+  const puntos=[{{t:'Toda la ciudad'}}].concat(D.puntos.map(p=>({{t:p.nombre,p}})));
+  const bs=botonera(document.getElementById('botones'),puntos,(it)=>{{
+    if(!it.p){{cajaEq.hidden=true;dibujar(null,'Toda la ciudad');todo();return;}}
+    const p=it.p;cajaEq.hidden=false;
+    const sub=[{{t:'Todo el punto'}}].concat(p.equipos.map(e=>({{t:e,e}})));
+    const be=botonera(cajaEq,sub,(x)=>{{
+      if(!x.e){{dibujar(p.equipos,p.nombre);m.fitBounds(L.latLngBounds(p.limites),{{padding:[40,40],maxZoom:18}});return;}}
+      dibujar([x.e],x.e+' · '+p.nombre);m.fitBounds(L.latLngBounds(D.limites_equipo[x.e]),{{padding:[50,50],maxZoom:19}});
+    }});
+    be[0].click();
+  }});
+  bs[0].click();
+}})();
+
+// ---------------- tablero ----------------
+(function(){{
+  const W=1000;
+  function escala(mx){{const pasos=[1,2,5,10,20,25,50,100,200,250,500,1000];
+    const p=pasos.find(x=>x>=mx/4)||1000;return {{paso:p,tope:Math.max(p,Math.ceil(mx/p)*p)}};}}
+  function grafico(cont,u,series,H){{
+    const meses=T.meses,n=meses.length,izq=46,der=10,arr=30,aba=28;
+    const bw=(W-izq-der)/n,tot=meses.map((_,i)=>series.reduce((a,s)=>a+s.v[i],0));
+    const {{paso,tope}}=escala(Math.max(1,...tot));const y=v=>arr+(H-arr-aba)*(1-v/tope);
+    const i0=meses.indexOf(u.ventana[0]),i1=meses.indexOf(u.ventana[1]),ii=meses.indexOf(u.mes_inicio);
+    let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Serie mensual de '+u.nombre+'">';
+    if(i0>=0&&i1>=0){{s+='<rect class="ventana" x="'+(izq+i0*bw)+'" y="'+arr+'" width="'+((i1-i0+1)*bw)+'" height="'+(H-arr-aba)+'"/>';
+      for(let a=0;a<3;a++){{const xa=izq+(i0+a*12)*bw;if(a)s+='<line class="sepa" x1="'+xa+'" x2="'+xa+'" y1="'+(arr-4)+'" y2="'+(H-aba)+'"/>';
+        s+='<text class="anio" x="'+(xa+6*bw)+'" y="'+(arr-10)+'" text-anchor="middle">Año '+(a+1)+'</text>';}}}}
+    for(let k=0;k<=tope;k+=paso)s+='<line class="grid" x1="'+izq+'" x2="'+(W-der)+'" y1="'+y(k)+'" y2="'+y(k)+'"/>'+
+      '<text class="eje" x="'+(izq-8)+'" y="'+(y(k)+4)+'" text-anchor="end">'+num(k)+'</text>';
+    meses.forEach((m,i)=>{{const x=izq+i*bw;let base=0,g='<g class="col" data-i="'+i+'"><rect class="hit" x="'+x+'" y="'+arr+'" width="'+bw+'" height="'+(H-arr-aba)+'"/>';
+      series.forEach(sr=>{{const v=sr.v[i];if(!v)return;const y0=y(base),y1=y(base+v);
+        g+='<rect x="'+(x+1)+'" y="'+y1+'" width="'+Math.max(bw-2,1)+'" height="'+Math.max(y0-y1-(base?1.5:0),1)+'" style="fill:var('+sr.c+')"/>';base+=v;}});
+      s+=g+'</g>';if(m.endsWith('-01'))s+='<text class="eje" x="'+(x+2)+'" y="'+(H-8)+'">'+m.slice(0,4)+'</text>';}});
+    if(ii>=0){{const xi=izq+ii*bw;s+='<line class="inicio" x1="'+xi+'" x2="'+xi+'" y1="'+(arr-4)+'" y2="'+(H-aba)+'"/>'+
+      '<text class="inicio-t" x="'+(xi-6)+'" y="'+(arr+12)+'" text-anchor="end">Inicio de operación</text>';}}
+    s+='<line class="base" x1="'+izq+'" x2="'+(W-der)+'" y1="'+y(0)+'" y2="'+y(0)+'"/></svg><div class="tip" hidden></div>';
+    cont.innerHTML=s;const tip=cont.querySelector('.tip'),svg=cont.querySelector('svg');
+    cont.querySelectorAll('.col').forEach(gr=>{{
+      gr.addEventListener('mouseenter',()=>{{const i=+gr.dataset.i,m=meses[i];
+        const enBase=i>=i0&&i<=i1?'Línea base · Año '+(Math.floor((i-i0)/12)+1):(i>=ii&&ii>=0?'Equipo en operación':'Fuera de la línea base');
+        tip.innerHTML='<b>'+mesTxt(m)+'</b> · '+enBase+'<br>'+series.map(sr=>'<i class="sw" style="background:var('+sr.c+')"></i>'+sr.n+': <b>'+num(sr.v[i])+'</b>').join('<br>')+
+          (series.length>1?'<br>Total: <b>'+num(tot[i])+'</b>':'');
+        tip.hidden=false;const r=svg.getBoundingClientRect(),esc=r.width/W;
+        let left=(izq+(i+.5)*bw)*esc+12;if(left+tip.offsetWidth>r.width)left=(izq+(i+.5)*bw)*esc-tip.offsetWidth-12;
+        tip.style.left=Math.max(0,left)+'px';tip.style.top='8px';}});
+      gr.addEventListener('mouseleave',()=>{{tip.hidden=true;}});}});
+  }}
+  function codigos(u){{
+    const mx=Math.max(1,...u.codigos.map(c=>c.agente+c.foto));
+    document.getElementById('t-cods').innerHTML=u.codigos.slice().sort((a,b)=>(b.agente+b.foto)-(a.agente+a.foto)).map(c=>{{const t=c.agente+c.foto;
+      return '<div class="cod'+(t?'':' cero')+'"><code>'+c.codigo+'</code><span class="desc">'+c.desc+'</span>'+
+        '<span class="bar" title="Agentes '+num(c.agente)+' · Fotodetección '+num(c.foto)+'"><i class="ag" style="width:'+(100*c.agente/mx)+'%"></i><i class="fo" style="width:'+(100*c.foto/mx)+'%"></i></span>'+
+        '<span class="tot">'+num(t)+'</span><span class="det">Agentes '+num(c.agente)+' · fotodetección '+num(c.foto)+'</span></div>';}}).join('');
+  }}
+  function mostrar(u,p){{
+    document.getElementById('t-sol').textContent='Solicitud '+p.solicitud+(u===p?' · '+p.equipos.length+' equipos':' · '+p.nombre);
+    document.getElementById('t-nombre').textContent=u===p?p.nombre:'Equipo '+u.nombre.slice(-3);
+    document.getElementById('t-meta').textContent=(u===p?'Equipos '+p.equipos.map(e=>e.nombre.slice(-3)).join(' y ')+' · ':u.direccion+' · código único '+u.codigo_unico+' · ')+
+      'inicio de operación '+u.inicio+' · línea base '+u.texto_ventana;
+    document.getElementById('k-comp').textContent=num(u.tot.comparendos);
+    document.getElementById('k-fall').textContent=num(u.tot.fallecidos);
+    document.getElementById('k-les').textContent=num(u.tot.lesionados);
+    grafico(document.getElementById('g-comp'),u,[{{n:'Agentes',c:'--s-ag',v:u.agente}},{{n:'Fotodetección anterior',c:'--s-fo',v:u.foto}}],290);
+    grafico(document.getElementById('g-vict'),u,[{{n:'Fallecidos',c:'--dead',v:u.fallecidos}},{{n:'Lesionados',c:'--hurt',v:u.lesionados}}],150);
+    codigos(u);
+  }}
+  const caja=document.getElementById('t-equipos');
+  const bp=botonera(document.getElementById('t-puntos'),T.puntos.map(p=>({{t:p.nombre,p}})),(it)=>{{
+    const p=it.p;const be=botonera(caja,[{{t:'Todo el punto',u:p}}].concat(p.equipos.map(e=>({{t:'Equipo '+e.nombre.slice(-3),u:e}}))),x=>mostrar(x.u,p));
+    be[0].click();}});
+  bp[0].click();
 }})();
 </script>
 </body></html>"""

@@ -20,9 +20,9 @@ import geopandas as gpd
 import pandas as pd
 
 import _entorno  # noqa: F401
-from sast.ejecutivo import INFRACCIONES, barras, excel_ansv, fmt, mes_largo, pagina, rango
+from sast.ejecutivo import INFRACCIONES, excel_ansv, fmt, mes_largo, pagina, rango
 from sast.equipos import equipos_operativos
-from sast.rutas import OUTPUTS, PROCESSED, RAIZ, anio_base, ventana_base
+from sast.rutas import OUTPUTS, PROCESSED, RAIZ, anio_base, meses_serie, ventana_base
 
 CRITERIO = "buffer15"
 MEDIOS = ["agente", "fotodeteccion_previa"]
@@ -77,7 +77,6 @@ def main() -> None:
         v = ventana_base(inicio)
         d = l[(l["nivel"] == "solicitud") & (l["unidad"] == str(sol))]
         compd = d[~d["indicador"].isin(VICTIMAS)]
-        serie = [int(compd[compd["mes"] == str(m)]["valor"].sum()) for m in v]
         top = compd.groupby("indicador")["valor"].sum().sort_values(ascending=False).head(3)
         zz = gpd.read_file(PROCESSED / "equipos_sast.gpkg", layer="zonas_buffer")
         b = zz[zz["equipo"].isin(g["equipo"])].total_bounds
@@ -90,7 +89,6 @@ def main() -> None:
             "fallecidos": int(d[d["indicador"] == "Fallecidos"]["valor"].sum()),
             "lesionados": int(d[d["indicador"] == "Lesionados"]["valor"].sum()),
             "top": [(k, int(x)) for k, x in top.items() if x > 0],
-            "grafico": barras(serie, list(v), f"Comparendos por mes en {nombre}"),
             "limites": [[b[1], b[0]], [b[3], b[2]]],
         })
 
@@ -101,20 +99,64 @@ def main() -> None:
     e["en_base"] = [anio_base(pd.Period(m, "M"), inicio_eq[u]) is not None for m, u in zip(e["mes"], e["unidad"])]
     e = e[e["en_base"]]
     ec = e[(e["tipo"] == "comparendo") & e["medio"].isin(MEDIOS)]
-    ec = ec[[c in aprob[u] for c, u in zip(ec["codigo"], ec["unidad"])]].drop_duplicates("id_evento")
-    es = e[(e["tipo"] == "siniestro")].drop_duplicates("id_evento")
+    ec = ec[[c in aprob[u] for c, u in zip(ec["codigo"], ec["unidad"])]]
+    eqs_c = ec.groupby("id_evento")["unidad"].agg(lambda u: sorted(set(u)))
+    ec = ec.drop_duplicates("id_evento").assign(eqs=lambda x: x["id_evento"].map(eqs_c))
+    es = e[(e["tipo"] == "siniestro")]
+    eqs_s = es.groupby("id_evento")["unidad"].agg(lambda u: sorted(set(u)))
+    es = es.drop_duplicates("id_evento").assign(eqs=lambda x: x["id_evento"].map(eqs_s))
     es = es[(es["cantidad_muertos"] + es["cantidad_heridos"]) > 0]
     zb = gpd.read_file(PROCESSED / "equipos_sast.gpkg", layer="zonas_buffer")
     mapa = {
         "zonas": json.loads(zb[["equipo", "geometry"]].to_json()),
         "equipos": [[round(r.lon, 6), round(r.lat, 6), r.equipo[-3:], r.punto.title(), r.direccion_ansv,
-                     r.codigo_unico, r.fecha_inicio.strftime("%d/%m/%Y")] for r in eq.itertuples()],
+                     r.codigo_unico, r.fecha_inicio.strftime("%d/%m/%Y"), r.equipo] for r in eq.itertuples()],
         "comparendos": [[round(r.lon_u, 6), round(r.lat_u, 6), f"{r.fecha:%d/%m/%Y}", r.codigo,
-                         INFRACCIONES.get(r.codigo, "")] for r in ec.itertuples()],
+                         INFRACCIONES.get(r.codigo, ""), r.eqs] for r in ec.itertuples()],
         "siniestros": [[round(r.lon, 6), round(r.lat, 6), f"{r.fecha:%d/%m/%Y}", int(r.cantidad_muertos),
-                        int(r.cantidad_heridos)] for r in es.itertuples()],
-        "puntos": [{"nombre": p["nombre"], "limites": p["limites"]} for p in puntos],
+                        int(r.cantidad_heridos), r.eqs] for r in es.itertuples()],
+        "puntos": [{"nombre": p["nombre"], "limites": p["limites"],
+                    "equipos": [x for x in eq[eq["solicitud"] == p["solicitud"]]["equipo"]]} for p in puntos],
+        "limites_equipo": {r.equipo: [[b[1], b[0]], [b[3], b[2]]]
+                           for r, b in ((r, r.geometry.bounds) for r in zb.itertuples())},
     }
+
+    # ---------------- tablero: serie mensual y códigos por punto y por equipo ----------------
+    meses_s = [str(m) for m in meses_serie()]
+    ls = largo[(largo["criterio"] == CRITERIO) & largo["aprobado"] & largo["medio"].isin(MEDIOS + ["portal"])]
+
+    def unidad(nivel, u, inicio, nombre, codigos):
+        d = ls[(ls["nivel"] == nivel) & (ls["unidad"] == u)]
+        v = ventana_base(inicio)
+        piv = lambda m: d[m].groupby("mes")["valor"].sum().reindex(meses_s, fill_value=0).astype(int).tolist()  # noqa: E731
+        base = d[d["anio_base"].notna()]
+        cods = []
+        for k in sorted(codigos):
+            b = base[base["indicador"] == k]
+            cods.append({"codigo": k, "desc": INFRACCIONES.get(k, ""),
+                         "agente": int(b[b["medio"] == "agente"]["valor"].sum()),
+                         "foto": int(b[b["medio"] == "fotodeteccion_previa"]["valor"].sum())})
+        return {"nombre": nombre, "ventana": [str(v[0]), str(v[-1])], "texto_ventana": rango(v),
+                "inicio": inicio.strftime("%d/%m/%Y"), "mes_inicio": str(inicio.to_period("M")),
+                "agente": piv(d["medio"] == "agente"), "foto": piv(d["medio"] == "fotodeteccion_previa"),
+                "fallecidos": piv(d["indicador"] == "Fallecidos"), "lesionados": piv(d["indicador"] == "Lesionados"),
+                "tot": {"comparendos": int(base[~base["indicador"].isin(VICTIMAS)]["valor"].sum()),
+                        "fallecidos": int(base[base["indicador"] == "Fallecidos"]["valor"].sum()),
+                        "lesionados": int(base[base["indicador"] == "Lesionados"]["valor"].sum())},
+                "codigos": cods}
+
+    tablero = {"meses": meses_s, "puntos": []}
+    for p in puntos:
+        g = eq[eq["solicitud"] == p["solicitud"]]
+        tp = unidad("solicitud", str(p["solicitud"]), g["fecha_inicio"].min(), p["nombre"], set().union(*g["codigos"]))
+        tp["solicitud"] = p["solicitud"]
+        tp["equipos"] = [{**unidad("equipo", r.equipo, r.fecha_inicio, r.equipo, r.codigos),
+                          "codigo_unico": r.codigo_unico, "direccion": r.direccion_ansv} for r in g.itertuples()]
+        assert tp["tot"]["comparendos"] == p["comparendos"], p["nombre"]
+        tablero["puntos"].append(tp)
+    tab_eq = {e_["nombre"]: e_ for tp in tablero["puntos"] for e_ in tp["equipos"]}
+    for t in tabla:
+        assert tab_eq[t["equipo"]]["tot"]["comparendos"] == sum(v for k, v in t.items() if k in INFRACCIONES), t["equipo"]
 
     # ---------------- control: puntos = mapa, equipo = tabla ----------------
     for p in puntos:
@@ -139,7 +181,7 @@ def main() -> None:
         "tot_fallecidos": sum(p["fallecidos"] for p in puntos),
         "tot_lesionados": sum(p["lesionados"] for p in puntos),
         "n_comparendos_total": len(base), "pct_no_ubicable": f"El {pct:.0%}".replace(".", ","),
-        "puntos": puntos, "tabla": tabla, "codigos_tabla": cods, "mapa": mapa,
+        "puntos": puntos, "tablero": tablero, "tabla": tabla, "codigos_tabla": cods, "mapa": mapa,
         "generado": f"{date.today():%d/%m/%Y}", "version": version(),
         "fuentes": [
             ("Siniestros", f"Sistema de información de siniestralidad vial de Valledupar (portal de la ANSV), corte {corte_s}."),
