@@ -1,0 +1,1 @@
+# Se pinea con versiones exactas al crear el entorno (ver README).

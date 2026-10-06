@@ -1,0 +1,14 @@
+# Credenciales
+.env
+# Datos crudos: comparendos con cédula, nombre y placa (datos personales)
+data/raw/*
+!data/raw/.gitkeep
+# Procesados intermedios pesados
+data/processed/*.parquet
+data/processed/cache/
+# Entorno
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
