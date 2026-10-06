@@ -1,6 +1,8 @@
 """Etapa 5 — Indicadores por equipo y mes en la zona de influencia.
 
-Criterios espaciales (decisión 3): `buffer15` (oficial: polígono + 15 m) y `estricto`.
+Criterios espaciales: `oficial` (mixto, decisión 15: estricto para comparendos ubicados por
+dirección, +15 m para siniestros y comparendos ubicados por GPS), `buffer15` y `estricto`
+(sensibilidad).
 Indicadores: Fallecidos y Lesionados (personas, portal) y cada código de infracción aprobado
 para el equipo. Los comparendos se desglosan por medio (agente / fotodeteccion_previa); los
 generados por las cámaras SAST van aparte (`sast`) y no entran a la línea base (decisión 1).
@@ -72,6 +74,13 @@ def main() -> None:
             j["mes"] = j["fecha"].dt.to_period("M")
         jc = jc[(jc["mes"] >= SERIE_INICIO) & (jc["mes"] <= SERIE_FIN)]
         js = js[(js["mes"] >= SERIE_INICIO) & (js["mes"] <= SERIE_FIN)]
+        # criterio oficial mixto (decisión 15): comparendos ubicados por dirección (sobre el eje
+        # de la vía) -> polígono estricto; ubicados por GPS y siniestros (coordenada) -> +15 m
+        por_dir = jc["ubicacion"].isin(["direccion", "direccion_gps"])
+        jc = pd.concat([jc, jc[(por_dir & (jc["criterio"] == "estricto"))
+                               | (~por_dir & (jc["criterio"] == "buffer15"))].assign(criterio="oficial")],
+                       ignore_index=True)
+        js = pd.concat([js, js[js["criterio"] == "buffer15"].assign(criterio="oficial")], ignore_index=True)
         eventos.append(jc.assign(nivel=unidad, tipo="comparendo").rename(columns={unidad: "unidad"}))
         eventos.append(js.assign(nivel=unidad, tipo="siniestro").rename(columns={unidad: "unidad"}))
 
@@ -101,14 +110,55 @@ def main() -> None:
     # resumen en pantalla: línea base oficial por equipo
     base = largo[(largo["nivel"] == "equipo") & largo["anio_base"].notna() & largo["aprobado"]
                  & (largo["medio"] != "sast")]
-    for crit in CRITERIOS:
+    for crit in ["oficial", *CRITERIOS]:
         t = base[base["criterio"] == crit].pivot_table(index="unidad", columns="indicador",
                                                        values="valor", aggfunc="sum", fill_value=0)
         print(f"\nLínea base sep-2023–ago-2026, criterio {crit} (aprobados, sin SAST):")
         print(t.to_string())
-    sast = largo[(largo["medio"] == "sast") & (largo["nivel"] == "equipo") & (largo["criterio"] == "buffer15")]
+    sast = largo[(largo["medio"] == "sast") & (largo["nivel"] == "equipo") & (largo["criterio"] == "oficial")]
     print("\nComparendos SAST por equipo de zona (aparte):")
     print(sast.pivot_table(index="unidad", columns="indicador", values="valor", aggfunc="sum", fill_value=0).to_string())
+
+    # siniestros en zona para revisión manual (hallazgo de auditoría 2026-10-06), con posible gemelo:
+    # otro siniestro del portal a ±1 día y < 150 m (típico de «Deceso clínico» que repite un hecho)
+    sz = ev[(ev["tipo"] == "siniestro") & (ev["criterio"] == "oficial") & (ev["nivel"] == "equipo")]
+    rev = (sz.groupby("id_evento").agg(equipos=("unidad", lambda u: ", ".join(sorted(u))))
+           .join(s.set_index("id_evento")[["codrot", "fecha", "gravedad", "cantidad_muertos", "cantidad_heridos",
+                                           "fuente", "direccion", "x", "y"]]).reset_index(drop=True))
+    gemelos = []
+    for r in rev.itertuples():
+        cerca = s[(s["codrot"] != r.codrot) & ((s["fecha"] - r.fecha).abs() <= pd.Timedelta(days=1))
+                  & (((s["x"] - r.x) ** 2 + (s["y"] - r.y) ** 2) ** 0.5 < 150)]
+        gemelos.append("; ".join(f"{c.codrot} ({c.fuente}, {c.fecha:%d/%m/%Y}, m {c.cantidad_muertos} h {c.cantidad_heridos})"
+                                 for c in cerca.itertuples()))
+    rev["posible_gemelo"] = gemelos
+    rev["base"] = rev["fecha"].dt.to_period("M").map(anio_base).notna()
+    rev.drop(columns=["x", "y"]).sort_values("fecha").to_csv(
+        OUTPUTS / "tables" / "siniestros_en_zona_revision.csv", index=False, encoding="utf-8-sig")
+    print(f"\nSiniestros en alguna zona (buffer 15 m), ene-2023–sep-2026: {len(rev)} "
+          f"({rev['base'].sum()} en la línea base; {(rev['posible_gemelo'] != '').sum()} con posible gemelo) "
+          "-> outputs/tables/siniestros_en_zona_revision.csv")
+
+    # sensibilidad de la ubicación (hallazgo 4 de la auditoría): sobre los comparendos de la línea
+    # base con GPS utilizable y dirección ubicada, ¿cuántos caen en cada zona por dirección y por GPS?
+    cg = pd.read_parquet(PROCESSED / "comparendos_ubicados.parquet")
+    cg = cg[cg["medio"].isin(["agente", "fotodeteccion_previa"]) & cg["coord_estado"].eq("ok")
+            & cg["ubicacion"].isin(["direccion", "direccion_gps"])].copy()
+    cg = cg[cg["fecha"].dt.to_period("M").map(anio_base).notna()]
+    cg["id_evento"] = "C" + cg["nro"] + "_" + cg["codigo"]
+    gps = gpd.GeoSeries(gpd.points_from_xy(cg["lon"], cg["lat"]), crs=4326).to_crs(CRS_METRICO)
+    filas_s = []
+    for fuente, geom in (("direccion", gpd.points_from_xy(cg["x"], cg["y"])), ("gps", gps.values)):
+        g = gpd.GeoDataFrame(cg[["id_evento", "codigo"]], geometry=geom, crs=CRS_METRICO)
+        j = en_zonas(g, z, "equipo").merge(cg[["id_evento", "codigo"]], on="id_evento")
+        j = j[[c in aprob_eq[e] for c, e in zip(j["codigo"], j["equipo"])]]
+        filas_s.append(j.groupby(["equipo", "criterio"]).size().rename(fuente))
+    sens = pd.concat(filas_s, axis=1).fillna(0).astype(int).unstack("criterio")
+    sens.columns = [f"{a}_{b}" for a, b in sens.columns]
+    sens = sens.reindex(sorted(aprob_eq)).fillna(0).astype(int).reset_index()
+    sens.to_csv(OUTPUTS / "tables" / "sensibilidad_ubicacion.csv", index=False, encoding="utf-8-sig")
+    print(f"\nSensibilidad (línea base, {len(cg):,} comparendos con GPS y dirección ubicada; códigos aprobados):")
+    print(sens.to_string(index=False))
 
     largo.to_parquet(PROCESSED / "indicadores_largo.parquet", index=False)
     ev.to_parquet(PROCESSED / "eventos_en_zona.parquet", index=False)

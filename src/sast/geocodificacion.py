@@ -25,12 +25,16 @@ Reglas [Nuestra] (docs/metodologia.md):
 - Dirección de un equipo SAST (Excel de equipos): si la referencia no da ese cruce o lo da a
   más de `PUNTO_EQUIPO_M` de la coordenada levantada del equipo, manda la coordenada del
   equipo (`punto_equipo`). Caso que lo motiva: «TRANSVERSAL 12 - CALLE 20B» (equipo 032), cuyo
-  cruce en IGAC+OSM queda a 115 m de la zona porque allí la referencia nombra las vías
+  cruce teórico en IGAC+OSM (punto medio de un hueco) queda a 265 m del equipo porque allí la referencia nombra las vías
   como Calle 21/22 y Carrera 15/16.
 - Placa sobre diagonal o transversal («DIAGONAL 21 # 18B-6»): el lector original solo infiere la
   vía generadora para calle y carrera. Aquí se prueba, en orden, el tipo que cruza (diagonal ->
   carrera, luego transversal; transversal -> calle, luego diagonal) y se toma el primero que
   existe y cruza en la referencia; queda marcado en `alias`.
+- Placa sin «#» («CARRERA 16 20-27», «CALLE 16B 14-08»): el lector original solo reconoce la
+  placa tras «#» o un conector. Si tras la primera vía viene «número[letra][BIS] - número», se
+  inserta el «#» antes de leer (`marcar_placa`). «DIAGONAL 16-18» (un solo número tras el guion)
+  no se interpreta: puede ser placa o cruce.
 - Vía sola, vías paralelas, kilometraje, referencias o texto no interpretable: la dirección
   no da un punto (`sin_punto`).
 """
@@ -43,13 +47,14 @@ from dataclasses import dataclass, field
 from shapely import Point
 from shapely.ops import nearest_points
 
-from sast.ubicacion.direccion import _MARCA_PLACA, Via, leer, limpiar
+from sast.ubicacion.direccion import _MARCA_PLACA, _VIA, Via, leer, limpiar
 from sast.ubicacion.geocodificar import Ejes, cruces_teoricos
 
 # placa tras el número de la vía generadora: «# 12-20», «# 7A 41», «12 B BIS - 20»
 _PLACA_TRAS_MARCA = re.compile(r"#\s*\d{1,3}\s*(?:[A-Z]\b)?\s*(?:BIS\b)?\s*(?:[A-Z]\b)?\s*-?\s*(\d{1,3})\b")
 _GENERADORA = re.compile(r"#\s*(\d{1,3})(?!\d)\s*([A-WZ](?![A-Z]))?\s*(BIS\b)?")
 CRUZA = {"DG": ("CR", "TV"), "TV": ("CL", "DG")}
+_PLACA_SIN_MARCA = re.compile(r"^(\s+)(\d{1,3}\s*(?:[A-Z]\b)?\s*(?:BIS\b)?\s*(?:[A-Z]\b)?\s*-\s*\d{1,3})\b")
 _PLACA_GUION = re.compile(r"\b\d{1,3}\s*(?:[A-Z]\b)?\s*(?:BIS\b)?\s*(?:[A-Z]\b)?\s*-\s*(\d{1,3})\b")
 SIGUIENTE_MAX_M = 250.0     # el siguiente cruce debe estar a menos de esto (una cuadra larga)
 CERCANOS_M = 150.0          # candidatos de un mismo cruce a menos de esto: se promedian
@@ -65,6 +70,21 @@ class Resultado:
     detalle: str = ""
     vias: str = ""
     alias: str = ""
+
+
+def marcar_placa(texto: str) -> str:
+    """«CARRERA 16 20-27» -> «CARRERA 16 # 20-27». Sin cambios si ya hay «#» o no calza."""
+    t = limpiar(texto)
+    if "#" in _MARCA_PLACA.sub(" # ", t):
+        return t
+    m = _VIA.search(t)
+    if not m:
+        return t
+    resto = t[m.end():]
+    r = _PLACA_SIN_MARCA.match(resto)
+    if not r:
+        return t
+    return t[:m.end()] + " # " + resto[r.start(2):]
 
 
 def placa(texto: str) -> int | None:
@@ -117,6 +137,7 @@ class Geocodificador:
         return self._cruces[k]
 
     def ubicar(self, texto: str) -> Resultado:
+        texto = marcar_placa(texto)
         d = leer(texto)
         if d.tipo == "via_sola" and d.domiciliaria and d.via_1.tipo in CRUZA:
             m = _GENERADORA.search(_MARCA_PLACA.sub(" # ", d.texto))

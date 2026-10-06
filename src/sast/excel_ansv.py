@@ -2,7 +2,7 @@
 
 Filas: Fallecidos, Lesionados y los códigos aprobados del equipo (en el orden del Excel de
 equipos). Columnas: los 36 meses sep-2023 … ago-2026 agrupados en Año 1, 2 y 3, Total y
-Observaciones. Valores: criterio oficial (buffer 15 m), comparendos de agentes + fotodetección
+Observaciones. Valores: criterio oficial mixto (polígono para comparendos ubicados por dirección, +15 m para siniestros y GPS), comparendos de agentes + fotodetección
 previa (sin SAST).
 """
 
@@ -49,8 +49,11 @@ def hoja_equipo(ws, info: dict, valores: pd.DataFrame, observaciones: dict) -> N
     ws["A1"] = f"Línea base — {info['equipo']} — {info['punto']} (solicitud {info['solicitud']})"
     ws["A1"].font = Font(bold=True, size=13)
     ws["A2"] = f"Dirección: {info['direccion']}"
-    ws["A3"] = f"Fecha inicio de operación: {info['fecha_inicio']}    Fecha inicial para reportar indicadores: {info['fecha_inicio']}"
-    ws["A4"] = (f"Criterio: zona de influencia + {info['buffer']:.0f} m (EPSG:9377). Comparendos de agentes "
+    pend = "" if info["fecha_confirmada"] else " (POR CONFIRMAR: tomada del formulario ANSV de un equipo)"
+    ws["A3"] = (f"Fecha inicio de operación: {info['fecha_inicio']}{pend}    "
+                f"Id ANSV del equipo: {info['id_ansv'] or 'pendiente'}")
+    ws["A4"] = (f"Criterio: zona de influencia (comparendos ubicados por dirección: polígono; siniestros y GPS: "
+                f"+{info['buffer']:.0f} m, EPSG:9377). Comparendos de agentes "
                 "y fotodetección previa (sin cámaras SAST). Fallecidos y lesionados = personas, portal ANSV "
                 f"corte {info['corte_portal']}.")
     f0 = 6
@@ -78,7 +81,8 @@ def hoja_equipo(ws, info: dict, valores: pd.DataFrame, observaciones: dict) -> N
         for j, m in enumerate(meses):
             c = ws.cell(f, 2 + j, int(valores.at[ind, m]))
             c.border, c.alignment = BORDE, CENTRO
-        c = ws.cell(f, ct, f"=SUM({get_column_letter(2)}{f}:{get_column_letter(37)}{f})")
+        # valor fijo, no fórmula: un lector que no recalcula (pandas, plataforma web) vería la celda vacía
+        c = ws.cell(f, ct, int(valores.loc[ind].sum()))
         c.font, c.border, c.alignment = NEGRITA, BORDE, CENTRO
         c = ws.cell(f, co, observaciones.get(ind, ""))
         c.border, c.alignment = BORDE, Alignment(wrap_text=True, vertical="top")

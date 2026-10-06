@@ -18,11 +18,14 @@ def main() -> None:
     crudo, malas, fuente = leer_zip()
     assert not (set(crudo.columns) & PERSONALES), "se coló un campo personal"
     d = tipificar(crudo)
-    print(f"{fuente}: {len(crudo):,} filas leídas; {len(malas)} malformadas apartadas")
+    decl = crudo.attrs["totales_declarados"]
+    print(f"{fuente}: {len(crudo):,} filas leídas = suma de los pies «Total:» ({sum(decl.values()):,}); "
+          f"{len(malas)} filas malformadas apartadas")
     if d["fecha"].isna().any():
         raise SystemExit(f"{d['fecha'].isna().sum()} fechas no interpretables")
     print(f"  fechas {d['fecha'].min().date()} a {d['fecha'].max().date()}")
-    futuras = d["fecha"].gt(pd.Timestamp("2026-10-06"))
+    print(f"  direcciones con <PLACA> enmascarada: {d['direccion'].str.contains('<PLACA>', regex=False).sum()}")
+    futuras = d["fecha"].gt(pd.Timestamp.today().normalize())
     if futuras.any():
         raise SystemExit(f"{futuras.sum()} comparendos con fecha futura")
 
@@ -57,7 +60,10 @@ def main() -> None:
                                             encoding="utf-8-sig")
     malas.to_csv(TABLAS / "comparendos_malformadas.csv", index=False, encoding="utf-8-sig")
     diag = pd.DataFrame([
-        ("filas_leidas", len(crudo)), ("filas_malformadas", len(malas)),
+        ("filas_leidas", len(crudo)), ("total_declarado_pies", sum(decl.values())),
+        ("filas_malformadas", len(malas)),
+        ("direcciones_placa_enmascarada", int(d["direccion"].str.contains("<PLACA>", regex=False).sum())),
+        *[(f"codigo_formato_inesperado_{k}", v) for k, v in raros.items()],
         ("duplicados_apartados", len(apartados)), ("depurados", len(dep)),
         ("dup_conflicto", int(dep["dup_conflicto"].sum())),
         ("notificacion_1900", int(dep["bandera_notificacion_1900"].sum())),

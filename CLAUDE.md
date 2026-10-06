@@ -69,8 +69,26 @@ real de los datos:
    (`punto_equipo`). Solo aplica a «TRANSVERSAL 12 - CALLE 20B» (032), cuyo cruce teórico queda a 265 m.
 10. **Placa sobre diagonal o transversal** («DIAGONAL 21 # 18B-6»): se infiere la vía generadora
     (DG → CR, luego TV; TV → CL, luego DG).
-11. **Prueba independiente:** las 8 direcciones de los comparendos SAST deben caer en la zona de su
-    propio equipo (verificado el 2026-10-06).
+11. **Control de las direcciones SAST:** las 8 direcciones de los comparendos SAST caen en la zona de
+    su propio equipo (verificado el 2026-10-06). Es un control débil, no una prueba independiente
+    (revisor-datos): en 041/042 y 021/022 las zonas se solapan y la dirección cae en ambas; en 032 es
+    circular (`punto_equipo` usa la coordenada del propio equipo); el 071 no tiene registros SAST.
 12. **Duplicados:** por (número, código). Mismo número con dos códigos = dos infracciones. Del par
     repetido se conserva la fila con coordenada útil y luego la de resolución más completa.
     La coordenada (1, 1) es un marcador de «sin coordenada».
+13. **Placa sin «#»** («CARRERA 16 20-27»): se inserta el «#» antes de leer (`marcar_placa`). Sin
+    esto, el 76–92 % de la fotodetección previa de 2024 quedaba sin ubicar (revisor-datos).
+14. **Placas en el campo dirección** se enmascaran como `<PLACA>` al leer; las filas leídas se
+    concilian contra el pie «Total:» de cada archivo del export.
+
+Decisiones tras la auditoría del revisor-datos (Santiago, 2026-10-06):
+15. **Criterio espacial oficial mixto** (reemplaza la decisión 3): comparendos ubicados por dirección
+    (punto sobre el eje) → polígono estricto; siniestros y comparendos ubicados por GPS → +15 m.
+    Motivo: con +15 m para todo, el 041 absorbía entero el cruce vecino Cra 13 × Cl 16 (C02 533 → 1.304).
+    Todo estricto y todo +15 m se informan como sensibilidad.
+16. **Lesionados se reportan con salvedad** en cada celda de Observaciones y en la metodología
+    (registro del portal no homogéneo entre 2023–2025 y 2026). Fallecidos también llevan salvedad
+    por el cambio de fuentes.
+17. **Universo del export:** según Santiago, incluye todos los comparendos impuestos, también los
+    pagados, pese al título «Pendientes Notificación».
+18. **Revocados, anulados y absueltos cuentan:** el indicador mide comparendos impuestos.

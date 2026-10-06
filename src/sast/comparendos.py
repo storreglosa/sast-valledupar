@@ -5,7 +5,11 @@ descomprimir y **los datos personales (cédula, tipo de documento, nombre, apell
 descartan en la lectura**: nunca llegan a un DataFrame ni a `data/processed/`.
 
 Reglas [Nuestra] (docs/metodologia.md):
-- Fila malformada (número de celdas distinto del encabezado): se aparta y se cuenta.
+- Pie de tabla «Total: N»: se usa para conciliar las filas leídas contra el total declarado.
+  Cualquier otra fila con un número de celdas distinto del encabezado se aparta y se cuenta.
+- Placa escrita en el campo de dirección («CALLE ABC123 VALLEDUPAR»): se enmascara como
+  «<PLACA>» en la lectura (tres letras + tres dígitos, o + dos dígitos y una letra, salvo
+  abreviaturas y palabras que aparecen en direcciones: CON, CRA, CLL…).
 - Duplicados por (número de comparendo, código): ver `depurar_duplicados`.
 - Coordenada (1, 1) o (0, 0): marcador de «sin coordenada», no un punto.
 - Medio:
@@ -43,6 +47,13 @@ RENOMBRE = {"Nro Comparendo": "nro", "Fecha Comparendo": "fecha", "Secretaría":
 _TR = re.compile(r"<tr\b[^>]*>(.*?)</tr>", re.S | re.I)
 _TD = re.compile(r"<t[dh]\b[^>]*>(.*?)</t[dh]>", re.S | re.I)
 _TAG = re.compile(r"<[^>]+>")
+_PLACA = re.compile(r"\b([A-Z]{3})\s?(\d{3}|\d{2}[A-Z])\b")
+_NO_PLACA = {"CON", "CRA", "CLL", "CAL", "KRA", "CRR", "CLE", "TRV", "TRA", "DIG", "DIA", "AVE", "AVD",
+             "MAS", "BIS", "DOS", "APT", "MAZ", "CIN", "NRO", "NUM", "LOC", "KMS", "VIA", "SUR", "MZA"}
+
+
+def enmascarar_placas(texto: str) -> str:
+    return _PLACA.sub(lambda m: m.group(0) if m.group(1) in _NO_PLACA else "<PLACA>", texto)
 # «CALLE 21 - CARRERA 15 (OESTE - ESTE)», «DIAGONAL 21 - CARRERA 18E (NORTE-SUR)»
 PATRON_SAST = re.compile(
     r"^\s*(CALLE|CARRERA|DIAGONAL|TRANSVERSAL)\s+\w+(\s+\w+)?\s+-\s+"
@@ -56,7 +67,7 @@ def _celda(c: str) -> str:
 
 def _leer_html(texto: str, nombre: str) -> tuple[pd.DataFrame, list[dict]]:
     filas, malformadas, encabezado = [], [], None
-    idx_publicas = None
+    idx_publicas, total_declarado = None, None
     for m in _TR.finditer(texto):
         celdas = [_celda(c) for c in _TD.findall(m.group(1))]
         if encabezado is None:
@@ -65,6 +76,9 @@ def _leer_html(texto: str, nombre: str) -> tuple[pd.DataFrame, list[dict]]:
                     raise ValueError(f"{nombre}: el encabezado cambió: {celdas}")
                 encabezado = celdas
                 idx_publicas = [i for i, c in enumerate(celdas) if c not in PERSONALES]
+            continue
+        if len(celdas) == 2 and celdas[0] == "Total:":
+            total_declarado = int(celdas[1])
             continue
         if len(celdas) != len(encabezado):
             # sin datos personales: solo cuántas celdas y el número de comparendo si lo hay
@@ -75,22 +89,29 @@ def _leer_html(texto: str, nombre: str) -> tuple[pd.DataFrame, list[dict]]:
     if encabezado is None:
         raise ValueError(f"{nombre}: no se encontró el encabezado de la tabla")
     df = pd.DataFrame(filas, columns=[encabezado[i] for i in idx_publicas])
+    if total_declarado is None:
+        raise ValueError(f"{nombre}: sin pie «Total:» para conciliar")
+    if total_declarado != len(df):
+        raise ValueError(f"{nombre}: el pie declara {total_declarado} filas y se leyeron {len(df)}")
     df.insert(0, "archivo", nombre)
+    df.attrs["total_declarado"] = total_declarado
     return df, malformadas
 
 
 def leer_zip() -> tuple[pd.DataFrame, pd.DataFrame, str]:
     """-> (comparendos sin datos personales, filas malformadas, nombre del zip)."""
     ruta = ultimo(RAW / "comparendos", "*_sttv_comparendos-*.zip")
-    partes, malas = [], []
+    partes, malas, declarados = [], [], {}
     with zipfile.ZipFile(ruta) as z:
         for nombre in sorted(z.namelist()):
             texto = z.read(nombre).decode("latin-1")
             df, m = _leer_html(texto, nombre)
+            declarados[nombre] = df.attrs["total_declarado"]
             partes.append(df)
             malas.extend(m)
     df = pd.concat(partes, ignore_index=True).rename(columns=RENOMBRE)
-    return df, pd.DataFrame(malas), ruta.name
+    df.attrs["totales_declarados"] = declarados
+    return df, pd.DataFrame(malas, columns=["archivo", "n_celdas", "primera_celda"]), ruta.name
 
 
 def tipificar(df: pd.DataFrame) -> pd.DataFrame:
@@ -105,7 +126,7 @@ def tipificar(df: pd.DataFrame) -> pd.DataFrame:
         d[c] = pd.to_numeric(d[c].str.replace(",", ".", regex=False), errors="coerce")
     d["valor"] = pd.to_numeric(d["valor"], errors="coerce")
     d["codigo"] = d["codigo"].str.strip().str.upper()
-    d["direccion"] = d["direccion"].str.strip()
+    d["direccion"] = d["direccion"].str.strip().map(enmascarar_placas)
     # coordenada utilizable: dentro de una caja holgada del municipio de Valledupar
     caja = d["lat"].between(9.6, 10.95) & d["lon"].between(-74.2, -72.9)
     d["coord_estado"] = np.select(
