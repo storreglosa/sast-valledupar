@@ -1,0 +1,3 @@
+codrot,accion,gravedad,cantidad_muertos,cantidad_heridos,motivo,decidido_por,fecha
+20001_2025_DECESO CLINICO CLINICO 7,excluir,,,,"Gemelo de 20001_1396898 (mismo hecho del 01/06/2025, Cra 12 con Cl 21): el registro de deceso clínico repite el siniestro",Santiago Torreglosa,2026-10-06
+20001_1396898,ajustar,Con Muertos,1,1,"Un solo hecho con gravedad muerto: de los 2 heridos registrados, el de la motocicleta falleció (deceso clínico 20001_2025_DECESO CLINICO CLINICO 7)",Santiago Torreglosa,2026-10-06

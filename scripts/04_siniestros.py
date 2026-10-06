@@ -11,7 +11,7 @@ import geopandas as gpd
 import pandas as pd
 
 import _entorno  # noqa: F401
-from sast.rutas import CRS_GEO, CRS_METRICO, OUTPUTS, PROCESSED, RAW, SERIE_FIN, SERIE_INICIO, ultimo
+from sast.rutas import DOCS, CRS_GEO, CRS_METRICO, OUTPUTS, PROCESSED, RAW, SERIE_FIN, SERIE_INICIO, ultimo
 
 TABLAS = OUTPUTS / "tables"
 
@@ -28,6 +28,28 @@ def main() -> None:
     futuras = s["fecha"].gt(pd.Timestamp(corte))
     if futuras.any():
         print(f"  AVISO: {futuras.sum()} siniestros con fecha posterior al corte: {s.loc[futuras, 'codrot'].tolist()}")
+    for c in ("cantidad_muertos", "cantidad_heridos"):
+        s[c] = s[c].astype("Int64")
+    # correcciones revisadas a mano por Santiago (docs/correcciones_siniestros.csv): no tocan el
+    # portal ni data/raw; se aplican aquí y se reportan
+    corr = pd.read_csv(DOCS / "correcciones_siniestros.csv", encoding="utf-8")
+    faltan = sorted(set(corr["codrot"]) - set(s["codrot"]))
+    if faltan:
+        raise SystemExit(f"Correcciones para codrot que no están en el corte: {faltan}")
+    s["corregido"] = ""
+    for r in corr.itertuples():
+        m = s["codrot"] == r.codrot
+        if r.accion == "excluir":
+            s.loc[m, "corregido"] = "excluido"
+        elif r.accion == "ajustar":
+            antes = s.loc[m, ["gravedad", "cantidad_muertos", "cantidad_heridos"]].iloc[0].tolist()
+            s.loc[m, ["gravedad", "cantidad_muertos", "cantidad_heridos"]] = [
+                r.gravedad, int(r.cantidad_muertos), int(r.cantidad_heridos)]
+            s.loc[m, "corregido"] = f"ajustado (antes: {antes[0]}, m {antes[1]}, h {antes[2]})"
+        else:
+            raise SystemExit(f"Acción desconocida en correcciones: {r.accion}")
+        print(f"  corrección {r.accion}: {r.codrot}")
+    s = s[s["corregido"] != "excluido"].reset_index(drop=True)
     for c in ("cantidad_muertos", "cantidad_heridos"):
         nul = s[c].isna().sum()
         if nul:
@@ -49,7 +71,12 @@ def main() -> None:
         print(f"  AVISO: {(~s['coord_ok']).sum()} siniestros sin coordenada utilizable (no se pueden asignar a zona)")
     pts = gpd.GeoSeries(gpd.points_from_xy(s["lon"].where(s["coord_ok"]), s["lat"].where(s["coord_ok"])),
                         crs=CRS_GEO).to_crs(CRS_METRICO)
-    s["x"], s["y"] = pts.x, pts.y
+    s["x"], s["y"] = pts.x.to_numpy(), pts.y.to_numpy()
+    # control: x/y deben corresponder a lon/lat de la MISMA fila (un desalineamiento de índice ya
+    # ocurrió una vez al excluir un registro)
+    vuelta = gpd.GeoSeries(gpd.points_from_xy(s["x"], s["y"]), crs=CRS_METRICO).to_crs(CRS_GEO)
+    desfase = ((vuelta.x.to_numpy() - s["lon"]).abs() + (vuelta.y.to_numpy() - s["lat"]).abs())[s["coord_ok"]]
+    assert desfase.max() < 1e-6, f"x/y desalineados con lon/lat (máx {desfase.max():.4f}°)"
 
     serie = s[(s["mes"] >= SERIE_INICIO) & (s["mes"] <= SERIE_FIN)]
     cob = serie.groupby("mes").agg(siniestros=("codrot", "size"),
@@ -77,7 +104,7 @@ def main() -> None:
           f"(muertos {dif['cantidad_muertos'].sum()} vs {dif['v_muertos'].sum()}; "
           f"heridos {dif['cantidad_heridos'].sum()} vs {dif['v_heridos'].sum()})")
 
-    cols = ["codrot", "fecha", "mes", "gravedad", "cantidad_muertos", "cantidad_heridos",
+    cols = ["codrot", "corregido", "fecha", "mes", "gravedad", "cantidad_muertos", "cantidad_heridos",
             "v_muertos", "v_heridos", "difiere_victimas", "direccion", "fuente", "lon", "lat",
             "x", "y", "coord_ok"]
     s[cols].assign(mes=s["mes"].astype(str), corte=corte).to_parquet(PROCESSED / "siniestros.parquet", index=False)

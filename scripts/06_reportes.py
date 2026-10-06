@@ -15,8 +15,7 @@ from sast.equipos import equipos_operativos
 from sast.excel_ansv import libro
 from sast.informe import (MEDIOS, VICTIMAS, esc, fmt, leyenda, mes_corto, pagina, svg_apiladas,
                           tabla, tarjeta)
-from sast.rutas import (BASE_FIN, BASE_INICIO, BUFFER_M, DISCORDANCIA_M, OUTPUTS, PROCESSED,
-                        meses_base, meses_serie)
+from sast.rutas import BUFFER_M, DISCORDANCIA_M, OUTPUTS, PROCESSED, meses_serie, ventana_base
 
 BASE = ["agente", "fotodeteccion_previa"]
 SALVEDAD_LESIONADOS = ("SALVEDAD: el portal registra muchos menos lesionados por mes en 2023–2025 que en 2026 "
@@ -40,8 +39,8 @@ def cargar():
     return eq, largo, ev, comp, sin, cob, diag
 
 
-def matriz(largo, unidad, indicadores, medios, criterio="oficial", nivel="equipo", meses=None):
-    meses = [str(m) for m in (meses if meses is not None else meses_base())]
+def matriz(largo, unidad, indicadores, medios, meses, criterio="oficial", nivel="equipo"):
+    meses = [str(m) for m in meses]
     d = largo[(largo["nivel"] == nivel) & (largo["unidad"] == str(unidad)) & (largo["criterio"] == criterio)
               & largo["medio"].isin(medios + ["portal"])]
     t = d.pivot_table(index="indicador", columns="mes", values="valor", aggfunc="sum", fill_value=0)
@@ -60,7 +59,9 @@ def main() -> None:
     corte_comp = comp["fecha"].max().date().isoformat()
     corte_portal = str(sin["corte"].iat[0])
     nombre = f"{corte_comp}_sttv_linea-base-sast"
-    base_txt = f"{mes_corto(str(BASE_INICIO))} a {mes_corto(str(BASE_FIN))}"
+    ventanas = {r.equipo: ventana_base(r.fecha_inicio) for r in eq.itertuples()}
+    rango = lambda v: f"{mes_corto(str(v[0]))} a {mes_corto(str(v[-1]))}"  # noqa: E731
+    base_txt = "36 meses previos al inicio de cada equipo"
 
     # cobertura del portal por año (para el aviso de lesionados)
     cob["anio"] = cob["mes"].str[:4]
@@ -74,7 +75,7 @@ def main() -> None:
     hojas, resumen = [], []
     for r in eq.itertuples():
         inds = INDICES_VICTIMAS + list(r.codigos)
-        val = matriz(largo, r.equipo, inds, BASE)
+        val = matriz(largo, r.equipo, inds, BASE, ventanas[r.equipo])
         val.columns = [pd.Period(m, "M") for m in val.columns]
         obs = {}
         for ind in inds:
@@ -95,7 +96,8 @@ def main() -> None:
                             "fotodeteccion_previa": None if ind in INDICES_VICTIMAS else total_base(largo, r.equipo, ind, ["fotodeteccion_previa"]),
                             "estricto": total_base(largo, r.equipo, ind, [] if ind in INDICES_VICTIMAS else BASE, "estricto"),
                             "buffer15": total_base(largo, r.equipo, ind, [] if ind in INDICES_VICTIMAS else BASE, "buffer15")})
-        info = {"fecha_confirmada": bool(r.fecha_inicio_confirmada), "id_ansv": r.id_ansv, "equipo": r.equipo, "punto": r.punto.title(), "solicitud": r.solicitud, "direccion": r.direccion,
+        info = {"codigo_unico": r.codigo_unico, "solicitud_ansv": r.solicitud_ansv, "direccion_ansv": r.direccion_ansv,
+                "ventana": ventanas[r.equipo], "equipo": r.equipo, "punto": r.punto.title(), "solicitud": r.solicitud, "direccion": r.direccion,
                 "fecha_inicio": r.fecha_inicio.strftime("%d/%m/%Y"), "buffer": BUFFER_M, "corte_portal": corte_portal}
         hojas.append((info, val, obs))
     resumen = pd.DataFrame(resumen)
@@ -111,12 +113,18 @@ def main() -> None:
     punto_t = punto_t.reset_index().rename(columns={"unidad": "solicitud"})
     sast = largo[(largo["medio"] == "sast") & (largo["nivel"] == "equipo") & (largo["criterio"] == "oficial")]
     sast_t = (sast.pivot_table(index=["unidad", "indicador"], columns="mes", values="valor", aggfunc="sum", fill_value=0)
-              .reset_index().rename(columns={"unidad": "equipo_zona"}))
+              .reset_index().rename(columns={"unidad": "equipo"}))
     no_ub = (comp.assign(anio=comp["fecha"].dt.year).groupby(["medio", "ubicacion", "anio"]).size()
              .unstack(fill_value=0).reset_index())
     metodologia = [
         "LÍNEA BASE DE INDICADORES DE SEGURIDAD VIAL — EQUIPOS SAST EN OPERACIÓN — STTV Valledupar",
-        f"Periodo de línea base (formato ANSV): {base_txt}, 36 meses (Año 1, 2 y 3) previos al inicio de operación.",
+        "Periodo de línea base (formato ANSV): los 36 meses (Año 1, 2 y 3) previos al mes de inicio de operación de cada "
+        "equipo (plataforma ANSV): " + "; ".join(f"{r.equipo} inicio {r.fecha_inicio:%d/%m/%Y} → {rango(ventanas[r.equipo])}"
+                                                for r in eq.itertuples()) + ". Los totales por punto usan la ventana del "
+        "equipo del punto que inició primero.",
+        "Equipos: coordenadas, códigos aprobados y nombres del Excel «Equipos SAST»; fecha de inicio, código único, solicitud "
+        "y dirección de la plataforma ANSV (config/equipos.yaml). Los comparendos de las cámaras SAST se asignan a su equipo "
+        "por la dirección de la plataforma y se ubican en la coordenada del equipo.",
         "Zona: polígono de la capa «Zona de influencia» del SIG de equipos SAST. Criterio oficial mixto: los comparendos "
         "ubicados por dirección (punto sobre el eje de la vía) cuentan si caen dentro del polígono; los siniestros y los "
         f"comparendos ubicados por GPS (pueden caer fuera de la calzada), si caen a ≤ {BUFFER_M:.0f} m del polígono. "
@@ -155,7 +163,10 @@ def main() -> None:
 
     # ---------------- HTML ----------------
     meses = [str(m) for m in meses_serie()]
-    marcas = {str(BASE_INICIO): "inicio línea base", "2026-09": "inicio SAST"}
+    def marcas_punto(g):
+        inicio = g["fecha_inicio"].min()
+        v = ventana_base(inicio)
+        return {str(v[0]): "inicio línea base", str(inicio.to_period("M")): "inicio SAST"}
     partes = [f"<h1>Línea base de indicadores — equipos SAST en operación</h1>"
               f'<p class="sub">Secretaría de Tránsito y Transporte de Valledupar · reporte a la ANSV · '
               f"comparendos al {pd.Timestamp(corte_comp):%d/%m/%Y}, portal de siniestros al {corte_portal}</p>"]
@@ -210,10 +221,10 @@ def main() -> None:
         nom = g["punto"].iat[0].title()
         partes.append(f"<h3>{esc(nom)} (solicitud {sol}: {', '.join(g['equipo'])})</h3>"
                       + svg_apiladas(meses, series, {k: v[1] for k, v in MEDIOS.items()},
-                                     {k: v[0] for k, v in MEDIOS.items()}, f"Comparendos por mes en {nom}", marcas)
+                                     {k: v[0] for k, v in MEDIOS.items()}, f"Comparendos por mes en {nom}", marcas_punto(g))
                       + leyenda(list(VICTIMAS), VICTIMAS, {k: k for k in VICTIMAS})
                       + svg_apiladas(meses, vict, VICTIMAS, {k: k for k in VICTIMAS},
-                                     f"Fallecidos y lesionados por mes en {nom}", marcas, H=130))
+                                     f"Fallecidos y lesionados por mes en {nom}", marcas_punto(g), H=130))
     partes.append("<h3>Totales por punto, sin doble conteo</h3>")
     cols_p = [c for c in punto_t.columns if c != "solicitud"]
     partes.append(tabla(["Solicitud"] + cols_p, [[str(r[0])] + [fmt(v) for v in r[1:]]
@@ -222,34 +233,43 @@ def main() -> None:
     # SAST
     s_eq = sast.groupby(["unidad", "indicador"])["valor"].sum().unstack(fill_value=0)
     partes.append("<h2>Comparendos de las cámaras SAST (fuera de la línea base)</h2>"
-                  '<p class="sub">Registros con fotodetección y dirección del equipo, por zona en la que caen. '
-                  "Sirven para verificar el geocodificador: cada equipo debe recibir los de su propia dirección.</p>"
-                  + tabla(["Zona"] + list(s_eq.columns), [[i] + [fmt(v) for v in row] for i, row in s_eq.iterrows()]))
+                  '<p class="sub">Registros con fotodetección y la dirección del equipo en la plataforma ANSV, asignados a '
+                  "su equipo. El EQUIPO071 inició el 02/10/2026 y no tiene registros en el export (corte 04/10/2026).</p>"
+                  + tabla(["Equipo"] + list(s_eq.columns), [[i] + [fmt(v) for v in row] for i, row in s_eq.iterrows()]))
     primeros = ev[(ev["tipo"] == "comparendo") & (ev["medio"] == "sast") & (ev["nivel"] == "equipo")
                   & (ev["criterio"] == "oficial")].groupby("unidad")["fecha"].min()
     if len(primeros):
-        partes.append('<p class="nota">Primer registro SAST por zona: '
-                      + "; ".join(f"{k} {v:%d/%m/%Y}" for k, v in primeros.items())
-                      + f". Los anteriores al {eq['fecha_inicio'].min():%d/%m/%Y} se tratan como pruebas o arranque anticipado.</p>")
+        ini = dict(zip(eq["equipo"], eq["fecha_inicio"]))
+        partes.append('<p class="nota">Primer registro SAST frente al inicio de operación: '
+                      + "; ".join(f"{k} {v:%d/%m/%Y} (inicio {ini[k]:%d/%m/%Y})" for k, v in primeros.items())
+                      + ".</p>")
 
     # mapa
     z = gpd.read_file(PROCESSED / "equipos_sast.gpkg", layer="zonas")
     zb = gpd.read_file(PROCESSED / "equipos_sast.gpkg", layer="zonas_buffer")
-    evc = ev[(ev["tipo"] == "comparendo") & (ev["nivel"] == "equipo") & (ev["criterio"] == "oficial")] \
-        .drop_duplicates("id_evento")
+    evc = ev[(ev["tipo"] == "comparendo") & (ev["nivel"] == "equipo") & (ev["criterio"] == "oficial")
+             & (ev["medio"] != "sast")].drop_duplicates("id_evento")
+    capa_eq = gpd.read_file(OUTPUTS / "capas" / "equipos_sast.geojson")
+    capa_eq = capa_eq[capa_eq["estado"] == "Operando"]
+    n_sast = sast.groupby("unidad")["valor"].sum().to_dict()
     evs = ev[(ev["tipo"] == "siniestro") & (ev["nivel"] == "equipo") & (ev["criterio"] == "oficial")] \
         .drop_duplicates("id_evento")
     evs = evs[(evs["cantidad_muertos"] + evs["cantidad_heridos"]) > 0]
     datos = {"zonas": json.loads(z[["equipo", "geometry"]].to_json()),
              "zonas_buffer": json.loads(zb[["equipo", "geometry"]].to_json()),
-             "nombres": {k: v[0] for k, v in MEDIOS.items()},
+             "nombres": {k: v[0] for k, v in MEDIOS.items() if k != "sast"},
+             "equipos": [[round(r.geometry.x, 6), round(r.geometry.y, 6), r.equipo, r.punto.title(), r.direccion_ansv,
+                          r.codigo_unico, pd.Timestamp(r.fecha_inicio).strftime("%d/%m/%Y"), int(n_sast.get(r.equipo, 0))]
+                         for r in capa_eq.itertuples()],
              "comparendos": [[round(r.lon_u, 6), round(r.lat_u, 6), r.medio, f"{r.fecha:%d/%m/%Y}", r.codigo]
                              for r in evc.itertuples()],
              "siniestros": [[round(r.lon, 6), round(r.lat, 6), f"{r.fecha:%d/%m/%Y}", r.gravedad,
                              int(r.cantidad_muertos), int(r.cantidad_heridos)] for r in evs.itertuples()]}
-    partes.append("<h2>Mapa</h2><p class=\"sub\">Zonas de influencia (línea continua) y tolerancia de "
-                  f"{BUFFER_M:.0f} m (línea punteada). Comparendos y siniestros con víctimas de ene-2023 a sep-2026 "
-                  "dentro de alguna zona. Varios comparendos en un mismo cruce quedan superpuestos.</p><div id=\"mapa\"></div>")
+    partes.append("<h2>Mapa</h2><p class=\"sub\">Equipos SAST en operación (coordenadas del Excel de equipos; pase el "
+                  "cursor para ver código único, fecha de inicio y comparendos SAST), zonas de influencia (línea continua) y "
+                  f"tolerancia de {BUFFER_M:.0f} m (línea punteada). Comparendos (agentes y fotodetección previa) y siniestros "
+                  "con víctimas de ene-2023 a sep-2026 dentro de alguna zona. Los botones centran el mapa en cada punto."
+                  "</p><div id=\"botones-mapa\"></div><div id=\"mapa\"></div>")
 
     # calidad
     ub = comp["ubicacion"].value_counts()

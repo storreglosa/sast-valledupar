@@ -1,7 +1,12 @@
 """Etapa 1 — Equipos operativos y zonas de influencia.
 
-Salida: data/processed/equipos_sast.gpkg (capas `equipos`, `zonas`, `zonas_buffer`) en
-EPSG:4326, y outputs/tables/equipos_operativos.csv. Reporta inconsistencias, no las corrige.
+Los equipos se ubican SIEMPRE con las coordenadas del Excel de equipos (nunca geocodificando su
+dirección). Salidas:
+- outputs/capas/equipos_sast.geojson (versionada, EPSG:4326): los 15 equipos del Excel con estado,
+  fecha de inicio de operación, código único, solicitud y dirección de la plataforma ANSV.
+- data/processed/equipos_sast.gpkg (capas `equipos`, `zonas`, `zonas_buffer`).
+- outputs/tables/equipos_operativos.csv.
+Reporta inconsistencias, no las corrige.
 """
 
 import geopandas as gpd
@@ -16,16 +21,25 @@ def main() -> None:
     eq = equipos_operativos()
     print(f"Excel: {todos.attrs['fuente']} — {len(todos)} equipos; operativos: {len(eq)}")
     for _, r in eq.iterrows():
-        print(f"  {r.equipo}  sol {r.solicitud}  {r.punto:<24} {r.direccion:<28} "
-              f"{len(r.codigos)} códigos: {', '.join(r.codigos)}")
+        print(f"  {r.equipo}  sol {r.solicitud}  {r.punto:<24} inicio {r.fecha_inicio:%d/%m/%Y}  "
+              f"{r.codigo_unico}  {len(r.codigos)} códigos: {', '.join(r.codigos)}")
     sin_cod = eq[eq["codigos"].map(len).eq(0)]["equipo"].tolist()
     if sin_cod:
         raise SystemExit(f"Equipos sin códigos aprobados: {sin_cod}")
-    if not eq["fecha_inicio_confirmada"].all():
-        print(f"  AVISO: fecha de inicio por defecto ({eq['fecha_inicio'].min().date()}) en "
-              f"{(~eq['fecha_inicio_confirmada']).sum()} equipos (config/equipos.yaml).")
-    if eq["id_ansv"].isna().any():
-        print(f"  AVISO: {eq['id_ansv'].isna().sum()} equipos sin id ANSV (config/equipos.yaml).")
+
+    # capa versionada de equipos: coordenadas del Excel + datos de la plataforma ANSV
+    capa = todos.merge(eq[["equipo", "fecha_inicio", "codigo_unico", "solicitud_ansv", "direccion_ansv"]],
+                       on="equipo", how="left")
+    capa["estado"] = capa["fecha_inicio"].notna().map({True: "Operando", False: "No operando"})
+    capa["fecha_inicio"] = capa["fecha_inicio"].dt.strftime("%Y-%m-%d")
+    capa["codigos"] = capa["codigos"].map(", ".join)
+    capa = gpd.GeoDataFrame(capa.drop(columns=["infracciones_texto"]),
+                            geometry=gpd.points_from_xy(capa.lon, capa.lat), crs=CRS_GEO)
+    (OUTPUTS / "capas").mkdir(exist_ok=True)
+    ruta_capa = OUTPUTS / "capas" / "equipos_sast.geojson"
+    ruta_capa.unlink(missing_ok=True)
+    capa.to_file(ruta_capa, driver="GeoJSON")
+    print(f"-> outputs/capas/equipos_sast.geojson ({len(capa)} equipos, {capa['estado'].eq('Operando').sum()} operando)")
 
     z_todas = leer_zonas()
     zonas = zonas_operativas(eq)

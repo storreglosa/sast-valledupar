@@ -5,6 +5,7 @@ Luego, por registro:
   direccion          la dirección da un punto (cruce o domiciliaria). Si además hay GPS y
                      está a más de DISCORDANCIA_M, se marca `discordante`.
   direccion_gps      la dirección da varios cruces posibles y el GPS elige el más cercano.
+  equipo             comparendo de una cámara SAST: coordenada de su equipo en el Excel de equipos.
   gps                la dirección no da punto; el GPS es utilizable y cae en el perímetro
                      urbano (+ margen de la cabecera).
   no_ubicable        ninguno de los anteriores.
@@ -76,8 +77,14 @@ def main() -> None:
     y = np.full(len(c), np.nan)
     ubic = np.array(["no_ubicable"] * len(c), dtype=object)
     dist_gps = np.full(len(c), np.nan)
-    for i, (met, cand) in enumerate(zip(c["metodo_dir"], c["candidatos"])):
+    # comparendos SAST: en la coordenada de su equipo (Excel de equipos), sin geocodificar
+    pe_equipo = dict(zip(eq["equipo"], pe))
+    for i, (met, cand, eqs) in enumerate(zip(c["metodo_dir"], c["candidatos"], c["equipo_sast"])):
         tiene_gps = gps_ok.iat[i]
+        if isinstance(eqs, str):
+            x[i], y[i] = pe_equipo[eqs].x, pe_equipo[eqs].y
+            ubic[i] = "equipo"
+            continue
         if met in ("cruce", "cruce_hueco", "punto_equipo", "cruce_aproximado", "domiciliaria", "domiciliaria_cuadra"):
             x[i], y[i] = cand[0]
             ubic[i] = "direccion"
@@ -96,7 +103,9 @@ def main() -> None:
     c["dist_gps_direccion_m"] = dist_gps
     c["discordante"] = c["dist_gps_direccion_m"] > DISCORDANCIA_M
     pts = gpd.GeoSeries(gpd.points_from_xy(c["x"], c["y"]), crs=CRS_METRICO).to_crs(CRS_GEO)
-    c["lon_u"], c["lat_u"] = pts.x.where(c["x"].notna()), pts.y.where(c["x"].notna())
+    ok = c["x"].notna().to_numpy()
+    c["lon_u"] = np.where(ok, pts.x.to_numpy(), np.nan)
+    c["lat_u"] = np.where(ok, pts.y.to_numpy(), np.nan)
     c = c.drop(columns="candidatos")
 
     print("\nComparendos por ubicación y medio:")

@@ -117,6 +117,10 @@ th:first-child,td:first-child{text-align:left}.graf{width:100%;height:auto;backg
 .graf .grid{stroke:var(--grid)}.graf .base{stroke:var(--ink3)}.graf .eje{fill:var(--ink3);font-size:10px}.graf .marca{stroke:var(--ink2);stroke-dasharray:3 3}
 .graf .hit{fill:transparent}.graf .col:hover .hit{fill:var(--grid)}.leyenda{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--ink2);margin:6px 0}
 .leyenda i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+#botones-mapa{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}#botones-mapa button{font:inherit;font-size:13px;
+padding:5px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);cursor:pointer}
+#botones-mapa button:hover{border-color:var(--ink3)}.eq-icono span{display:block;background:#0b0b0b;color:#fff;font:600 11px/18px system-ui;
+text-align:center;border-radius:4px;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.4)}
 #mapa{height:520px;border-radius:10px;border:1px solid var(--line)}details{margin:8px 0}summary{cursor:pointer;color:var(--ink2)}
 .nota{color:var(--ink3);font-size:13px}code{font-size:12.5px}
 """
@@ -147,7 +151,17 @@ const D={datos};
  const sin=L.layerGroup();D.siniestros.forEach(p=>{{L.circleMarker([p[1],p[0]],{{radius:6,weight:2,color:c('--s8'),fillColor:c('--s8'),fillOpacity:.35}})
    .bindTooltip(p[2]+' · '+p[3]+' · fallecidos '+p[4]+', lesionados '+p[5]).addTo(sin);}});
  capas['Siniestros con víctimas']=sin;
+ // equipos SAST: coordenadas del Excel de equipos
+ const eqs=L.layerGroup();D.equipos.forEach(p=>{{L.marker([p[1],p[0]],{{icon:L.divIcon({{className:'eq-icono',html:'<span>'+p[2].slice(-3)+'</span>',iconSize:[30,18]}})}})
+   .bindTooltip('<b>'+p[2]+'</b> · '+p[3]+'<br>'+p[4]+'<br>'+p[5]+' · inicio '+p[6]+'<br>comparendos SAST: '+p[7]).addTo(eqs);}});
+ capas['Equipos SAST']=eqs;
  Object.values(capas).forEach(l=>l.addTo(m));L.control.layers(null,capas,{{collapsed:false}}).addTo(m);
  m.fitBounds(zb.getBounds(),{{padding:[20,20]}});
+ // botones para centrar el mapa en cada punto
+ const puntos={{}};D.equipos.forEach(p=>{{(puntos[p[3]]=puntos[p[3]]||[]).push([p[1],p[0]]);}});
+ const cont=document.getElementById('botones-mapa');
+ const boton=(t,f)=>{{const b=document.createElement('button');b.textContent=t;b.onclick=f;cont.appendChild(b);}};
+ boton('Toda la ciudad',()=>m.fitBounds(zb.getBounds(),{{padding:[20,20]}}));
+ Object.entries(puntos).forEach(([n,ll])=>boton(n,()=>m.fitBounds(L.latLngBounds(ll).pad(1.2),{{maxZoom:18}})));
 }})();
 </script></body></html>"""

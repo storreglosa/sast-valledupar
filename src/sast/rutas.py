@@ -21,9 +21,10 @@ CRS_METRICO = 9377    # MAGNA-SIRGAS / Origen-Nacional (CTM12): toda medida en m
 # Serie mensual del informe HTML (decisión 1, 2026-10-06)
 SERIE_INICIO = pd.Period("2023-01", "M")
 SERIE_FIN = pd.Period("2026-09", "M")
-# Línea base del formato ANSV: 36 meses previos al inicio de operación (Año 1, 2 y 3)
-BASE_INICIO = pd.Period("2023-09", "M")
-BASE_FIN = pd.Period("2026-08", "M")
+# Línea base del formato ANSV: los 36 meses previos al mes de inicio de operación DE CADA EQUIPO
+# (Año 1, 2 y 3). En el formulario ANSV de un equipo con inicio el 02/09/2026 el Año 1 es
+# sep-2023–ago-2024. Ver `ventana_base`.
+MESES_BASE = 36
 
 BUFFER_M = 15.0              # tolerancia de la zona de influencia (decisión 3)
 DISCORDANCIA_M = 100.0       # coordenada GPS frente a dirección (decisión 4)
@@ -33,15 +34,18 @@ def meses_serie() -> pd.PeriodIndex:
     return pd.period_range(SERIE_INICIO, SERIE_FIN, freq="M")
 
 
-def meses_base() -> pd.PeriodIndex:
-    return pd.period_range(BASE_INICIO, BASE_FIN, freq="M")
+def ventana_base(fecha_inicio) -> pd.PeriodIndex:
+    """Los 36 meses previos al mes de inicio de operación."""
+    fin = pd.Timestamp(fecha_inicio).to_period("M") - 1
+    return pd.period_range(fin - (MESES_BASE - 1), fin, freq="M")
 
 
-def anio_base(mes: pd.Period) -> int | None:
-    """Año 1, 2 o 3 de la línea base ANSV (sep–ago); None si el mes queda fuera."""
-    if mes < BASE_INICIO or mes > BASE_FIN:
+def anio_base(mes: pd.Period, fecha_inicio) -> int | None:
+    """Año 1, 2 o 3 de la línea base del equipo; None si el mes queda fuera de su ventana."""
+    v = ventana_base(fecha_inicio)
+    if mes < v[0] or mes > v[-1]:
         return None
-    return (mes - BASE_INICIO).n // 12 + 1
+    return (mes - v[0]).n // 12 + 1
 
 
 def ultimo(directorio: Path, patron: str) -> Path:

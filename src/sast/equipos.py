@@ -48,8 +48,16 @@ def leer_excel() -> pd.DataFrame:
     return out
 
 
+def normalizar_direccion_sast(texto) -> str:
+    """Llave para casar la dirección de un comparendo SAST con la `direccion_ansv` del equipo:
+    «CALLE 21 - CARRERA 15 (OESTE - ESTE)» = «CALLE 21 - CARRERA 15 (SENTIDO OESTE - ESTE)»."""
+    t = str(texto or "").upper().replace("SENTIDO", "")
+    return re.sub(r"[^A-Z0-9]", "", t)
+
+
 def equipos_operativos() -> pd.DataFrame:
-    """Equipos de las solicitudes operativas, con fecha de inicio e id ANSV de la config."""
+    """Equipos de las solicitudes operativas: Excel (nombre, coordenadas, códigos) + config
+    (fecha de inicio, código único, solicitud y dirección en la plataforma ANSV)."""
     cfg = leer_config()
     df = leer_excel()
     df = df[df["solicitud"].isin(cfg["solicitudes_operativas"])].copy()
@@ -58,10 +66,15 @@ def equipos_operativos() -> pd.DataFrame:
     sobran = sorted(set(extra) - set(df["equipo"]))
     if faltan or sobran:
         raise ValueError(f"config/equipos.yaml no cuadra con el Excel: faltan {faltan}, sobran {sobran}")
-    defecto = pd.Timestamp(cfg["fecha_inicio_defecto"])
-    df["fecha_inicio"] = [pd.Timestamp(extra[e].get("fecha_inicio") or defecto) for e in df["equipo"]]
-    df["fecha_inicio_confirmada"] = [extra[e].get("fecha_inicio") is not None for e in df["equipo"]]
-    df["id_ansv"] = [extra[e].get("id_ansv") for e in df["equipo"]]
+    sin_fecha = [e for e in df["equipo"] if not extra[e].get("fecha_inicio")]
+    if sin_fecha:
+        raise ValueError(f"Equipos sin fecha_inicio en config/equipos.yaml: {sin_fecha}")
+    df["fecha_inicio"] = [pd.Timestamp(extra[e]["fecha_inicio"]) for e in df["equipo"]]
+    for campo in ("codigo_unico", "solicitud_ansv", "direccion_ansv"):
+        df[campo] = [extra[e].get(campo) for e in df["equipo"]]
+    df["llave_sast"] = df["direccion_ansv"].map(normalizar_direccion_sast)
+    if df["llave_sast"].duplicated().any():
+        raise ValueError("Dos equipos con la misma dirección ANSV")
     return df.reset_index(drop=True)
 
 

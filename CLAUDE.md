@@ -35,6 +35,7 @@ python scripts/03_geocodificar.py      # ubicación de comparendos (~1,5 min)
 python scripts/04_siniestros.py        # fallecidos/lesionados, cobertura del portal
 python scripts/05_indicadores.py       # tabla larga equipo × mes × indicador × medio
 python scripts/06_reportes.py          # Excel ANSV + HTML en outputs/
+python scripts/07_revision_geocodificacion.py  # listas para revisar la geocodificación a mano
 ```
 Los insumos de `data/raw/` los copia Santiago (`docs/ingesta.md`). `SAST_RAW=<carpeta>` corre el
 pipeline contra otra carpeta de insumos (ensayos), sin tocar `data/raw/`.
@@ -92,3 +93,20 @@ Decisiones tras la auditoría del revisor-datos (Santiago, 2026-10-06):
 17. **Universo del export:** según Santiago, incluye todos los comparendos impuestos, también los
     pagados, pese al título «Pendientes Notificación».
 18. **Revocados, anulados y absueltos cuentan:** el indicador mide comparendos impuestos.
+
+Decisiones del 2026-10-06 (tarde), Santiago:
+19. **Equipos = Excel de equipos.** Coordenadas, nombres y códigos aprobados salen siempre del Excel,
+    nunca de geocodificar la dirección del equipo. Capa versionada: `outputs/capas/equipos_sast.geojson`.
+    La fecha de inicio, el código único, la solicitud y la dirección vienen de la plataforma ANSV
+    (`config/equipos.yaml`).
+20. **Ventana de línea base por equipo:** los 36 meses previos al mes de inicio de operación de cada
+    equipo. Es la regla del formulario ANSV, donde un inicio el 02/09/2026 da un Año 1 de sep-2023 a
+    ago-2024. El total por punto usa la ventana del equipo que inició primero.
+21. **Comparendos SAST:** se asignan a su equipo por la dirección ANSV (sin «SENTIDO») y se ubican
+    en la coordenada del equipo. No se cuentan por zona. Ninguno es anterior al inicio de su equipo.
+22. **Correcciones manuales de siniestros** en `docs/correcciones_siniestros.csv` (no se toca el
+    portal). La primera es el gemelo de Mercado Público del 01/06/2025: un solo hecho con muertos,
+    con 1 fallecido (el motociclista) y 1 herido.
+23. **EQUIPO071 sin comparendos SAST:** inició el 02/10/2026 y el export corta el 04/10/2026; según
+    Santiago, en esa zona no se hacía ese tipo de control.
+24. **El repo se mantiene privado y sin remoto** por ahora.

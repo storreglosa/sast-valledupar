@@ -1,23 +1,35 @@
 # Equipos SAST en operación y datos que no trae el Excel de equipos.
-# Los códigos aprobados, nombres y coordenadas se leen del Excel (data/raw/equipos/).
+# Los códigos aprobados, nombres y COORDENADAS se leen del Excel (data/raw/equipos/): es la
+# fuente de verdad para todo lo referente a equipos (decisión de Santiago, 2026-10-06).
 #
-# fecha_inicio: inicio de operación según la plataforma ANSV («Fecha inicio de operación:
-#   2 de Septiembre de 2026», formulario del equipo 12374). Se asume igual para todos
-#   mientras Santiago no confirme otra por equipo.
-# id_ansv: identificador del equipo en fotodeteccion-app.ansv.gov.co (pendiente; 12374 es
-#   uno de ellos, sin confirmar a cuál corresponde).
+# Fuente de lo que sigue: plataforma ANSV fotodeteccion-app.ansv.gov.co, listado de puntos con
+# estado «Operando» del municipio (captura enviada por Santiago, 2026-10-06):
+#   fecha_inicio     «Fecha inicio de operación» del equipo.
+#   codigo_unico     «Código único» del punto en la plataforma.
+#   solicitud_ansv   «Código solicitud» en la plataforma.
+#   direccion_ansv   «Dirección» del punto en la plataforma (con sentido): es la que aparece en
+#                    los comparendos que genera el equipo.
+# OJO: para el EQUIPO071 la plataforma dice SOL0000010785 y el Excel de equipos SOL0000011264
+# (coordenadas iguales). Pendiente de aclarar; no afecta el cálculo.
 
 solicitudes_operativas: [2, 3, 4, 5, 7]
 
-fecha_inicio_defecto: 2026-09-02
-
 equipos:
-  EQUIPO021: {fecha_inicio: null, id_ansv: null}
-  EQUIPO022: {fecha_inicio: null, id_ansv: null}
-  EQUIPO031: {fecha_inicio: null, id_ansv: null}
-  EQUIPO032: {fecha_inicio: null, id_ansv: null}
-  EQUIPO041: {fecha_inicio: null, id_ansv: null}
-  EQUIPO042: {fecha_inicio: null, id_ansv: null}
-  EQUIPO051: {fecha_inicio: null, id_ansv: null}
-  EQUIPO052: {fecha_inicio: null, id_ansv: null}
-  EQUIPO071: {fecha_inicio: null, id_ansv: null}
+  EQUIPO021: {fecha_inicio: 2026-09-02, codigo_unico: CU000000000908, solicitud_ansv: SOL0000010402,
+              direccion_ansv: "DIAGONAL 21 - CARRERA 19 (SENTIDO SUR - NORTE)"}
+  EQUIPO022: {fecha_inicio: 2026-09-02, codigo_unico: CU000000000909, solicitud_ansv: SOL0000010402,
+              direccion_ansv: "DIAGONAL 21 - CARRERA 18E (SENTIDO NORTE - SUR)"}
+  EQUIPO031: {fecha_inicio: 2026-08-27, codigo_unico: CU000000000907, solicitud_ansv: SOL0000010802,
+              direccion_ansv: "CALLE 21 - CARRERA 15 (SENTIDO OESTE - ESTE)"}
+  EQUIPO032: {fecha_inicio: 2026-08-27, codigo_unico: CU000000000906, solicitud_ansv: SOL0000010802,
+              direccion_ansv: "TRANSVERSAL 12 - CALLE 20B (SENTIDO NORTE - SUR)"}
+  EQUIPO041: {fecha_inicio: 2026-08-18, codigo_unico: CU000000000915, solicitud_ansv: SOL0000010743,
+              direccion_ansv: "CALLE 16 - CARRERA 12 (OESTE - ESTE)"}
+  EQUIPO042: {fecha_inicio: 2026-06-17, codigo_unico: CU000000000914, solicitud_ansv: SOL0000010743,
+              direccion_ansv: "CARRERA 12 - CALLE 16 (SUR - NORTE)"}
+  EQUIPO051: {fecha_inicio: 2026-08-27, codigo_unico: CU000000000912, solicitud_ansv: SOL0000010882,
+              direccion_ansv: "CARRERA 9 - CALLE 17 (SUR - NORTE)"}
+  EQUIPO052: {fecha_inicio: 2026-08-27, codigo_unico: CU000000000911, solicitud_ansv: SOL0000010882,
+              direccion_ansv: "CALLE 17 - CARRERA 8 (ESTE - OESTE)"}
+  EQUIPO071: {fecha_inicio: 2026-10-02, codigo_unico: CU000000000894, solicitud_ansv: SOL0000010785,
+              direccion_ansv: "CALLE 6 - CARRERA 23 (SENTIDO OESTE - ESTE)"}

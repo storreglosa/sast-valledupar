@@ -1,7 +1,8 @@
 """Excel de línea base en el formato de la plataforma ANSV (una hoja por equipo).
 
 Filas: Fallecidos, Lesionados y los códigos aprobados del equipo (en el orden del Excel de
-equipos). Columnas: los 36 meses sep-2023 … ago-2026 agrupados en Año 1, 2 y 3, Total y
+equipos). Columnas: los 36 meses previos al inicio de operación del equipo agrupados en Año 1, 2
+y 3, Total y
 Observaciones. Valores: criterio oficial mixto (polígono para comparendos ubicados por dirección, +15 m para siniestros y GPS), comparendos de agentes + fotodetección
 previa (sin SAST).
 """
@@ -13,7 +14,6 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-from sast.rutas import meses_base
 
 MESES_ES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto",
             "Septiembre", "Octubre", "Noviembre", "Diciembre"]
@@ -45,13 +45,12 @@ def _hoja_tabla(ws, df: pd.DataFrame, fila: int = 1) -> None:
 
 def hoja_equipo(ws, info: dict, valores: pd.DataFrame, observaciones: dict) -> None:
     """valores: index = indicadores (orden de filas), columns = Period (36 meses)."""
-    meses = list(meses_base())
+    meses = list(info["ventana"])
     ws["A1"] = f"Línea base — {info['equipo']} — {info['punto']} (solicitud {info['solicitud']})"
     ws["A1"].font = Font(bold=True, size=13)
     ws["A2"] = f"Dirección: {info['direccion']}"
-    pend = "" if info["fecha_confirmada"] else " (POR CONFIRMAR: tomada del formulario ANSV de un equipo)"
-    ws["A3"] = (f"Fecha inicio de operación: {info['fecha_inicio']}{pend}    "
-                f"Id ANSV del equipo: {info['id_ansv'] or 'pendiente'}")
+    ws["A3"] = (f"Fecha inicio de operación: {info['fecha_inicio']}    Código único: {info['codigo_unico']}    "
+                f"Solicitud: {info['solicitud_ansv']}    Dirección ANSV: {info['direccion_ansv']}")
     ws["A4"] = (f"Criterio: zona de influencia (comparendos ubicados por dirección: polígono; siniestros y GPS: "
                 f"+{info['buffer']:.0f} m, EPSG:9377). Comparendos de agentes "
                 "y fotodetección previa (sin cámaras SAST). Fallecidos y lesionados = personas, portal ANSV "

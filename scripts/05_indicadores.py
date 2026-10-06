@@ -42,6 +42,11 @@ def en_zonas(eventos: gpd.GeoDataFrame, z: gpd.GeoDataFrame, unidad: str) -> pd.
 
 def main() -> None:
     eq = equipos_operativos()
+    sol_de = dict(zip(eq["equipo"], eq["solicitud"]))
+    # inicio de operación por unidad: el del equipo; para el punto, el más temprano de sus equipos
+    # (así su ventana no incluye meses en que alguno ya operaba)
+    inicio = {**dict(zip(eq["equipo"], eq["fecha_inicio"])),
+              **{str(k): v for k, v in eq.groupby("solicitud")["fecha_inicio"].min().items()}}
     z = zonas()
     zp = (z.groupby("solicitud").agg(punto=("punto", "first"),
                                      geometry=("geometry", lambda g: unary_union(list(g))),
@@ -64,9 +69,13 @@ def main() -> None:
     filas = []
     eventos = []
     for unidad, zz in (("equipo", z), ("solicitud", zp)):
-        jc = en_zonas(gc, zz, unidad).merge(
-            c[["id_evento", "fecha", "codigo", "medio", "ubicacion", "discordante", "sast_antes_inicio",
-               "direccion", "lon_u", "lat_u"]], on="id_evento")
+        cols_c = ["id_evento", "fecha", "codigo", "medio", "ubicacion", "discordante", "sast_antes_inicio",
+                  "direccion", "lon_u", "lat_u"]
+        jc = en_zonas(gc[gc["medio"] != "sast"], zz, unidad).merge(c[cols_c], on="id_evento")
+        # comparendos SAST: cuentan para su propio equipo (dirección ANSV), no por la zona donde caen
+        cs = c[c["medio"] == "sast"].copy()
+        cs[unidad] = cs["equipo_sast"] if unidad == "equipo" else cs["equipo_sast"].map(sol_de)
+        jc = pd.concat([jc] + [cs[cols_c + [unidad]].assign(criterio=k) for k in CRITERIOS], ignore_index=True)
         js = en_zonas(gs, zz, unidad).merge(
             s[["id_evento", "fecha", "cantidad_muertos", "cantidad_heridos", "gravedad", "fuente",
                "direccion", "lon", "lat"]], on="id_evento")
@@ -76,7 +85,7 @@ def main() -> None:
         js = js[(js["mes"] >= SERIE_INICIO) & (js["mes"] <= SERIE_FIN)]
         # criterio oficial mixto (decisión 15): comparendos ubicados por dirección (sobre el eje
         # de la vía) -> polígono estricto; ubicados por GPS y siniestros (coordenada) -> +15 m
-        por_dir = jc["ubicacion"].isin(["direccion", "direccion_gps"])
+        por_dir = jc["ubicacion"].isin(["direccion", "direccion_gps", "equipo"])
         jc = pd.concat([jc, jc[(por_dir & (jc["criterio"] == "estricto"))
                                | (~por_dir & (jc["criterio"] == "buffer15"))].assign(criterio="oficial")],
                        ignore_index=True)
@@ -94,7 +103,7 @@ def main() -> None:
 
     largo = pd.concat(filas, ignore_index=True)
     largo["unidad"] = largo["unidad"].astype(str)
-    largo["anio_base"] = largo["mes"].map(anio_base)
+    largo["anio_base"] = [anio_base(m, inicio[u]) for m, u in zip(largo["mes"], largo["unidad"])]
     # código aprobado para el equipo (o para algún equipo del punto)
     aprob_eq = {r.equipo: set(r.codigos) for r in eq.itertuples()}
     aprob_sol = eq.groupby("solicitud")["codigos"].agg(lambda x: set().union(*x)).to_dict()
@@ -113,10 +122,10 @@ def main() -> None:
     for crit in ["oficial", *CRITERIOS]:
         t = base[base["criterio"] == crit].pivot_table(index="unidad", columns="indicador",
                                                        values="valor", aggfunc="sum", fill_value=0)
-        print(f"\nLínea base sep-2023–ago-2026, criterio {crit} (aprobados, sin SAST):")
+        print(f"\nLínea base (36 meses previos al inicio de cada equipo), criterio {crit} (aprobados, sin SAST):")
         print(t.to_string())
     sast = largo[(largo["medio"] == "sast") & (largo["nivel"] == "equipo") & (largo["criterio"] == "oficial")]
-    print("\nComparendos SAST por equipo de zona (aparte):")
+    print("\nComparendos SAST por equipo (aparte):")
     print(sast.pivot_table(index="unidad", columns="indicador", values="valor", aggfunc="sum", fill_value=0).to_string())
 
     # siniestros en zona para revisión manual (hallazgo de auditoría 2026-10-06), con posible gemelo:
@@ -132,7 +141,8 @@ def main() -> None:
         gemelos.append("; ".join(f"{c.codrot} ({c.fuente}, {c.fecha:%d/%m/%Y}, m {c.cantidad_muertos} h {c.cantidad_heridos})"
                                  for c in cerca.itertuples()))
     rev["posible_gemelo"] = gemelos
-    rev["base"] = rev["fecha"].dt.to_period("M").map(anio_base).notna()
+    rev["base"] = [any(anio_base(f.to_period("M"), inicio[e]) for e in eqs.split(", "))
+                   for f, eqs in zip(rev["fecha"], rev["equipos"])]
     rev.drop(columns=["x", "y"]).sort_values("fecha").to_csv(
         OUTPUTS / "tables" / "siniestros_en_zona_revision.csv", index=False, encoding="utf-8-sig")
     print(f"\nSiniestros en alguna zona (buffer 15 m), ene-2023–sep-2026: {len(rev)} "
@@ -144,14 +154,17 @@ def main() -> None:
     cg = pd.read_parquet(PROCESSED / "comparendos_ubicados.parquet")
     cg = cg[cg["medio"].isin(["agente", "fotodeteccion_previa"]) & cg["coord_estado"].eq("ok")
             & cg["ubicacion"].isin(["direccion", "direccion_gps"])].copy()
-    cg = cg[cg["fecha"].dt.to_period("M").map(anio_base).notna()]
+    # ventana más amplia de los equipos (el filtro por equipo se hace tras la unión espacial)
+    cg = cg[cg["fecha"].dt.to_period("M").map(lambda m: any(anio_base(m, f) for f in eq["fecha_inicio"]))]
     cg["id_evento"] = "C" + cg["nro"] + "_" + cg["codigo"]
     gps = gpd.GeoSeries(gpd.points_from_xy(cg["lon"], cg["lat"]), crs=4326).to_crs(CRS_METRICO)
     filas_s = []
     for fuente, geom in (("direccion", gpd.points_from_xy(cg["x"], cg["y"])), ("gps", gps.values)):
         g = gpd.GeoDataFrame(cg[["id_evento", "codigo"]], geometry=geom, crs=CRS_METRICO)
         j = en_zonas(g, z, "equipo").merge(cg[["id_evento", "codigo"]], on="id_evento")
-        j = j[[c in aprob_eq[e] for c, e in zip(j["codigo"], j["equipo"])]]
+        j = j.merge(cg[["id_evento", "fecha"]], on="id_evento")
+        j = j[[c in aprob_eq[e] and anio_base(f.to_period("M"), inicio[e]) is not None
+               for c, e, f in zip(j["codigo"], j["equipo"], j["fecha"])]]
         filas_s.append(j.groupby(["equipo", "criterio"]).size().rename(fuente))
     sens = pd.concat(filas_s, axis=1).fillna(0).astype(int).unstack("criterio")
     sens.columns = [f"{a}_{b}" for a, b in sens.columns]

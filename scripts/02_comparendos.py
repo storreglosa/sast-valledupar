@@ -8,7 +8,7 @@ import pandas as pd
 
 import _entorno  # noqa: F401
 from sast.comparendos import PERSONALES, depurar_duplicados, leer_zip, tipificar
-from sast.equipos import equipos_operativos
+from sast.equipos import equipos_operativos, normalizar_direccion_sast
 from sast.rutas import OUTPUTS, PROCESSED
 
 TABLAS = OUTPUTS / "tables"
@@ -40,13 +40,21 @@ def main() -> None:
     if len(raros):
         print(f"  AVISO: códigos con formato inesperado: {raros.to_dict()}")
 
-    # medio SAST: además del patrón, la fecha debe ser posterior al inicio de su equipo
+    # comparendos SAST: a qué equipo pertenecen (dirección del comparendo = dirección del equipo en la
+    # plataforma ANSV, sin «SENTIDO») y si son anteriores a su fecha de inicio de operación
     eq = equipos_operativos()
-    inicio_min = eq["fecha_inicio"].min()
-    sast_antes = dep["medio"].eq("sast") & dep["fecha"].lt(inicio_min)
-    print(f"  SAST: {dep['medio'].eq('sast').sum():,} registros, primero {dep.loc[dep['medio'].eq('sast'), 'fecha'].min().date()}; "
-          f"{sast_antes.sum():,} antes del inicio de operación ({inicio_min.date()}) — "
-          "se mantienen fuera de la línea base (pruebas o arranque anticipado, por confirmar)")
+    llave = dict(zip(eq["llave_sast"], eq["equipo"]))
+    es_sast = dep["medio"].eq("sast")
+    dep["equipo_sast"] = dep["direccion"].map(normalizar_direccion_sast).map(llave).where(es_sast)
+    sin_equipo = dep.loc[es_sast & dep["equipo_sast"].isna(), "direccion"].value_counts()
+    if len(sin_equipo):
+        raise SystemExit(f"Comparendos SAST sin equipo asignable: {sin_equipo.to_dict()}")
+    inicio = dep["equipo_sast"].map(dict(zip(eq["equipo"], eq["fecha_inicio"])))
+    sast_antes = es_sast & dep["fecha"].lt(inicio)
+    print(f"  SAST: {es_sast.sum():,} registros asignados a su equipo por la dirección ANSV; "
+          f"{sast_antes.sum():,} anteriores a la fecha de inicio de su equipo")
+    print(dep[es_sast].groupby("equipo_sast").agg(n=("fecha", "size"), primero=("fecha", "min"))
+          .join(eq.set_index("equipo")["fecha_inicio"]).to_string())
     dep["sast_antes_inicio"] = sast_antes
 
     print("\nMedio × estado de la coordenada:")
