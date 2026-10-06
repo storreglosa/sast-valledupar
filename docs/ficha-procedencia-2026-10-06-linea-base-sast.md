@@ -138,11 +138,11 @@ queda como está, como soporte.
 
   | Archivo | Contenido | SHA-256 |
   |---|---|---|
-  | `outputs/2026-10-04_sttv_linea-base-sast_plataforma-ansv.xlsx` | Una hoja por equipo con los bloques Año 1, 2 y 3 en el orden del formulario de la plataforma, más Resumen e Instrucciones | `0026f38fb16811e711ffc5f18941f84802a6ef179e702d540a0aeea716b2738d` |
-  | `outputs/2026-10-04_sttv_linea-base-sast_ejecutivo.html` | Informe ejecutivo para gerencia, con mapa interactivo | `0c80ac4e0d58c0604c3a2bb06da4df1639930ee79a9effefa5e235ad61c88a76` |
+  | `outputs/2026-10-04_sttv_linea-base-sast_plataforma-ansv.xlsx` | Una hoja por equipo con los bloques Año 1, 2 y 3 en el orden del formulario de la plataforma, más Resumen e Instrucciones | `653db138538349ee6d3b5fd0c7fe399236c283892b96f8394645af13d7450c58` |
+  | `outputs/2026-10-04_sttv_linea-base-sast_ejecutivo.html` | Informe ejecutivo para gerencia, con mapa interactivo filtrable y tablero por punto y equipo | `c20dc5d576fd11c2ab4b06c339098587a7811c824f35a1550852abce26d0fb78` |
 
 - **Script:** `scripts/08_reporte_ejecutivo.py` (plantilla en `src/sast/ejecutivo.py`), commit
-  `2feda89d804d22d8d08f54209abbf5929c5e800c` (2feda89). Lee la tabla larga de la etapa 5, criterio
+  `aae977d2cda2c92c43fa061b75dac07a59092dd4` (aae977d). Lee la tabla larga de la etapa 5, criterio
   `buffer15`. Los insumos y las transformaciones son los mismos de esta ficha.
 - **Control:** las sumas de las hojas del Excel coinciden con la tabla del informe ejecutivo.
 - **Totales oficiales por equipo** (36 meses previos al inicio de cada equipo; «—» = código no
