@@ -1,0 +1,8 @@
+﻿medio,ubicacion,2023,2024,2025,2026
+agente,direccion,10729,14502,7502,7131
+agente,direccion_gps,180,506,140,165
+agente,gps,11517,9932,8212,7812
+agente,no_ubicable,3409,4017,1734,848
+fotodeteccion_previa,direccion,4,15198,26294,8004
+fotodeteccion_previa,no_ubicable,1,1058,1330,450
+sast,direccion,0,0,0,5709
