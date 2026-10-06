@@ -137,7 +137,13 @@ def main() -> None:
             "ADVERTENCIA: el portal registra en 2026 muchos más lesionados por mes que en 2023–2025 "
             f"({cob_anio['lesionados_mes'].min():.1f} a {cob_anio['lesionados_mes'].max():.1f} por mes en todo el municipio). "
             "La diferencia corresponde a un cambio en la captura, no necesariamente en la siniestralidad: la línea base de "
-            "lesionados puede estar subestimada en los Años 1 y 2.")
+            "lesionados no es homogénea: los Años 1 y 2 y la primera parte del Año 3 (sep-2025 a ene-2026) pueden estar "
+            "subestimados.")
+    metodologia.append("ADVERTENCIA — " + SALVEDAD_FALLECIDOS.replace("SALVEDAD: ", "fallecidos: "))
+    metodologia.append("ADVERTENCIA — siniestros en zona: se ubican solo por la coordenada del portal y requieren revisión "
+                       "manual (hoja «Siniestros en zona», con posibles gemelos «Deceso clínico») antes de reportarse.")
+    metodologia.append("LIMITACIÓN — placas sin «#» («CARRERA 16 20-27»): se interpretan como domiciliarias; la regla solo "
+                       "pudo contrastarse con GPS en una minoría de registros (la fotodetección previa no trae coordenada).")
     sens = pd.read_csv(OUTPUTS / "tables" / "sensibilidad_ubicacion.csv")
     sin_rev = pd.read_csv(OUTPUTS / "tables" / "siniestros_en_zona_revision.csv")
     anexos = {"Resumen": resumen, "Sensibilidad ubicación": sens, "Siniestros en zona": sin_rev, "Por punto": punto_t, "Serie 2023-2026": serie_t,
@@ -170,7 +176,10 @@ def main() -> None:
                       + ", ".join(f'{cob_anio.loc[a, "lesionados_mes"]:.1f} en {a}' for a in ("2023", "2024", "2025"))
                       + '. '
                       'Es un cambio en la captura (más fuentes desde 2026), no necesariamente en la siniestralidad: la línea '
-                      'base de lesionados de los Años 1 y 2 puede estar subestimada.</div>')
+                      'base de lesionados no es homogénea: los Años 1 y 2 y la primera parte del Año 3 (sep-2025 a ene-2026) '
+                      'pueden estar subestimados.</div>'
+                      f'<div class="aviso"><b>Fallecidos: fuentes cambiantes.</b> {esc(SALVEDAD_FALLECIDOS.replace("SALVEDAD: ", ""))} '
+                      'Los siniestros en zona deben revisarse a mano antes de reportarse (sección «Calidad de los datos»).</div>')
 
     # tabla resumen por equipo
     partes.append(f"<h2>Línea base por equipo ({base_txt})</h2>"

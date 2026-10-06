@@ -41,11 +41,16 @@ más de 100 m de la dirección en la mitad de los casos (la mediana pasa de 47 m
    equipo son un orden de magnitud. Las de equipos con zonas que se solapan (021/022, 041/042)
    deben leerse por punto.
 3. **Lesionados:** el registro del portal no es homogéneo. Hay 7–9 lesionados por mes en el
-   municipio en 2023–2025 frente a unos 29 en 2026. Se reporta con salvedad.
+   municipio en 2023–2025 frente a unos 29 en 2026. Afecta los Años 1 y 2 y la primera parte del
+   Año 3. Se reporta con salvedad.
 4. **Fallecidos:** la mezcla de fuentes del portal cambia entre años. Los siniestros en zona
    (`outputs/tables/siniestros_en_zona_revision.csv`) requieren revisión manual, incluidos los
    posibles gemelos «Deceso clínico».
 5. **Fecha de inicio de operación e id ANSV:** pendientes de confirmar por equipo
    (`config/equipos.yaml`).
-6. **La fotodetección previa no SAST sigue operando** cerca de las zonas después del inicio SAST.
+6. **Placas sin «#»** («CARRERA 16 20-27»): se interpretan como domiciliarias. La regla solo pudo
+   contrastarse con GPS en 182 registros (la fotodetección previa no trae coordenada). La mediana
+   coincide, pero el 27 % discrepa más de 500 m, sobre todo en «CALLE 16B 7A-45 … CALLE DE LOS
+   TURCOS» y «CARRERA 27 44-100». Probablemente el problema está en la referencia vial.
+7. **La fotodetección previa no SAST sigue operando** cerca de las zonas después del inicio SAST.
    Es un factor de confusión en cualquier comparación antes/después.
