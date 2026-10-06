@@ -134,7 +134,9 @@ const D={datos};
 (function(){{
  if(!window.L) {{document.getElementById('mapa').innerHTML='<p class="nota">El mapa necesita conexión a internet (Leaflet).</p>';return;}}
  const css=getComputedStyle(document.documentElement);const c=v=>css.getPropertyValue(v).trim();
- const m=L.map('mapa');L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png',{{maxZoom:20,attribution:'© OpenStreetMap'}}).addTo(m);
+ const m=L.map('mapa');// Fondo Esri: los servidores de OSM bloquean (403) las páginas abiertas como archivo local
+ L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{{z}}/{{y}}/{{x}}',
+   {{maxZoom:19,attribution:'Fondo © Esri, HERE, Garmin, OpenStreetMap contributors'}}).addTo(m);
  const zb=L.geoJSON(D.zonas_buffer,{{style:{{color:c('--ink2'),weight:1,dashArray:'3 3',fillOpacity:0.04}}}}).addTo(m);
  L.geoJSON(D.zonas,{{style:{{color:c('--acento'),weight:2,fillOpacity:0.12}},onEachFeature:(f,l)=>l.bindTooltip(f.properties.equipo)}}).addTo(m);
  const col={{agente:c('--s1'),fotodeteccion_previa:c('--s2'),sast:c('--s3')}};
