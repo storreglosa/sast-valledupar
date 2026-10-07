@@ -1,4 +1,4 @@
-# Vendorizado de ~/Claude_code/Analisis_siniestralidad/src/ubicacion/referencia.py (commit d057993, 2026-10-06).
+# Vendorizado de ~/Claude_code/Analisis_siniestralidad/src/ubicacion/referencia.py (commit d057993, 2026-10-06; = db52cbd tras la reescritura del historial de ese repo el 2026-10-07).
 # Solo se cambian las importaciones; la lógica es la del original.
 """Capas de referencia del POT de Valledupar para el diagnóstico de ubicación.
 

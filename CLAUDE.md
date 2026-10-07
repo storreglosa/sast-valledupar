@@ -110,7 +110,8 @@ Decisiones del 2026-10-06 (tarde), Santiago:
     con 1 fallecido (el motociclista) y 1 herido.
 23. **EQUIPO071 sin comparendos SAST:** inició el 02/10/2026 y el export corta el 04/10/2026; según
     Santiago, en esa zona no se hacía ese tipo de control.
-24. **El repo se mantiene privado y sin remoto** por ahora.
+24. **El repo se mantiene privado.** Estuvo sin remoto hasta el 2026-10-07, cuando Santiago pidió
+    remotos privados para todos los repos: `origin` = `github.com/storreglosa/sast-valledupar` (privado).
 25. **Cifra oficial reportada a la ANSV = zona + 15 m para todo** (Santiago, 2026-10-06; reemplaza la
     decisión 15 solo para el reporte). El informe técnico (`06_reportes.py`) se deja como está, con
     el criterio mixto y las sensibilidades. El informe ejecutivo para gerencia y el Excel para

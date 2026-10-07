@@ -1,4 +1,4 @@
-# Vendorizado de ~/Claude_code/Analisis_siniestralidad/src/ubicacion/geocodificar.py (commit d057993, 2026-10-06).
+# Vendorizado de ~/Claude_code/Analisis_siniestralidad/src/ubicacion/geocodificar.py (commit d057993, 2026-10-06; = db52cbd tras la reescritura del historial de ese repo el 2026-10-07).
 # Solo se cambian las importaciones; la lógica es la del original.
 """Punto teórico de una dirección sobre los ejes viales, y distancia al punto registrado.
 
