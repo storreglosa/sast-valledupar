@@ -16,3 +16,5 @@ __pycache__/
 data/processed/*.gpkg
 # Lleva números de comparendo: no se versiona
 outputs/tables/comparendos_apartados.csv
+# Paquetes para enviar por correo (copias de entregables versionados)
+outputs/envio/
