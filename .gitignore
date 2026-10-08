@@ -18,3 +18,8 @@ data/processed/*.gpkg
 outputs/tables/comparendos_apartados.csv
 # Paquetes para enviar por correo (copias de entregables versionados)
 outputs/envio/
+# Registros puntuales de revisión (fecha, dirección, coordenada): no se publican (decisión 26)
+outputs/tables/revision_geocodificacion_en_zona.csv
+outputs/tables/revision_geocodificacion_muestra_fuera.csv
+outputs/tables/siniestros_en_zona_revision.csv
+outputs/tables/siniestros_contraste_victimas.csv

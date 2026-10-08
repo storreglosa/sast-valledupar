@@ -110,9 +110,22 @@ Decisiones del 2026-10-06 (tarde), Santiago:
     con 1 fallecido (el motociclista) y 1 herido.
 23. **EQUIPO071 sin comparendos SAST:** inició el 02/10/2026 y el export corta el 04/10/2026; según
     Santiago, en esa zona no se hacía ese tipo de control.
-24. **El repo se mantiene privado.** Estuvo sin remoto hasta el 2026-10-07, cuando Santiago pidió
-    remotos privados para todos los repos: `origin` = `github.com/storreglosa/sast-valledupar` (privado).
+24. ~~**El repo se mantiene privado.**~~ Reemplazada por la 26. Estuvo sin remoto hasta el 2026-10-07:
+    `origin` = `github.com/storreglosa/sast-valledupar`.
 25. **Cifra oficial reportada a la ANSV = zona + 15 m para todo** (Santiago, 2026-10-06; reemplaza la
     decisión 15 solo para el reporte). El informe técnico (`06_reportes.py`) se deja como está, con
     el criterio mixto y las sensibilidades. El informe ejecutivo para gerencia y el Excel para
     copiar en la plataforma (`08_reporte_ejecutivo.py`) usan +15 m.
+
+Decisiones del 2026-10-08, Santiago (tablero de semáforos SAST, `tablero/`):
+26. **El repo pasa a público** para publicar el tablero en GitHub Pages (reemplaza la 24). El
+    historial se deja como está: auditado el 2026-10-08 (16 commits), sin placas, cédulas, nombres
+    ni secretos. Dejan de versionarse los 4 CSV de revisión con registros puntuales (`.gitignore`);
+    siguen en commits anteriores. Los HTML de línea base (entregables) siguen versionados.
+27. **Tiempos semafóricos = reportes de los controladores SISTRA** (`data/raw/semaforos/`), no la
+    tabla del correo del 29/09/2026. Diferencias: La Viña P1 85 s (correo 60), Mercado P2 110 s
+    (correo 100), Mercado P1 sin horario en el controlador (correo: dom/fest 05:30–17:00).
+28. **Grupo semafórico → acceso:** no viene en los PDF. Se propone con OSM + matriz de grupos
+    amigos y lo valida Santiago; sin validación el tablero no anima vehículos en ese cruce.
+29. **Así se ve en campo:** TIRA→TIV (2 s) es solo rojo; el último segundo peatonal (TFV→TFA) es
+    rojo intermitente; las cinco intersecciones tienen contador regresivo.
