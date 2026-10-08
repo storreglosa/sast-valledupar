@@ -247,10 +247,13 @@ Punto de 7px. Apagado `#2a1414`; **al aire** (on) rojo tally con halo; **vista p
 SVG de dígitos de 10×18 con 7 polígonos inclinados −6°, dos puntos fijos opcionales y segmentos apagados con su color al 9 % sobre negro. Lo usan la hora de Bogotá (ámbar), la regresiva de cada cabeza (color de su luz), la cuenta de cada monitor fuente y el centro del reloj grande (segundos del ciclo en tinta, o restante del grupo en foco en su color).
 
 ### Reloj del ciclo (anillo)
-Tres capas SVG superpuestas: arcos quietos (se repintan solo al cambiar de plan), capa móvil que gira por `transform` en el compositor (aguja blanca; en los mini, cuentas LED con halo por grupo) y centro (display, cambia una vez por segundo). Verde sólido, amarillo rayado a 45°, rojo atenuado, despeje punteado. El reloj grande lleva marcas cada 10 s y números cada 20 s; su entrada es un fundido con escala desde 0.94.
+Tres capas SVG superpuestas: arcos quietos (se repintan solo al cambiar de plan), capa móvil que gira por `transform` en el compositor (aguja blanca; en los mini, cuentas LED con halo por grupo) y centro (display, cambia una vez por segundo). Verde sólido, amarillo rayado a 45°, rojo atenuado, despeje punteado. El reloj grande lleva marcas cada 10 s y números cada 20 s; su entrada es un fundido con escala desde 0.94. El monitor del reloj muestra siempre, junto al plan y su ciclo, las dos cifras clave del plan: el rojo más largo y el verde promedio de los flujos vehiculares (sin flechas ni peatonales).
+
+### Diagrama del cruce
+Norte del mapa arriba, sin rotar (fiel al mapa y a la imagen satelital). Cada vía lleva su nombre completo en versalitas condensadas sobre su eje, derecho y lejos del cruce (una vez por nombre). Un cruce largo, con pares lejos del centro, trae su propio encuadre (`vista`).
 
 ### Cabeza semafórica
-Caja negra (`#0d1114`) de esquinas de 6px con lentes apilados (rojo, ámbar, verde; peatonal con figura quieta o caminando; flecha), la regresiva de 7 segmentos debajo y la palabra de estado (SIGA, PREVENCIÓN, PARE, NO INICIE) en Barlow Condensed 700 del color de la luz. El despeje es el lente rojo intermitente a 0.5 s.
+Caja negra (`#0d1114`) de esquinas de 6px con lentes apilados (rojo, ámbar, verde; peatonal con figura quieta o caminando; flecha), la regresiva de 7 segmentos debajo y la palabra de estado (SIGA, PREVENCIÓN, PARE, NO INICIE) en Barlow Condensed 700 del color de la luz. El despeje es el lente rojo intermitente a 0.5 s. En el diagrama, la cabeza va paralela a la vía que controla (en columna si la vía es más vertical, en fila si es más horizontal, y girada lo que falte, a lo sumo 45°, para que el contador se lea) y sobre el andén derecho, al lado de la cola y antes de la línea de pare: nunca tapa la calzada. La peatonal va a lo largo del andén exterior, junto a su cebra.
 
 ### Buttons
 - **Shape:** esquinas de control (5px), 34px de alto.

@@ -122,7 +122,7 @@ export function fases(it, plan) {
 export function resumen(it, plan, vigente) {
   const k = kpis(plan, it.grupos);
   const g = Object.fromEntries(it.grupos.map((x) => [x.id, x]));
-  const rojoMax = Math.max(...Object.values(k.rojo_s));
+  const { rojoMax, rojoMaxId, verdeProm } = claves(plan, it.grupos);
   const cuando = vigente
     ? `${NOMBRE_DIA[vigente.b.diaSemana]} ${hhmm(vigente.b.minutos)}${vigente.festivo ? ` (festivo: ${vigente.festivo})` : ''}`
     : null;
@@ -130,7 +130,8 @@ export function resumen(it, plan, vigente) {
     ? `Ahora (${cuando}) rige el plan ${plan.id}.`
     : `Plan ${plan.id}${plan.con_horario ? '' : ', programado en el controlador pero sin horario: hoy no corre'}.`;
   const ciclo = `El ciclo dura ${plan.ciclo} s: el semáforo repite la misma secuencia ${String(k.ciclos_hora).replace('.', ',')} veces por hora.`;
-  const espera = `Quien llega justo cuando se pone en rojo espera hasta ${rojoMax} s.`;
+  const espera = `Quien llega justo cuando se pone en rojo espera hasta ${rojoMax} s (${g[rojoMaxId].nombre}). `
+    + `El verde de los flujos vehiculares dura en promedio ${verdeProm} s.`;
 
   // comparación con el plan más corto que sí corre (de noche)
   const corren = it.planes.filter((p) => p.con_horario);
@@ -144,7 +145,18 @@ export function resumen(it, plan, vigente) {
   }
   const verdes = Object.entries(k.verde_s).filter(([id]) => g[id].tipo !== 'peatonal')
     .map(([id, s]) => ({ id, s, pct: k.verde_pct[id] }));
-  return { intro, ciclo, espera, noche, verdes, kpis: k, fases: fases(it, plan) };
+  return { intro, ciclo, espera, noche, verdes, kpis: k, rojoMax, rojoMaxId, verdeProm, fases: fases(it, plan) };
+}
+
+/** Cifras clave de un plan: el rojo más largo (grupo vehicular o flecha) y el verde promedio de los
+ *  flujos vehiculares (sin flechas ni peatonales, que se montan sobre otros verdes). */
+export function claves(plan, grupos) {
+  const k = kpis(plan, grupos);
+  const tipo = Object.fromEntries(grupos.map((g) => [g.id, g.tipo]));
+  const [rojoMaxId, rojoMax] = Object.entries(k.rojo_s).reduce((a, b) => (b[1] > a[1] ? b : a));
+  const veh = Object.entries(k.verde_s).filter(([id]) => tipo[id] === 'vehicular').map(([, v]) => v);
+  const verdeProm = veh.length ? Math.round(veh.reduce((a, b) => a + b, 0) / veh.length) : null;
+  return { rojoMax, rojoMaxId, verdeProm, ciclo: plan.ciclo, ciclosHora: k.ciclos_hora };
 }
 
 export const GLOSARIO = [

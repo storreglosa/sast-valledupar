@@ -222,6 +222,13 @@ button { font: inherit; color: inherit; }
 .cab-cuenta { height: 15px; display: flex; }
 .cab-cuenta svg { height: 100%; width: auto; }
 .cab-tag { font: 700 .72rem/1 var(--f-rotulo); letter-spacing: .04em; color: var(--tinta); background: rgba(5,7,10,.82); padding: 2px 5px; border-radius: 3px; white-space: nowrap; }
+/* cabeza paralela a su vía: en columna (vía vertical) o en fila (vía horizontal) */
+.cab-in { display: grid; justify-items: center; gap: 3px; }
+.cab.fila .cab-in { grid-auto-flow: column; align-items: center; gap: 4px; }
+.cab.fila .cab-cuerpo { grid-auto-flow: column; align-items: center; }
+.cab.fila .cab-caja { grid-auto-flow: column; }
+/* nombres de las vías sobre su eje */
+.nom-via { font-family: var(--f-rotulo); font-weight: 700; letter-spacing: .08em; fill: #8794a0; stroke: #0b0f12; paint-order: stroke; stroke-linejoin: round; }
 
 /* controles del simulador */
 .controles {
@@ -456,7 +463,7 @@ svg .parpadea { animation: parpadeo .5s steps(1) infinite; }
 .cabeza .lente { width: 16px; height: 16px; } .cabeza .lente.peat { width: 18px; height: 18px; } .cabeza .lente.peat svg { width: 13px; height: 13px; }
 .cabeza .cab-cuenta { height: 19px; }
 .cabeza .palabra { font-size: .62rem; letter-spacing: .05em; white-space: nowrap; }
-.analisis .monitor:nth-child(2) .mon-cuerpo { padding: 6px 4px; }
+.analisis .monitor:nth-child(2) .mon-cuerpo { padding: 2px 4px; }
 /* 7 grupos en ~300 px (1280 y 1366 de ancho): la palabra se ajusta al ancho de su cabeza;
    «PREVENCIÓN» y «NO INICIE» caben sin invadir la vecina */
 .cabezas .cabeza { container-type: inline-size; }
@@ -474,6 +481,15 @@ svg .parpadea { animation: parpadeo .5s steps(1) infinite; }
 .rl-ley { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: .7rem; }
 .rl-info { gap: 5px; overflow: hidden; max-height: 100%; align-self: safe center; }
 .rl-foco:empty { display: none; }
+.rl-kpi { display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: .74rem; color: var(--tinta-3); }
+.rl-kpi b { font: 700 1.1rem/1 var(--f-rotulo); color: var(--tinta); margin-right: 2px; }
+/* cabezas del monitor, compactas: el alto se lo lleva la explicación */
+.cabezas .cabeza { gap: 2px; padding: 3px 2px; }
+.cabezas .cabeza .cab-caja { padding: 3px; gap: 2px; }
+.cabezas .cabeza .lente { width: 12px; height: 12px; }
+.cabezas .cabeza .lente.peat { width: 14px; height: 14px; } .cabezas .cabeza .lente.peat svg { width: 10px; height: 10px; }
+.cabezas .cabeza .cab-cuenta { height: 15px; }
+.cabezas .cabeza .g { font-size: .8rem; }
 .rl-info { align-content: safe center; }
 .fase .corto { display: none; }
 .kpis-linea { display: none; flex: none; margin: 0 0 6px; font-size: .74rem; line-height: 1.35; color: var(--tinta-3); }
@@ -485,13 +501,16 @@ svg .parpadea { animation: parpadeo .5s steps(1) infinite; }
 @media (min-width: 1181px) {
   .pant-reloj { container: reloj / size; }
   .pant-expl { container: expl / size; }
-  @container reloj (max-height: 120px) { .rl-ley li.basico { display: none; } }
+  @container reloj (max-height: 150px) { .rl-ley li.basico { display: none; } }
+  @container reloj (max-height: 112px) { .rl-ley { display: none; } }
   @container expl (max-height: 200px) {
     .expl .lead, .kpis { display: none; }
     .kpis-linea { display: block; }
     .pant-expl .fases-scroll { min-height: 0; }
     .fase .largo { display: none; } .fase .corto { display: inline; }
   }
+  /* la frase del ciclo (también en el título del párrafo) cede su espacio a la fase en curso */
+  @container expl (max-height: 270px) { .lead-ciclo { display: none; } }
   /* 1280×720: la fase en curso manda; los indicadores siguen en pantallas más altas */
   @container expl (max-height: 160px) { .kpis-linea { display: none; } }
 }

@@ -2,7 +2,7 @@
 // reloj del ciclo, cabezas con contador y explicación (con semana y tabla de tiempos).
 import { h, mostrarTip, ocultarTip } from '../util/dom.js';
 import { estado, luz, restanteVisible, kpis } from '../nucleo/tiempos.js';
-import { resumen, rotulo, brazosPartidos, GLOSARIO } from '../nucleo/explicacion.js';
+import { resumen, rotulo, brazosPartidos, claves, GLOSARIO } from '../nucleo/explicacion.js';
 import { anillo } from './anillo.js';
 import { cabeza, PALABRA } from './cabezas.js';
 import { semana, colorCiclo } from './programacion.js';
@@ -140,6 +140,8 @@ export function reloj(it, fases) {
   m.el.title = 'Pase el cursor por una cabeza semafórica para ver su cuenta regresiva en el centro del reloj.';
   const a = anillo(it, { tam: 'completo', fases });
   const plan = h('div', { class: 'rl-plan' });
+  // cifras clave del plan, siempre a la vista: el rojo más largo y el verde promedio
+  const cifras = h('div', { class: 'rl-kpi' });
   const foco = h('div', { class: 'rl-foco' });
   m.pantalla.classList.add('pant-reloj');
   // en pantallas bajas se ocultan primero verde/amarillo/rojo («basico»): se leen solos
@@ -148,7 +150,7 @@ export function reloj(it, fases) {
     h('li', { class: 'basico' }, h('i', { class: 'sw rojo' }), 'rojo'), ...(it.grupos.some((g) => g.tipo === 'peatonal') ? [h('li', {}, h('i', { class: 'sw despeje' }), 'despeje peatonal')] : []),
     h('li', {}, h('i', { class: 'sw aguja' }), 'aguja = ahora'));
   m.pantalla.append(h('div', { class: 'reloj' }, h('div', { class: 'rl-anillo' }, a.el),
-    h('div', { class: 'rl-info' }, plan, foco, ley)));
+    h('div', { class: 'rl-info' }, plan, cifras, foco, ley)));
   let enfoque = null, previo = '';
   return {
     ...m,
@@ -159,6 +161,14 @@ export function reloj(it, fases) {
       if (clave === previo) return;
       previo = clave;
       plan.replaceChildren(h('b', {}, p.id), ` · ciclo ${p.ciclo} s`);
+      if (cifras.dataset.plan !== p.id) {
+        cifras.dataset.plan = p.id;
+        const k = claves(p, it.grupos);
+        const nom = it.grupos.find((g) => g.id === k.rojoMaxId)?.nombre || k.rojoMaxId;
+        cifras.replaceChildren(
+          h('span', { title: `La espera más larga en rojo: ${nom}` }, h('b', {}, `${k.rojoMax} s`), ' rojo máx.'),
+          ...(k.verdeProm != null ? [h('span', { title: 'Promedio del verde de los flujos vehiculares (sin flechas ni peatonales)' }, h('b', {}, `${k.verdeProm} s`), ' verde prom.')] : []));
+      }
       foco.textContent = enfoque ? `Centro: cuenta regresiva de ${enfoque}` : '';
     },
   };
@@ -219,14 +229,14 @@ export function explicacionMon(it, { alElegirPlan }) {
       const k = r.kpis;
       contenido.append(h('div', { class: 'kpis' },
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${plan.ciclo} s`), h('div', { class: 'e' }, 'dura el ciclo')),
-        h('div', { class: 'kpi' }, h('div', { class: 'v num' }, String(k.ciclos_hora).replace('.', ',')), h('div', { class: 'e' }, 'ciclos por hora')),
-        h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${k.todo_rojo_s} s`), h('div', { class: 'e' }, 'todo rojo por ciclo')),
-        h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${Math.max(...Object.values(k.rojo_s))} s`), h('div', { class: 'e' }, 'espera máxima en rojo'))));
+        h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${r.rojoMax} s`), h('div', { class: 'e' }, 'rojo máximo')),
+        h('div', { class: 'kpi' }, h('div', { class: 'v num' }, r.verdeProm != null ? `${r.verdeProm} s` : '–'), h('div', { class: 'e' }, 'verde promedio')),
+        h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${k.todo_rojo_s} s`), h('div', { class: 'e' }, 'todo rojo por ciclo'))));
       // los mismos cuatro indicadores en una línea: reemplaza a la fila en pantallas bajas (CSS)
       contenido.append(h('p', { class: 'kpis-linea' }, h('b', { class: 'num' }, `${plan.ciclo} s`), ' de ciclo · ',
-        h('b', { class: 'num' }, String(k.ciclos_hora).replace('.', ',')), ' ciclos por hora · ', h('b', { class: 'num' }, `${k.todo_rojo_s} s`),
-        ' de todo rojo · ', h('b', { class: 'num' }, `${Math.max(...Object.values(k.rojo_s))} s`), ' de espera máxima en rojo'));
-      const ex = h('div', { class: 'expl' }, h('p', { class: 'lead', title: r.ciclo }, r.intro));
+        h('b', { class: 'num' }, `${r.rojoMax} s`), ' rojo máximo · ', ...(r.verdeProm != null ? [h('b', { class: 'num' }, `${r.verdeProm} s`), ' verde promedio · '] : []),
+        h('b', { class: 'num' }, `${k.todo_rojo_s} s`), ' de todo rojo'));
+      const ex = h('div', { class: 'expl' }, h('p', { class: 'lead', title: `${r.ciclo} ${r.espera}` }, r.intro, h('span', { class: 'lead-ciclo' }, ` ${r.ciclo}`)));
       const ol = h('ol', { class: 'fases' });
       lista = h('div', { class: 'fases-scroll' }, ol);
       for (const f of r.fases) {

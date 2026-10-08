@@ -1,16 +1,19 @@
-// Diagrama del cruce en la pantalla principal: geometría OSM en metros (orientada con el acceso
-// «norte» de la codificación hacia arriba, como la figura del manual SDM), cajón amarillo, cebras,
-// líneas de pare, cabezas semafóricas con contador y la microsimulación ilustrativa en canvas.
+// Diagrama del cruce en la pantalla principal: geometría OSM en metros, con el norte del mapa
+// arriba (fiel al mapa y a la imagen satelital; Santiago, 2026-10-08), nombres de las vías, cajón
+// amarillo, cebras, líneas de pare, cabezas semafóricas con contador (paralelas a su vía, sobre el
+// andén) y la microsimulación ilustrativa en canvas.
 import { h, s } from '../util/dom.js';
 import { cabeza } from './cabezas.js';
 import { estado, luz, restanteVisible } from '../nucleo/tiempos.js';
 import { crearSim, trazo, puntoEn } from '../simulacion/trafico.js';
 import { bogota } from '../nucleo/horario.js';
+import { nombreVia } from '../nucleo/explicacion.js';
 
 const R_VISTA = 31;   // media altura visible (m); un cruce largo trae su propia vista (geo.vista)
 
 export function diagrama(it, geo, { alAnunciar } = {}) {
-  const n = (geo.norte * Math.PI) / 180;
+  // norte del mapa arriba: sin rotación (geo.norte = norte de la codificación, solo para los accesos)
+  const n = 0;
   const cosn = Math.cos(-n), sinn = Math.sin(-n);
   // encuadre: centro del cruce y 31 m, o la vista que trae un cruce largo (pares lejos del centro)
   const V = geo.vista || { x: 0, y: 0, r: R_VISTA };
@@ -24,11 +27,13 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
   raiz.append(base, lienzo, sobre);
 
   // ---------------------------------------------------------------- base en SVG (metros)
-  const mundo = s('g', { transform: `rotate(${-geo.norte}) scale(1 -1) translate(${-V.x} ${-V.y})` });
+  const mundo = s('g', { transform: `scale(1 -1) translate(${-V.x} ${-V.y})` });
   const defs = s('defs', {},
     s('pattern', { id: `caj-${it.id}`, width: 2.2, height: 2.2, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' },
       s('path', { d: 'M0 1.1H2.2M1.1 0V2.2', stroke: 'var(--cajon)', 'stroke-width': 0.16, opacity: 0.75 })));
-  base.append(defs, mundo);
+  // nombres de las vías: en el plano de pantalla (en metros, sin el espejo del mundo), siempre derechos
+  const gNombres = s('g', { class: 'nombres-via', 'aria-hidden': 'true' });
+  base.append(defs, mundo, gNombres);
   const pts = (p) => p.map(([x, y]) => `${x},${y}`).join(' ');
   const gCordon = s('g'), gAsfalto = s('g'), gMarcas = s('g'), gCajon = s('g'), gCebras = s('g'), gPare = s('g');
   mundo.append(gCordon, gAsfalto, gMarcas, gCajon, gCebras, gPare);
@@ -83,7 +88,7 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
   }
   // rosa con el norte real
   const rosa = s('svg', { class: 'diag-norte', viewBox: '-24 -24 48 48', 'aria-label': 'Norte' },
-    s('g', { transform: `rotate(${-geo.norte})` },
+    s('g', {},
       s('circle', { r: 20, fill: 'rgba(5,7,10,.6)', stroke: '#2b343c' }),
       s('path', { d: 'M0 -16L5 3H-5Z', fill: 'var(--tinta)' }), s('path', { d: 'M0 16L5 3H-5Z', fill: '#3b4650' }),
       s('text', { y: -6, 'text-anchor': 'middle', transform: 'translate(0 -6)', class: 'r-g', fill: '#000' }, '')),
@@ -91,33 +96,37 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
   raiz.append(rosa);
 
   // ---------------------------------------------------------------- cabezas (HTML, tamaño fijo en pantalla)
+  // Cada cabeza va paralela a la vía que controla y sobre el andén derecho, al lado de la cola y
+  // antes de la línea de pare, para no tapar la calzada; la peatonal, alineada con su cebra y más
+  // allá de su extremo. La posición exacta depende del tamaño en pantalla: se calcula en medir().
   const cabezas = [];
   for (const g of it.grupos) {
-    let ancla = null;
+    let lugar = null;
     const tr = geo.trayectorias[g.id];
     if (geo.pare[g.id] && tr) {
-      // sobre el andén derecho, 2 m aguas arriba de la línea de pare
-      const t = trazo(tr.puntos);
-      const q = puntoEn(t, Math.max(0, tr.s_pare - 2.5));
       const [p0, p1] = geo.pare[g.id];
-      const ancho = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
-      const lado = ancho / 2 + 2.6;
-      ancla = [q.x + Math.sin(q.ang) * lado, q.y - Math.cos(q.ang) * lado];
+      lugar = { tipo: 'via', t: trazo(tr.puntos), sPare: tr.s_pare, medio: Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) / 2 };
     } else {
       const z = geo.cebras.find((c) => c.grupo === g.id);
       if (z) {
-        const [a, b] = z.eje;
-        const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
-        const u = [(z.poligono[3][0] - z.poligono[0][0]) / 4, (z.poligono[3][1] - z.poligono[0][1]) / 4];
-        ancla = [b[0] + (dx / L) * 1.8 + u[0] * 3.2, b[1] + (dy / L) * 1.8 + u[1] * 3.2];
+        // la cabeza peatonal va en el extremo de la cebra que da al andén exterior: el más lejos del
+        // eje del brazo (en media calzada o calzada doble, el otro extremo da al centro o al
+        // separador), a lo largo del andén y hacia afuera del cruce, sin atravesar otra calzada
+        let [a, b] = z.eje;
+        const ur = [(z.poligono[3][0] - z.poligono[0][0]) / 4, (z.poligono[3][1] - z.poligono[0][1]) / 4];
+        const alBrazo = (q) => Math.abs(q[0] * ur[1] - q[1] * ur[0]);
+        if (alBrazo(a) > alBrazo(b)) [a, b] = [b, a];
+        const L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+        lugar = { tipo: 'cebra', b, dir: [(b[0] - a[0]) / L, (b[1] - a[1]) / L], ur };
       }
     }
-    if (!ancla) continue;
+    if (!lugar) continue;
     const c = cabeza(g);
     const tag = h('div', { class: 'cab-tag' }, g.tipo === 'peatonal' ? (g.mov?.codigo || g.id) : g.id);
-    const el = h('div', { class: `cab ${g.tipo === 'peatonal' ? 'peat-cab' : ''}`, 'data-g': g.id }, c.el, tag);
+    const dentro = h('div', { class: 'cab-in' }, c.el, tag);
+    const el = h('div', { class: `cab ${g.tipo === 'peatonal' ? 'peat-cab' : ''}`, 'data-g': g.id }, dentro);
     sobre.append(el);
-    cabezas.push({ g, c, el, ancla });
+    cabezas.push({ g, c, el, dentro, lugar });
   }
 
   let nota = null;
@@ -138,14 +147,15 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
     base.setAttribute('viewBox', `${-W / 2 / k} ${-H / 2 / k} ${W / k} ${H / k}`);
     dpr = Math.min(2, window.devicePixelRatio || 1);
     lienzo.width = Math.round(W * dpr); lienzo.height = Math.round(H * dpr);
-    const pos = cabezas.map((cb) => aPantalla(cb.ancla[0], cb.ancla[1]));
-    // que no se monten: empuje simple entre pares cercanos
+    const pos = cabezas.map(ubicarCabeza);
+    // que no se monten: empuje simple entre pares cercanos (p. ej. la Flecha y su flujo, que
+    // comparten línea de pare, quedan uno detrás del otro sobre el mismo andén)
     for (let it2 = 0; it2 < 6; it2++) {
       for (let i = 0; i < pos.length; i++) for (let j = i + 1; j < pos.length; j++) {
         let dx = pos[j][0] - pos[i][0], dy = pos[j][1] - pos[i][1];
-        if (Math.hypot(dx, dy) < 0.5) { dx = 1; dy = 0; }   // misma línea de pare (Flecha y su flujo): lado a lado
-        const d = Math.hypot(dx, dy);
-        const min = 50;
+        if (Math.hypot(dx, dy) < 0.5) { dx = pos[j][2][0]; dy = pos[j][2][1]; }
+        const d = Math.hypot(dx, dy) || 1;
+        const min = 30;
         if (d < min) { const e = (min - d) / 2; pos[i][0] -= (dx / d) * e; pos[i][1] -= (dy / d) * e; pos[j][0] += (dx / d) * e; pos[j][1] += (dy / d) * e; }
       }
     }
@@ -153,6 +163,66 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
       cb.el.style.left = `${Math.max(24, Math.min(W - 24, pos[i][0]))}px`;
       cb.el.style.top = `${Math.max(34, Math.min(H - 34, pos[i][1]))}px`;
     });
+    ponerNombres();
+  }
+
+  /** Orienta la cabeza paralela a su vía (columna o fila, más el giro que falte, ≤ 45°) y devuelve
+   *  [x, y, dirección aguas arriba] en píxeles, sobre el andén derecho y antes de la línea de pare. */
+  function ubicarCabeza(cb) {
+    const L = cb.lugar;
+    // dirección del eje en pantalla (norte arriba: y de pantalla = −y del mundo)
+    let q, dx, dy;
+    if (L.tipo === 'via') { q = puntoEn(L.t, Math.max(0, L.sPare - 4)); dx = Math.cos(q.ang); dy = -Math.sin(q.ang); }
+    else { dx = L.ur[0]; dy = -L.ur[1]; }                         // peatonal: a lo largo del andén
+    const ang = (Math.atan2(dy, dx) * 180) / Math.PI;           // eje de la vía en pantalla
+    const norm = (a) => { while (a > 90) a -= 180; while (a <= -90) a += 180; return a; };
+    const enFila = Math.abs(norm(ang)) <= 45;                      // vía más horizontal que vertical
+    cb.el.classList.toggle('fila', enFila);
+    const giro = enFila ? norm(ang) : norm(ang - 90);
+    cb.el.style.transform = `translate(-50%, -50%) rotate(${giro.toFixed(1)}deg)`;
+    const largoPx = enFila ? cb.el.offsetWidth : cb.el.offsetHeight;   // a lo largo de la vía
+    const anchoPx = enFila ? cb.el.offsetHeight : cb.el.offsetWidth;   // a través de la vía
+    if (L.tipo === 'via') {
+      const s0 = Math.max(0, L.sPare - (largoPx / 2) / k - 1.2);
+      const p = puntoEn(L.t, s0);
+      const lado = L.medio + 0.8 + (anchoPx / 2) / k;
+      const [x, y] = aPantalla(p.x + Math.sin(p.ang) * lado, p.y - Math.cos(p.ang) * lado);
+      return [x, y, [-dx, -dy]];
+    }
+    const fuera = 0.8 + (anchoPx / 2) / k, atras = (largoPx / 2) / k - 1.0;
+    const [x, y] = aPantalla(L.b[0] + L.dir[0] * fuera + L.ur[0] * atras, L.b[1] + L.dir[1] * fuera + L.ur[1] * atras);
+    return [x, y, [dx, dy]];
+  }
+
+  /** Un rótulo por vía (la calzada más larga a la vista), sobre su eje, derecho y lejos del cruce. */
+  function ponerNombres() {
+    gNombres.replaceChildren();
+    const fs = 11.5 / k, mx = W / 2 / k - 34 / k, arriba = -H / 2 / k + 0.27 * H / k, abajo = H / 2 / k - 0.16 * H / k;
+    const dentro = ([x, y]) => Math.abs(x) < mx && y > arriba && y < abajo;
+    const meta = 0.78 * Math.min(W, H) / 2 / k;
+    const mejor = new Map();
+    for (const v of geo.vias) {
+      const nom = nombreVia(v.n);
+      if (!nom || nom === 'sin nombre') continue;
+      const pts = v.p.map(([x, y]) => rot(x, y));
+      for (let i = 1; i < pts.length; i++) {
+        const [a, b] = [pts[i - 1], pts[i]];
+        const seg = Math.hypot(b[0] - a[0], b[1] - a[1]);
+        for (let f = 0; f <= seg; f += 1.5) {
+          const q = [a[0] + ((b[0] - a[0]) * f) / (seg || 1), a[1] + ((b[1] - a[1]) * f) / (seg || 1)];
+          if (!dentro(q)) continue;
+          const nota = Math.abs(Math.hypot(q[0], q[1]) - meta) + (v.ctx ? 6 : 0);
+          const prev = mejor.get(nom);
+          if (!prev || nota < prev.nota) mejor.set(nom, { nota, q, ang: (Math.atan2(b[1] - a[1], b[0] - a[0]) * 180) / Math.PI });
+        }
+      }
+    }
+    for (const [nom, m] of mejor) {
+      let a = m.ang; while (a > 90) a -= 180; while (a <= -90) a += 180;
+      gNombres.append(s('text', { x: m.q[0], y: m.q[1], transform: `rotate(${a.toFixed(1)} ${m.q[0]} ${m.q[1]})`,
+        'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'nom-via', 'font-size': fs.toFixed(2),
+        'stroke-width': (3 / k).toFixed(2) }, nom.toUpperCase()));
+    }
   }
   const aPantalla = (x, y) => { const [a, b] = rot(x, y); return [W / 2 + a * k, H / 2 + b * k]; };
   const ro = new ResizeObserver(medir);
@@ -169,6 +239,7 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
     ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * W / 2, dpr * H / 2);
     ctx.rotate(-n);
     ctx.scale(1, -1);
+    ctx.translate(-V.x, -V.y);         // la misma vista que el SVG y las cabezas
     if (noche) {
       ctx.globalCompositeOperation = 'lighter';
       for (const v of vehiculos) {
@@ -235,7 +306,7 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
     tl.to(trazos.map((t) => t.el), { strokeDashoffset: 0, duration: 0.9, stagger: 0.04 })
       .from([gMarcas, gCajon, gPare], { opacity: 0, duration: 0.5 }, '-=0.45');
     if (cebras.length) tl.from(cebras, { opacity: 0, duration: 0.35, stagger: 0.05 }, '-=0.35');
-    if (cabezas.length) tl.from(cabezas.map((c) => c.el), { opacity: 0, scale: 0.6, duration: 0.45, stagger: 0.05 }, '-=0.2');
+    if (cabezas.length) tl.from(cabezas.map((c) => c.dentro), { opacity: 0, scale: 0.6, duration: 0.45, stagger: 0.05 }, '-=0.2');
     tl.from(lienzo, { opacity: 0, duration: 0.6 }, '-=0.3');
     tl.eventCallback('onComplete', () => { for (const t of trazos) { t.el.style.strokeDasharray = ''; t.el.style.strokeDashoffset = ''; } });
     // salvaguarda para equipos lentos: el contenido nunca se queda oculto a medio animar
