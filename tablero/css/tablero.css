@@ -438,7 +438,6 @@ svg .parpadea { animation: parpadeo .5s steps(1) infinite; }
 .rl-anillo { height: 100%; aspect-ratio: 1; max-height: 100%; min-height: 0; }
 .rl-info { display: grid; gap: 6px; align-content: center; min-width: 0; }
 .rl-plan { font: 600 1rem/1 var(--f-rotulo); color: var(--tinta-2); } .rl-plan b { font-size: 1.5rem; color: var(--tinta); margin-right: 2px; }
-.rl-seg { font: 600 .95rem/1 var(--f-rotulo); color: var(--tinta-2); } .rl-seg b { font-size: 1.25rem; color: var(--tinta); }
 .rl-foco { font-size: .72rem; color: var(--tinta-3); }
 .rl-ley { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 3px; font-size: .74rem; color: var(--tinta-2); }
 .rl-ley li { display: flex; align-items: center; gap: 6px; }
@@ -464,8 +463,28 @@ svg .parpadea { animation: parpadeo .5s steps(1) infinite; }
 .rl-info { flex: 1; align-self: center; }
 .cabeza .gn { font: 600 .7rem var(--f-rotulo); color: var(--tinta-3); }
 .cabeza .g { white-space: nowrap; }
-.rl-ley { grid-template-columns: repeat(2, minmax(0, auto)); column-gap: 10px; font-size: .7rem; }
-.rl-info { gap: 4px; overflow: hidden; max-height: 100%; }
+/* los segundos del ciclo van solo en el 7 segmentos del centro (regla del contador de campo);
+   la leyenda fluye en las líneas que quepan y, si falta alto, recorta abajo, nunca la cabecera */
+.rl-ley { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: .7rem; }
+.rl-info { gap: 5px; overflow: hidden; max-height: 100%; align-self: safe center; }
+.rl-foco:empty { display: none; }
+.rl-info { align-content: safe center; }
+.kpis-linea { display: none; flex: none; margin: 0 0 6px; font-size: .74rem; line-height: 1.35; color: var(--tinta-3); }
+.kpis-linea b { font: 700 .92rem var(--f-rotulo); color: var(--tinta); white-space: nowrap; }
+
+/* pantallas bajas en escritorio (proyector 1280×720, portátil 1366×768): se ocultan primero las
+   ayudas que repiten algo visible, para que ningún texto quede cortado. Solo con el muro de
+   escritorio: ahí la altura de cada monitor la fija la grilla, no su contenido. */
+@media (min-width: 1181px) {
+  .pant-reloj { container: reloj / size; }
+  .pant-expl { container: expl / size; }
+  @container reloj (max-height: 120px) { .rl-ley li.basico { display: none; } }
+  @container expl (max-height: 200px) {
+    .expl .lead, .kpis { display: none; }
+    .kpis-linea { display: block; }
+    .fases-scroll { min-height: 0; }
+  }
+}
 
 /* celular: marcadores, controles y sellos compactos */
 @media (max-width: 760px) {

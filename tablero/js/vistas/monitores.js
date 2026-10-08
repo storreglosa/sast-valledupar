@@ -140,14 +140,15 @@ export function reloj(it, fases) {
   m.el.title = 'Pase el cursor por una cabeza semafórica para ver su cuenta regresiva en el centro del reloj.';
   const a = anillo(it, { tam: 'completo', fases });
   const plan = h('div', { class: 'rl-plan' });
-  const seg = h('div', { class: 'rl-seg num' });
   const foco = h('div', { class: 'rl-foco' });
+  m.pantalla.classList.add('pant-reloj');
+  // en pantallas bajas se ocultan primero verde/amarillo/rojo («basico»): se leen solos
   const ley = h('ul', { class: 'rl-ley' },
-    h('li', {}, h('i', { class: 'sw verde' }), 'verde'), h('li', {}, h('i', { class: 'sw amarillo' }), 'amarillo'),
-    h('li', {}, h('i', { class: 'sw rojo' }), 'rojo'), ...(it.grupos.some((g) => g.tipo === 'peatonal') ? [h('li', {}, h('i', { class: 'sw despeje' }), 'despeje peatonal')] : []),
+    h('li', { class: 'basico' }, h('i', { class: 'sw verde' }), 'verde'), h('li', { class: 'basico' }, h('i', { class: 'sw amarillo' }), 'amarillo'),
+    h('li', { class: 'basico' }, h('i', { class: 'sw rojo' }), 'rojo'), ...(it.grupos.some((g) => g.tipo === 'peatonal') ? [h('li', {}, h('i', { class: 'sw despeje' }), 'despeje peatonal')] : []),
     h('li', {}, h('i', { class: 'sw aguja' }), 'aguja = ahora'));
   m.pantalla.append(h('div', { class: 'reloj' }, h('div', { class: 'rl-anillo' }, a.el),
-    h('div', { class: 'rl-info' }, plan, seg, foco, ley)));
+    h('div', { class: 'rl-info' }, plan, foco, ley)));
   let enfoque = null, previo = '';
   return {
     ...m,
@@ -158,7 +159,6 @@ export function reloj(it, fases) {
       if (clave === previo) return;
       previo = clave;
       plan.replaceChildren(h('b', {}, p.id), ` · ciclo ${p.ciclo} s`);
-      seg.replaceChildren(h('b', {}, String(Math.floor(t))), ` s de ${p.ciclo}`);
       foco.textContent = enfoque ? `Centro: cuenta regresiva de ${enfoque}` : '';
     },
   };
@@ -197,6 +197,7 @@ export function cabezasMon(it, alEnfocar) {
 
 export function explicacionMon(it, { alElegirPlan }) {
   const m = monitor('Explicación del plan');
+  m.pantalla.classList.add('pant-expl');
   const cuerpo = h('div', { class: 'mon-cuerpo col' });
   m.pantalla.append(cuerpo);
   const tabs = ['Explicación', 'Semana', 'Tiempos'];
@@ -221,6 +222,10 @@ export function explicacionMon(it, { alElegirPlan }) {
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, String(k.ciclos_hora).replace('.', ',')), h('div', { class: 'e' }, 'ciclos por hora')),
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${k.todo_rojo_s} s`), h('div', { class: 'e' }, 'todo rojo por ciclo')),
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${Math.max(...Object.values(k.rojo_s))} s`), h('div', { class: 'e' }, 'espera máxima en rojo'))));
+      // los mismos cuatro indicadores en una línea: reemplaza a la fila en pantallas bajas (CSS)
+      contenido.append(h('p', { class: 'kpis-linea' }, h('b', { class: 'num' }, `${plan.ciclo} s`), ' de ciclo · ',
+        h('b', { class: 'num' }, String(k.ciclos_hora).replace('.', ',')), ' ciclos por hora · ', h('b', { class: 'num' }, `${k.todo_rojo_s} s`),
+        ' de todo rojo · ', h('b', { class: 'num' }, `${Math.max(...Object.values(k.rojo_s))} s`), ' de espera máxima en rojo'));
       const ex = h('div', { class: 'expl' }, h('p', { class: 'lead', title: r.ciclo }, r.intro));
       const ol = h('ol', { class: 'fases' });
       lista = h('div', { class: 'fases-scroll' }, ol);
