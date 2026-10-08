@@ -68,7 +68,9 @@ export function fases(it, plan) {
     for (let i = 0; i < seg.length; i++) {
       const j = (i + 1) % seg.length;
       if (seg[i].clave.startsWith('P:') && seg[j].clave.startsWith('P:')) {
-        const peds = [...new Set([...seg[i].clave.slice(2).split(','), ...seg[j].clave.slice(2).split(',')])];
+        // en el orden de los grupos (el de las cabezas), no en el de aparición
+        const peds = [...new Set([...seg[i].clave.slice(2).split(','), ...seg[j].clave.slice(2).split(',')])]
+          .sort((x, y) => it.grupos.findIndex((q) => q.id === x) - it.grupos.findIndex((q) => q.id === y));
         seg[i] = { clave: `P:${peds}`, inicio: seg[i].inicio, fin: seg[j].fin, seg: [...seg[i].seg, ...seg[j].seg] };
         seg.splice(j, 1);
         unio = true;
