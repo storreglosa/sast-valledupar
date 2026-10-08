@@ -50,6 +50,13 @@ python -m http.server 8765 -d tablero   # ver en http://127.0.0.1:8765
    guardia; commit y push. Si se salta 09, 10 se detiene: la asignación del config no coincide con
    la que usó 09.
 
+Si lo que está mal es la geometría y no el grupo (una vía con el sentido desactualizado en OSM, un
+acceso que entra por otra calle, una línea de pare en otro sitio), se corrige en el mismo cruce con
+`geometria` (opciones documentadas al inicio de `config/semaforos.yaml`): `sentidos`, `accesos`,
+`salidas`, `pare_m` (distancia del centro a la línea de pare) y `por_la_red` (trayectorias por las
+calzadas, para cruces largos con empalmes, como Los Manguitos). Sin esa clave todo sale de OSM.
+Si los pares quedan lejos del centro, el diagrama del tablero se encuadra solo para mostrarlos.
+
 ## Publicar
 El repo es público (decisión 26). En GitHub: Settings → Pages → Source: **GitHub Actions**.
 Cada push a `master` que toque `tablero/` vuelve a desplegar.

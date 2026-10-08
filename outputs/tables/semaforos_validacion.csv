@@ -50,6 +50,6 @@ INFO,area-andina,P5,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 0 s
 AVISO,area-andina,P5,despeje_cero,G1 termina su amarillo o despeje y G5 entra en verde en el mismo segundo: 0 s de despeje entre grupos en conflicto
 INFO,area-andina,,fin_dia,La leyenda termina tramos a las 23:59: se toma como 24:00
 AVISO,mercado,,matriz_permisiva,La matriz deja a G2 (2) y G6 (22) en verde a la vez aunque sus trayectorias se cruzan; en los planes nunca coinciden
-AVISO,manguitos,,orientacion,B4 (KR 19) es el acceso oeste pero se desvía 42° del eje ideal; confirmar en campo
+AVISO,manguitos,,orientacion,B5 (KR 19) es el acceso oeste pero se desvía 42° del eje ideal; confirmar en campo
 AVISO,area-andina,,orientacion,la orientación se apoya en una sola cámara SAST; conviene confirmarla en campo
 AVISO,area-andina,,acceso_sin_grupo,El brazo este (CL 6) recibe tránsito en OSM pero ningún grupo vehicular lo controla

@@ -16,6 +16,16 @@
 #               bloqueo y cebras demarcadas que no tienen grupo peatonal (brazos según la codificación).
 # nombres_via   nombre con que se rotula una vía cuando OSM no la nombra o la nombra distinto
 #               (según los mapas de inventario de Santiago y el Excel de equipos).
+# geometria     correcciones de campo de Santiago a la red OSM (opcional; sin ellas todo sale de OSM):
+#                 radio_dibujo  m alrededor del centro que se dibujan y donde nacen las trayectorias (75)
+#                 sentidos      {vía: entra | sale | doble}: sentido real cuando OSM está desactualizado
+#                 accesos       {cardinal: vía}: qué vía es el acceso (manda sobre `ejes`)
+#                 salidas       {cardinal: vía}: por dónde sale quien va hacia ese cardinal, si no es
+#                               la misma vía del acceso
+#                 por_la_red    true = trayectorias por las calzadas de la red (cruces largos, con
+#                               empalmes), en vez de una curva directa entre entrada y salida
+#                 pare_m        {cardinal: m}: distancia del centro a la línea de pare de ese acceso
+#               (src/sast/semaforos/geometria.py). Cada valor sale de una revisión de Santiago.
 # asignacion    grupo -> acceso / cebra validada por Santiago (decisión 28). Mientras falte, el
 #               tablero no anima vehículos en ese cruce. Forma:
 #                 asignacion: {validado_por: Santiago Torreglosa, fecha: 2026-10-08, desde_borrador: true,
@@ -34,6 +44,7 @@ intersecciones:
     correo: "La Viña – Cra. 9 con Calle 16B/17"
     centro: {nodos_osm: [986882742], nota: "CL 17 x KR 9, semáforo en OSM", ejes: {norte_sur: [KR 9], este_oeste: [CL 17]}}
     senalizacion: {cajon_amarillo: true, cebras_sin_semaforo: []}
+    asignacion: {validado_por: Santiago Torreglosa, fecha: 2026-10-08, desde_borrador: true}
 
   - id: mercado
     nombre: Mercado Público
@@ -46,6 +57,7 @@ intersecciones:
     centro: {nodos_osm: [986877340, 986873694, 986879730, 986888586], nota: "CL 21 x KR 16 en OSM (calzadas dobles); la «Transversal 12» del EQUIPO032 son los tramos sin nombre al norte", ejes: {norte_sur: [KR 16, sin nombre], este_oeste: [CL 21]}}
     senalizacion: {cajon_amarillo: true, cebras_sin_semaforo: [oeste]}
     nombres_via: {"sin nombre": "Transversal 12"}
+    asignacion: {validado_por: Santiago Torreglosa, fecha: 2026-10-08, desde_borrador: true}
 
   - id: manguitos
     nombre: Los Manguitos
@@ -55,8 +67,18 @@ intersecciones:
     solicitud: 2
     equipos: [EQUIPO021, EQUIPO022]
     correo: "Los Manguitos – Cra. 19 con Diagonal 21"
-    centro: {nodos_osm: [986880618, 986889496, 986871555, 986885581], nota: "DG 21 x KR 19 (calzadas dobles); la KR 19 sigue al SE como vía local y la CL 21 sale al NE", ejes: {norte_sur: [DG 21], este_oeste: [KR 19]}, radio_conexion: 45}
+    centro: {nodos_osm: [986880618, 986889496, 986871555, 986885581], nota: "DG 21 x KR 19 (calzadas dobles); la KR 19 sigue al SE como vía local y la CL 21 llega del NE, a ~50 m del centro", ejes: {norte_sur: [DG 21], este_oeste: [KR 19]}, radio_conexion: 50}
     senalizacion: {cajon_amarillo: false, cebras_sin_semaforo: []}
+    # mapa anotado por Santiago (2026-10-08): el acceso 4 es la Calle 21, de un solo sentido hacia el
+    # cruce (OSM la tiene de doble sentido); los pares del 1 y del 4 quedan antes del empalme de la
+    # Calle 21 y el del 3 a la entrada del cruce; el del 2 no cambia. Pendiente de su revisión.
+    geometria:
+      radio_dibujo: 110
+      sentidos: {CL 21: entra}
+      accesos: {este: CL 21}
+      salidas: {este: KR 19}
+      por_la_red: true
+      pare_m: {norte: 58, oeste: 13, este: 77}
 
   - id: loperena
     nombre: Colegio Loperena
@@ -69,6 +91,7 @@ intersecciones:
     centro: {nodos_osm: [986880924, 7646982077, 986886670, 986873926], nota: "CL 16 / DG 21 (OSM) x KR 12, semáforo en OSM", ejes: {norte_sur: [KR 12], este_oeste: [CL 16, DG 21]}}
     senalizacion: {cajon_amarillo: true, cebras_sin_semaforo: [este]}
     nombres_via: {"DG 21": "Diagonal 16"}
+    asignacion: {validado_por: Santiago Torreglosa, fecha: 2026-10-08, desde_borrador: true}
 
   - id: area-andina
     nombre: Universidad Área Andina
@@ -80,6 +103,7 @@ intersecciones:
     correo: null
     centro: {nodos_osm: [986872739, 986877534], nota: "CL 6 x KR 23 (calzada doble)", ejes: {norte_sur: [KR 23], este_oeste: [CL 6]}}
     senalizacion: {cajon_amarillo: true, cebras_sin_semaforo: [norte, este]}
+    asignacion: {validado_por: Santiago Torreglosa, fecha: 2026-10-08, desde_borrador: true}
 
 # Hallazgos de nivel ERROR que Santiago decidió aceptar (no detienen 09_semaforos.py):
 # - {interseccion: …, codigo: …, decision: "…", fecha: AAAA-MM-DD}

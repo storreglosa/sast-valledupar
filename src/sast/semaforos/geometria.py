@@ -11,6 +11,10 @@ x hacia el este, y hacia el norte de la cuadrícula CTM12. Nada se mide en grado
 - trayectorias, líneas de pare y cebras para dibujar el cruce y mover los vehículos ilustrativos.
 
 Anchos: OSM casi nunca trae carriles; se suponen 3,3 m por carril y se marca `supuesto`.
+
+Correcciones de campo (config/semaforos.yaml: `geometria`, por cruce): sentido real de una vía que
+OSM tiene desactualizada, qué vía es un acceso o una salida, distancia de cada línea de pare y
+trayectorias por las calzadas de la red (cruces largos). Sin ellas, todo sale de OSM como antes.
 """
 
 from __future__ import annotations
@@ -19,6 +23,7 @@ import math
 import re
 
 import geopandas as gpd
+import networkx as nx
 import numpy as np
 from shapely.geometry import LineString, MultiLineString, Point
 from shapely.ops import linemerge, substring, unary_union
@@ -90,9 +95,37 @@ def _unir_tramos(vias: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return gpd.GeoDataFrame(filas, crs=vias.crs)
 
 
-def brazos(c: Point, vias: gpd.GeoDataFrame, r_conexion: float = R_CONEXION) -> list[dict]:
-    circulo = c.buffer(R_DIBUJO)
-    cerca = _unir_tramos(vias[vias.intersects(c.buffer(R_DIBUJO + 60))])
+def aplicar_sentidos(vias: gpd.GeoDataFrame, c: Point, sentidos: dict, radio: float) -> gpd.GeoDataFrame:
+    """Corrige el sentido de vías que OSM tiene desactualizado (config: geometria.sentidos), solo en
+    los tramos a menos de `radio` m del cruce. «entra»: un solo sentido hacia el cruce; «sale»: un
+    solo sentido alejándose; «doble»: doble sentido. Un tramo de un solo sentido se reorienta para
+    que su digitalización siga el sentido (así lo lee el resto del módulo)."""
+    if not sentidos:
+        return vias
+    v = vias.copy()
+    cerca = v.distance(c) < radio
+    for nom, sentido in sentidos.items():
+        sel = cerca & (v["nomencla"] == nom)
+        if not sel.any():
+            raise ValueError(f"geometria.sentidos: no hay tramos de «{nom}» a menos de {radio:.0f} m del cruce")
+        if sentido == "doble":
+            v.loc[sel, "sentido"] = "Bidireccional"
+        elif sentido in ("entra", "sale"):
+            def orientar(g, entra=sentido == "entra"):
+                acerca = Point(g.coords[-1]).distance(c) < Point(g.coords[0]).distance(c)
+                return g if acerca == entra else LineString(list(g.coords)[::-1])
+            v.loc[sel, "sentido"] = "Unidireccional"
+            v.loc[sel, "geometry"] = v.loc[sel, "geometry"].apply(orientar)
+        else:
+            raise ValueError(f"geometria.sentidos: «{sentido}» no es entra, sale ni doble")
+        v.loc[sel, "sent_f"] = "corrección de campo"
+    return v
+
+
+def brazos(c: Point, vias: gpd.GeoDataFrame, r_conexion: float = R_CONEXION,
+           r_dibujo: float = R_DIBUJO) -> list[dict]:
+    circulo = c.buffer(r_dibujo)
+    cerca = _unir_tramos(vias[vias.intersects(c.buffer(r_dibujo + 60))])
     cerca = cerca[cerca.intersects(circulo)]
     partes = []
     for r in cerca.itertuples():
@@ -121,6 +154,7 @@ def brazos(c: Point, vias: gpd.GeoDataFrame, r_conexion: float = R_CONEXION) -> 
                     "entrante": (not unico) or (not a_favor), "saliente": (not unico) or a_favor,
                     "carriles": carriles, "ancho": round(carriles * ANCHO_CARRIL, 1),
                     "supuesto": supuesto, "osm_id": int(r.osm_id) if r.osm_id == r.osm_id else None,
+                    "corregido": getattr(r, "sent_f", None) == "corrección de campo",
                 })
     grupos: list[dict] = []
     for p in sorted(partes, key=lambda p: p["rumbo"]):
@@ -148,7 +182,8 @@ def _media_angular(angulos: list[float]) -> float:
 _SENTIDO = re.compile(r"\((?:SENTIDO\s+)?(NORTE|SUR|ESTE|OESTE)\s*-\s*(NORTE|SUR|ESTE|OESTE)\)")
 
 
-def cardinales(arms: list[dict], c: Point, camaras: list[dict], ejes: dict) -> list[str]:
+def cardinales(arms: list[dict], c: Point, camaras: list[dict], ejes: dict,
+               accesos: dict | None = None) -> list[str]:
     """Asigna «norte/este/sur/oeste» a cada brazo (decisión 30) y devuelve la evidencia.
 
     1. Las cámaras SAST orientan: su dirección ANSV dice de dónde viene el tránsito que vigilan
@@ -156,6 +191,7 @@ def cardinales(arms: list[dict], c: Point, camaras: list[dict], ejes: dict) -> l
     2. `ejes` (config) dice qué vías forman el eje norte–sur y el este–oeste: un brazo de una vía
        del eje N–S es norte o sur según el rumbo; uno del eje E–O es este u oeste según el lado.
     3. Un brazo de otra vía queda sin acceso (se dibuja, pero ningún grupo lo controla).
+    4. `accesos` (config geometria.accesos, corrección de campo) manda sobre 2: {«este»: «CL 21»}.
     """
     def nombre(a):
         return a["nomencla"] or "sin nombre"
@@ -190,6 +226,19 @@ def cardinales(arms: list[dict], c: Point, camaras: list[dict], ejes: dict) -> l
         else:
             a["cardinal"], ideal = None, rel
         a["desvio"] = round(dif_angular(rel, ideal), 1)
+    for card, nom in (accesos or {}).items():
+        ideal = 90 * CARDINALES.index(card)
+        cands = [a for a in arms if nombre(a) == nom and any(p["entrante"] for p in a["partes"])]
+        if not cands:
+            raise ValueError(f"geometria.accesos: no hay un brazo de entrada «{nom}» para el acceso {card}")
+        elegido = min(cands, key=lambda a: dif_angular((a["rumbo"] - norte) % 360, ideal))
+        for a in arms:
+            if a["cardinal"] == card and a is not elegido:
+                a["cardinal"] = None
+        elegido.update(cardinal=card, forzado=True,
+                       desvio=round(dif_angular((elegido["rumbo"] - norte) % 360, ideal), 1))
+        evidencia.append(f"{elegido['id']} ({nom}) es el acceso {card} por corrección de campo "
+                         "(config: geometria.accesos)")
     for card in CARDINALES:
         mismos = [a for a in arms if a["cardinal"] == card]
         for a in sorted(mismos, key=lambda a: a["desvio"])[1:]:
@@ -200,7 +249,7 @@ def cardinales(arms: list[dict], c: Point, camaras: list[dict], ejes: dict) -> l
     if len(estimados) == 1:
         evidencia.append("AVISO: la orientación se apoya en una sola cámara SAST; conviene confirmarla en campo")
     for a in arms:
-        if a["cardinal"] and a["desvio"] > 30:
+        if a["cardinal"] and a["desvio"] > 30 and not a.get("forzado"):
             evidencia.append(f"AVISO: {a['id']} ({nombre(a)}) es el acceso {a['cardinal']} pero se desvía "
                              f"{a['desvio']:.0f}° del eje ideal; confirmar en campo")
     for a in arms:
@@ -311,6 +360,106 @@ def trayectoria(arm_in: dict, arm_out: dict, c: Point) -> dict | None:
     ln = LineString(puntos)
     s_pare = max(a.length - CEBRA - 1.0, 0)
     return {"linea": ln, "s_pare": s_pare, "largo": ln.length}
+
+
+def s_a_distancia(ln: LineString, c: Point, d: float) -> float:
+    """Primer punto de `ln` (recorrida desde su inicio) a `d` m del centro o menos."""
+    for s in np.arange(0, ln.length, 0.25):
+        if ln.interpolate(s).distance(c) <= d:
+            return float(s)
+    return ln.length
+
+
+def grafo_vial(vias: gpd.GeoDataFrame, c: Point, r_dibujo: float) -> nx.DiGraph:
+    """Grafo dirigido de las calzadas dentro del círculo de dibujo: un solo sentido = un arco a favor
+    de la digitalización; doble sentido = dos arcos. Los nodos son vértices (al centímetro)."""
+    circulo = c.buffer(r_dibujo)
+    g = nx.DiGraph()
+    for r in vias[vias.intersects(circulo)].itertuples():
+        geom = r.geometry.intersection(circulo)
+        carr, _ = _carriles(r)
+        doble = r.sentido != "Unidireccional"
+        for ln in (geom.geoms if hasattr(geom, "geoms") else [geom]):
+            if ln.is_empty or ln.geom_type != "LineString":
+                continue
+            cs = [(round(x, 2), round(y, 2)) for x, y in ln.coords]
+            for a, b in zip(cs, cs[1:]):
+                if a == b:
+                    continue
+                datos = {"w": math.dist(a, b), "doble": doble, "ancho": carr * ANCHO_CARRIL}
+                g.add_edge(a, b, **datos)
+                if doble:
+                    g.add_edge(b, a, **datos)
+    return g
+
+
+def _nodo_cercano(g: nx.DiGraph, p, tol: float = 2.0):
+    q = min(g.nodes, key=lambda n: math.dist(n, p))
+    return q if math.dist(q, p) <= tol else None
+
+
+def _redondear(pts: list, r: float = 6.0) -> list:
+    """Esquinas redondeadas (curva de Bézier en cada vértice), sin tocar los tramos rectos."""
+    out = [tuple(pts[0])]
+    for i in range(1, len(pts) - 1):
+        a, b, d = (np.array(pts[i - 1]), np.array(pts[i]), np.array(pts[i + 1]))
+        l1, l2 = np.linalg.norm(b - a), np.linalg.norm(d - b)
+        if l1 < 1e-6 or l2 < 1e-6:
+            continue
+        u1, u2 = (b - a) / l1, (d - b) / l2
+        if np.dot(u1, u2) > 0.995:
+            out.append(tuple(b))
+            continue
+        k = min(r, 0.45 * l1, 0.45 * l2)
+        out.extend(tuple(q) for q in _bezier(b - u1 * k, b, b + u2 * k, n=8))
+    out.append(tuple(pts[-1]))
+    return out
+
+
+def trayectoria_red(arm_in: dict, arm_out: dict, c: Point, g: nx.DiGraph,
+                    pare_m: float | None = None) -> dict | None:
+    """Trayectoria por las calzadas de la red (camino más corto que respeta los sentidos), desde
+    donde la entrada cruza el círculo de dibujo hasta donde la salida lo cruza. En doble sentido va
+    por el carril derecho. La línea de pare queda a `pare_m` m del centro (o, sin ese dato, como en
+    `trayectoria`: 1 m antes de la cebra)."""
+    ent = [p for p in arm_in["partes"] if p["entrante"]]
+    sal = [p for p in arm_out["partes"] if p["saliente"]]
+    if not ent or not sal:
+        return None
+    pin, pout = max(ent, key=lambda p: p["carriles"]), max(sal, key=lambda p: p["carriles"])
+    s, t = _nodo_cercano(g, pin["linea"].coords[-1]), _nodo_cercano(g, pout["linea"].coords[-1])
+    if s is None or t is None:
+        return None
+    try:
+        camino = nx.shortest_path(g, s, t, weight="w")
+    except nx.NetworkXNoPath:
+        return None
+    # carril derecho en los arcos de doble sentido: cada vértice se corre según sus arcos vecinos
+    arcos = list(zip(camino, camino[1:]))
+    normal, corr = [], []
+    for a, b in arcos:
+        u = np.subtract(b, a) / g[a][b]["w"]
+        normal.append(np.array([u[1], -u[0]]))
+        corr.append(g[a][b]["ancho"] / 4 if g[a][b]["doble"] else 0.0)
+    pts = []
+    for i, p in enumerate(camino):
+        vec = [normal[j] * corr[j] for j in (i - 1, i) if 0 <= j < len(arcos)]
+        pts.append(np.array(p) + sum(vec) / len(vec))
+    ln = LineString(_redondear(pts))
+    d_pare = pare_m if pare_m is not None else arm_in["r_caja"] + CEBRA + 1.0
+    s_pare = s_a_distancia(ln, c, d_pare)
+    ancho = pin["ancho"] / (1 if pin["unico"] else 2)
+    return {"linea": ln, "s_pare": s_pare, "largo": ln.length, "ancho_pare": ancho}
+
+
+def linea_en(ln: LineString, s: float, ancho: float) -> list:
+    """Segmento perpendicular a `ln` en `s`, de `ancho` m (línea de pare sobre la trayectoria)."""
+    q = np.array(ln.interpolate(s).coords[0])
+    a = np.array(ln.interpolate(max(s - 1, 0)).coords[0])
+    b = np.array(ln.interpolate(min(s + 1, ln.length)).coords[0])
+    t = (b - a) / np.linalg.norm(b - a)
+    n = np.array([t[1], -t[0]])
+    return [q - n * ancho / 2, q + n * ancho / 2]
 
 
 def cebra(arm: dict, mitad: str, c: Point) -> dict | None:

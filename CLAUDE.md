@@ -145,3 +145,11 @@ Decisiones del 2026-10-08, Santiago (tablero de semáforos SAST, `tablero/`):
     la mitad por donde sale el directo k (31 brazo sur, 32 norte, 33 este, 34 oeste). Verificado contra
     las matrices de grupos amigos y los sentidos de las cámaras SAST. Lo que falta validar en campo es
     qué brazo físico es cada acceso y el movimiento de la «Flecha» de Los Manguitos.
+31. **Asignación validada (Santiago, 2026-10-08):** La Viña, Mercado, Loperena y Área Andina «todo
+    bien» sobre la página de validación. Eso incluye el centro de Mercado, el brazo este de Área Andina
+    sin grupo y la orientación de Área Andina con una sola cámara. **Los Manguitos** se rehízo con su mapa
+    anotado: el acceso 4 es la Calle 21, de un solo sentido hacia el cruce (OSM la tiene de doble
+    sentido); los pares del Flujo 1 y de la Flecha quedan a ~58 m (antes del empalme de la Calle 21), el
+    del Flujo 4 en la Calle 21 a ~77 m y el del Flujo 3 a ~13 m. La Flecha (giro a la derecha desde el
+    norte) es correcta. Estas correcciones de campo van en `config/semaforos.yaml` (`geometria`) y quedan
+    pendientes de su revisión.

@@ -84,6 +84,8 @@ def semaforos(proc: dict, conf: dict, borrador: bool) -> tuple[dict, dict]:
             "pare": {k: v for k, v in g["lineas_pare"].items() if publica and k in mov},
             "trayectorias": {k: v for k, v in g["trayectorias"].items() if publica and k in mov},
             "camaras": g["camaras"],
+            # cruce largo (pares lejos del centro): encuadre del diagrama, solo si se dibujan los pares
+            **({"vista": g["vista"]} if publica and g.get("vista") else {}),
         }
     sem = {"esquema": ESQUEMAS["semaforos"], "generado": proc["generado"], "zona_horaria": "America/Bogota",
            "nota_fase": NOTA_FASE, "nota_vehiculos": NOTA_VEHICULOS,

@@ -9,6 +9,7 @@ El borrador NO es un hecho: lo valida Santiago (config/semaforos.yaml: asignacio
 from __future__ import annotations
 
 import json
+import math
 from itertools import combinations
 
 import geopandas as gpd
@@ -19,6 +20,7 @@ from sast.semaforos import geometria as G
 from sast.semaforos.accesos import candidatos_flecha, conflicto, movimiento
 from sast.semaforos.tiempos import NO_ROJO, estado
 
+VISTA_R = 31.0   # media altura del diagrama del tablero (tablero/js/vistas/diagrama.js: R_VISTA)
 TEXTO_GIRO = {"directo": "directo", "izquierda": "giro a la izquierda", "derecha": "giro a la derecha"}
 
 
@@ -35,11 +37,28 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
     """`inter`: lo leído del PDF (grupos, matriz, planes). `camaras`: equipos SAST del punto en
     EPSG:9377 con `direccion_ansv`. Devuelve geometría (metros locales), borrador y hallazgos."""
     c = G.centro(cfg["centro"]["nodos_osm"], nodos)
-    arms = G.brazos(c, vias, cfg["centro"].get("radio_conexion", G.R_CONEXION))
-    evidencia = G.cardinales(arms, c, camaras, cfg["centro"]["ejes"])
-    for a in arms:
-        a["r_caja"] = G.radio_caja(a, arms, c) if a["cardinal"] else None
+    # correcciones de campo de Santiago sobre OSM (config: geometria); sin ellas, todo sale de OSM
+    aj = cfg.get("geometria") or {}
+    r_dib = aj.get("radio_dibujo", G.R_DIBUJO)
+    vias = G.aplicar_sentidos(vias, c, aj.get("sentidos") or {}, r_dib + 60)
+    arms = G.brazos(c, vias, cfg["centro"].get("radio_conexion", G.R_CONEXION), r_dib)
+    evidencia = G.cardinales(arms, c, camaras, cfg["centro"]["ejes"], aj.get("accesos"))
+    norte = next(float(e.split(" a ")[1].split("°")[0]) for e in evidencia if e.startswith("Norte de la"))
     por_card = {a["cardinal"]: a for a in arms if a["cardinal"]}
+    # salida distinta de la entrada (geometria.salidas): {«este»: «KR 19»} = quien sale al este lo hace
+    # por la Carrera 19, aunque el acceso este sea otra vía
+    por_sal = dict(por_card)
+    for card, nom in (aj.get("salidas") or {}).items():
+        ideal = 90 * G.CARDINALES.index(card)
+        cands = [a for a in arms if (a["nomencla"] or "sin nombre") == nom and any(q["saliente"] for q in a["partes"])]
+        if not cands:
+            raise ValueError(f"{cfg['id']}: geometria.salidas: no hay un brazo de salida «{nom}» para {card}")
+        por_sal[card] = min(cands, key=lambda a: G.dif_angular((a["rumbo"] - norte) % 360, ideal))
+        evidencia.append(f"{por_sal[card]['id']} ({nom}) es la salida {card} por corrección de campo "
+                         "(config: geometria.salidas)")
+    usados = {id(a) for a in [*por_card.values(), *por_sal.values()]}
+    for a in arms:
+        a["r_caja"] = G.radio_caja(a, arms, c) if id(a) in usados else None
     hallazgos = [("AVISO", "orientacion", e[7:]) for e in evidencia if e.startswith("AVISO")]
 
     # cámaras que anclan cada acceso (mismo sentido)
@@ -76,7 +95,7 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
                 hallazgos.append(("AVISO", "flecha", f"{g['id']}: ningún giro es compatible con sus amigos"))
                 asign[g["id"]] = {"confianza": "baja", "evidencia": "Sin giro compatible"}
         elif m["tipo"] == "vehicular":
-            ok = m["acceso"] in por_card and m["sale_por"] in por_card
+            ok = m["acceso"] in por_card and m["sale_por"] in por_sal
             conf = "alta" if anclado.get(m["acceso"]) and ok else ("media" if ok else "baja")
             ev = f"Nombre «{g['nombre']}» = movimiento {m['codigo']} (codificación SDM)"
             if anclado.get(m["acceso"]):
@@ -84,7 +103,9 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
                        "(la misma cámara orienta el cruce: no es evidencia independiente del acceso)")
             entra = [p for a in arms if a["cardinal"] == m["acceso"] for p in a["partes"] if p["entrante"]]
             if entra and all(p["unico"] for p in entra):
-                ev += f"; en OSM ese brazo es de un solo sentido y entra al cruce"
+                ev += ("; ese brazo es de un solo sentido y entra al cruce (corrección de campo de Santiago; "
+                       "OSM lo tiene de doble sentido)" if any(p.get("corregido") for p in entra)
+                       else "; en OSM ese brazo es de un solo sentido y entra al cruce")
             if not ok:
                 ev += "; FALTA el brazo de entrada o de salida en la red OSM"
             asign[g["id"]] = {"confianza": conf, "evidencia": ev}
@@ -104,7 +125,9 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
         movs[gid] = {**movs[gid], **{k: v for k, v in cambio.items() if k in ("acceso", "sale_por", "giro", "brazo", "mitad")}}
         if movs[gid].get("tipo") == "flecha":
             movs[gid]["tipo"] = "vehicular"
-        asign[gid] = {"confianza": "validada", "evidencia": f"Corregido por {cfg['asignacion'].get('validado_por')}"}
+        quien = cfg["asignacion"].get("validado_por")
+        asign[gid] = ({"confianza": "validada", "evidencia": f"Corregido por {quien}"} if quien else
+                      {"confianza": "media", "evidencia": "Corrección de campo de Santiago; pendiente de su revisión"})
 
     # ---- chequeo de seguridad: la matriz permite juntos pares que se cruzan
     planes = inter["planes"]
@@ -136,15 +159,27 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
 
     # ---- geometría exportable
     tray, pare, cebras = {}, {}, {}
+    pare_m = aj.get("pare_m") or {}
+    red = G.grafo_vial(vias, c, r_dib) if aj.get("por_la_red") else None
     for gid, m in movs.items():
-        if m["tipo"] == "vehicular" and m.get("acceso") in por_card and m.get("sale_por") in por_card:
-            t = G.trayectoria(por_card[m["acceso"]], por_card[m["sale_por"]], c)
+        if m["tipo"] == "vehicular" and m.get("acceso") in por_card and m.get("sale_por") in por_sal:
+            a_in, a_out = por_card[m["acceso"]], por_sal[m["sale_por"]]
+            if red is not None:
+                t = G.trayectoria_red(a_in, a_out, c, red, pare_m.get(m["acceso"]))
+            else:
+                t = G.trayectoria(a_in, a_out, c)
             if t is None:
                 hallazgos.append(("AVISO", "trayectoria", f"{gid}: no se pudo trazar {_texto_mov(m)}"))
                 continue
+            if red is None and m["acceso"] in pare_m:
+                t["s_pare"] = G.s_a_distancia(t["linea"], c, pare_m[m["acceso"]])
             tray[gid] = {"puntos": _xy(t["linea"].coords, c), "s_pare": round(t["s_pare"], 1),
                          "largo": round(t["largo"], 1)}
-            lp = G.linea_pare(por_card[m["acceso"]], c)
+            if red is not None or m["acceso"] in pare_m:
+                ent = G.carril_entrada(a_in)
+                lp = G.linea_en(t["linea"], t["s_pare"], t.get("ancho_pare") or (ent[1] if ent else 3.3))
+            else:
+                lp = G.linea_pare(a_in, c)
             if lp is not None:
                 pare[gid] = _xy(lp, c)
         elif m["tipo"] == "peatonal" and m["brazo"] in por_card:
@@ -170,9 +205,9 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
                               "recibe tránsito en OSM pero ningún grupo vehicular lo controla"))
 
     # vías para dibujar: las que forman el cruce y las del contexto cercano
-    circulo = c.buffer(G.R_DIBUJO)
+    circulo = c.buffer(r_dib)
     dibujo = []
-    for r in G._unir_tramos(vias[vias.intersects(c.buffer(G.R_DIBUJO + 60))]).itertuples():
+    for r in G._unir_tramos(vias[vias.intersects(c.buffer(r_dib + 60))]).itertuples():
         geom = r.geometry.intersection(circulo)
         if geom.is_empty:
             continue
@@ -185,9 +220,22 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
                            "carriles": carr, "ancho": round(carr * G.ANCHO_CARRIL, 1), "supuesto": sup,
                            "contexto": ln.distance(c) > cfg["centro"].get("radio_conexion", G.R_CONEXION),
                            "puntos": _xy(ln.coords, c)})
-    sem = nodos[(nodos["semaforo"] == "Sí") & (nodos.distance(c) < G.R_DIBUJO)]
+    sem = nodos[(nodos["semaforo"] == "Sí") & (nodos.distance(c) < r_dib)]
     origen = gpd.GeoSeries([c], crs=nodos.crs).to_crs(CRS_GEO).iloc[0]
-    norte = next(float(e.split(" a ")[1].split("°")[0]) for e in evidencia if e.startswith("Norte de la"))
+    # vista del diagrama: si alguna línea de pare o cebra queda lejos del centro (cruce largo), se
+    # encuadra todo; si no, el diagrama queda como siempre (centro y 31 m de media altura)
+    marcas = [q for l in pare.values() for q in l] + [q for z in cebras.values() for q in z["poligono"]]
+    vista = None
+    if marcas and max(math.hypot(x, y) for x, y in marcas) > VISTA_R - 5:
+        # encuadre en el plano de la codificación (norte arriba, como el diagrama), con margen extra
+        # arriba (título de la pantalla) y abajo (botones de planes); el centro vuelve a metros CTM12
+        n = math.radians(norte)
+        rot = [(x * math.cos(n) - y * math.sin(n), x * math.sin(n) + y * math.cos(n)) for x, y in marcas + [(0.0, 0.0)]]
+        x0, x1 = min(u for u, _ in rot) - 12, max(u for u, _ in rot) + 12
+        y0, y1 = min(v for _, v in rot) - 14, max(v for _, v in rot) + 20
+        cu, cv = (x0 + x1) / 2, (y0 + y1) / 2
+        vista = {"x": round(cu * math.cos(n) + cv * math.sin(n), 1), "y": round(-cu * math.sin(n) + cv * math.cos(n), 1),
+                 "r": round(max(VISTA_R, (x1 - x0) / 2, (y1 - y0) / 2), 1)}
     geo = {
         "origen": {"lon": round(origen.x, 7), "lat": round(origen.y, 7)},
         "norte_codificacion": round(norte, 1),
@@ -196,6 +244,7 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
                     "nomencla": a["nomencla"], "r_caja": a["r_caja"],
                     "entrante": any(p["entrante"] for p in a["partes"]),
                     "saliente": any(p["saliente"] for p in a["partes"]),
+                    "salida": next((k for k, v in por_sal.items() if v is a and por_card.get(k) is not a), None),
                     "ancho_supuesto": any(p["supuesto"] for p in a["partes"])} for a in arms],
         "trayectorias": tray, "lineas_pare": pare, "cebras": cebras,
         "cajon_amarillo": _xy(caja.exterior.coords, c) if caja is not None else None,
@@ -203,6 +252,7 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
                     for k in camaras],
         "semaforos_osm": [[round(p.x - c.x, 1), round(p.y - c.y, 1)] for p in sem.geometry],
         "evidencia": evidencia,
+        **({"vista": vista} if vista else {}),
     }
     borrador = {}
     for g in grupos:
@@ -213,7 +263,7 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
             texto, brazo = _texto_mov(m), m["acceso"]
         else:
             texto, brazo = "sin movimiento compatible", None
-        a = por_card.get(brazo)
+        a = por_card.get(brazo) or por_sal.get(brazo)
         borrador[g["id"]] = {"nombre": g["nombre"], "tipo": g["tipo"], "codigo": m.get("codigo"),
                              "movimiento": texto, "acceso": m.get("acceso"), "sale_por": m.get("sale_por"),
                              "brazo": brazo, "mitad": m.get("mitad"),

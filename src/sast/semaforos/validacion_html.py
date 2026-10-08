@@ -28,9 +28,13 @@ PREGUNTAS = {
                 "también marca semáforo en Cl 17 × Kr 8 y Cl 16B × Kr 9."],
     "mercado": ["¿El cruce es la Calle 21 con la vía que OSM llama Carrera 16 al sur y deja sin nombre al norte "
                 "(la «Transversal 12» del equipo 032)? El controlador dice «Calle21 X Carrera12» y «Calle 20 x Cra 12»."],
-    "manguitos": ["¿La «Flecha» es el giro a la derecha desde el norte (Diagonal 21 hacia el sur que gira a la "
-                  "Carrera 19 hacia el noroccidente)? Arranca siempre con el Flujo 1.",
-                  "¿El acceso este es la Carrera 19 local que llega desde el suroriente, y no la Calle 21?"],
+    "manguitos": ["Rehecho con tu mapa anotado (2026-10-08): acceso 4 = Calle 21, de un solo sentido hacia el cruce; "
+                  "pare del Flujo 1 y de la Flecha a ~58 m (antes del empalme de la Calle 21), del Flujo 4 en la "
+                  "Calle 21 a ~77 m del centro y del Flujo 3 a ~13 m; el del Flujo 2 no cambió. ¿Quedaron donde los marcaste?",
+                  "Flujo 3 (Carrera 19 desde el noroccidente): está dibujado siguiendo por la Carrera 19 hacia el "
+                  "suroriente (sube por la Diagonal 21 y gira). ¿Es así, o sigue al sur por la Diagonal 21?",
+                  "Flujo 4 (Calle 21): está dibujado como el «directo» de la codificación: baja por la Diagonal 21 "
+                  "y gira a la Carrera 19 hacia el noroccidente. ¿Es así, o sigue al sur por la Diagonal 21?"],
     "loperena": ["¿La vía de entrada desde el oeste (OSM: «DG 21») es la que el Excel llama Diagonal 16 y la "
                  "ANSV Calle 16?"],
     "area-andina": ["La Calle 6 al este de la Carrera 23 es de doble sentido en OSM, pero ningún grupo controla "
@@ -93,7 +97,9 @@ def escribir(datos: dict, diferencias: pd.DataFrame, hallazgos: dict, destino: P
                         "cod": it["borrador"][g]["codigo"] if g in it["borrador"] else "sin semáforo"}
                        for g, z in geo["cebras"].items()],
             "cajon": [ll(q) for q in geo["cajon_amarillo"]] if geo["cajon_amarillo"] else None,
-            "brazos": [{"p": ll([30 * _sin(b["rumbo"]), 30 * _cos(b["rumbo"])]), "t": f'{b["id"]} · {b["cardinal"] or "sin acceso"}'
+            # rótulo a 30 m, o más afuera si el brazo empieza lejos del centro (empalme de un cruce largo)
+            "brazos": [{"p": ll([max(30, (b["r_caja"] or 0) + 8) * _sin(b["rumbo"]), max(30, (b["r_caja"] or 0) + 8) * _cos(b["rumbo"])]),
+                        "t": f'{b["id"]} · {b["cardinal"] or ("salida " + b["salida"] if b.get("salida") else "sin acceso")}'
                         f'<br>{b["nomencla"] or "sin nombre"}'} for b in geo["brazos"]],
             "camaras": [{"p": ll([k["x"], k["y"]]), "t": k["equipo"]} for k in geo["camaras"]],
             "sem": [ll(p) for p in geo["semaforos_osm"]],
@@ -159,6 +165,9 @@ punto negro = línea de pare, franjas = cebras con su código (blancas = sin sem
 const M={json.dumps(mapas, ensure_ascii=False)};
 for (const [id,d] of Object.entries(M)) {{
   const m=L.map('mapa-'+id,{{maxZoom:21}}).setView(d.centro,19);
+  // cruces largos: que se vean todas las líneas de pare
+  const marcas=d.tray.map(t=>t.pare).concat([d.centro]);
+  if (marcas.some(q=>m.distance(q,d.centro)>40)) m.fitBounds(L.latLngBounds(marcas).pad(0.25),{{maxZoom:19}});
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{{z}}/{{y}}/{{x}}',
     {{maxZoom:21,maxNativeZoom:19,attribution:'Imagen: Esri World Imagery · Vías: © OpenStreetMap'}}).addTo(m);
   for (const v of d.vias) L.polyline(v.p,{{color:v.ctx?'#ddd':'#fff',opacity:v.ctx?.35:.55,weight:2}}).bindTooltip(v.n).addTo(m);

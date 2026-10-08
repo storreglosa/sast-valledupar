@@ -7,22 +7,24 @@ import { estado, luz, restanteVisible } from '../nucleo/tiempos.js';
 import { crearSim, trazo, puntoEn } from '../simulacion/trafico.js';
 import { bogota } from '../nucleo/horario.js';
 
-const R_VISTA = 31;   // media altura visible (m)
+const R_VISTA = 31;   // media altura visible (m); un cruce largo trae su propia vista (geo.vista)
 
 export function diagrama(it, geo, { alAnunciar } = {}) {
   const n = (geo.norte * Math.PI) / 180;
   const cosn = Math.cos(-n), sinn = Math.sin(-n);
-  // metros (x este, y norte de la cuadrícula) -> plano de la codificación (x der, y abajo)
-  const rot = (x, y) => [x * cosn + y * sinn, x * sinn - y * cosn];
+  // encuadre: centro del cruce y 31 m, o la vista que trae un cruce largo (pares lejos del centro)
+  const V = geo.vista || { x: 0, y: 0, r: R_VISTA };
+  // metros (x este, y norte de la cuadrícula) -> plano de la codificación (x der, y abajo), centrado en la vista
+  const rot = (x, y) => { x -= V.x; y -= V.y; return [x * cosn + y * sinn, x * sinn - y * cosn]; };
 
   const raiz = h('div', { class: 'diagrama', role: 'img', 'aria-label': `Diagrama del cruce ${it.nombre}` });
-  const base = s('svg', { class: 'base', viewBox: `${-R_VISTA} ${-R_VISTA} ${2 * R_VISTA} ${2 * R_VISTA}`, preserveAspectRatio: 'xMidYMid slice' });
+  const base = s('svg', { class: 'base', viewBox: `${-V.r} ${-V.r} ${2 * V.r} ${2 * V.r}`, preserveAspectRatio: 'xMidYMid slice' });
   const lienzo = h('canvas');
   const sobre = h('div', { class: 'sobre' });
   raiz.append(base, lienzo, sobre);
 
   // ---------------------------------------------------------------- base en SVG (metros)
-  const mundo = s('g', { transform: `rotate(${-geo.norte}) scale(1 -1)` });
+  const mundo = s('g', { transform: `rotate(${-geo.norte}) scale(1 -1) translate(${-V.x} ${-V.y})` });
   const defs = s('defs', {},
     s('pattern', { id: `caj-${it.id}`, width: 2.2, height: 2.2, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' },
       s('path', { d: 'M0 1.1H2.2M1.1 0V2.2', stroke: 'var(--cajon)', 'stroke-width': 0.16, opacity: 0.75 })));
@@ -131,7 +133,7 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
     const r = raiz.getBoundingClientRect();
     W = r.width; H = r.height;
     if (!W || !H) return;
-    k = Math.min(W, H) / (2 * R_VISTA);
+    k = Math.min(W, H) / (2 * V.r);
     // el SVG usa todo el rectángulo: misma escala que el canvas y las cabezas
     base.setAttribute('viewBox', `${-W / 2 / k} ${-H / 2 / k} ${W / k} ${H / k}`);
     dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -140,7 +142,9 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
     // que no se monten: empuje simple entre pares cercanos
     for (let it2 = 0; it2 < 6; it2++) {
       for (let i = 0; i < pos.length; i++) for (let j = i + 1; j < pos.length; j++) {
-        const dx = pos[j][0] - pos[i][0], dy = pos[j][1] - pos[i][1], d = Math.hypot(dx, dy) || 0.1;
+        let dx = pos[j][0] - pos[i][0], dy = pos[j][1] - pos[i][1];
+        if (Math.hypot(dx, dy) < 0.5) { dx = 1; dy = 0; }   // misma línea de pare (Flecha y su flujo): lado a lado
+        const d = Math.hypot(dx, dy);
         const min = 50;
         if (d < min) { const e = (min - d) / 2; pos[i][0] -= (dx / d) * e; pos[i][1] -= (dy / d) * e; pos[j][0] += (dx / d) * e; pos[j][1] += (dy / d) * e; }
       }
