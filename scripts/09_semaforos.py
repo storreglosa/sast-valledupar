@@ -190,7 +190,9 @@ def main() -> None:
     fx = RAIZ / "tests" / "fixtures"
     fx.mkdir(parents=True, exist_ok=True)
     with open(fx / "estados_referencia.json", "w", encoding="utf-8") as f:
-        json.dump({"leyenda": tiempos.CODIGO, "intersecciones": referencia}, f, ensure_ascii=False, indent=1)
+        json.dump({"leyenda": tiempos.CODIGO, "intersecciones": referencia,
+                   "festivos": {str(a): {d.isoformat(): n for d, n in horario.festivos(a).items()}
+                                for a in range(2024, 2036)}}, f, ensure_ascii=False, indent=1)
     por_inter = {}
     for x in hallazgos:
         por_inter.setdefault(x.interseccion, []).append((x.nivel, f"{x.plan + ': ' if x.plan else ''}{x.texto}"))

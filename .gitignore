@@ -23,3 +23,5 @@ outputs/tables/revision_geocodificacion_en_zona.csv
 outputs/tables/revision_geocodificacion_muestra_fuera.csv
 outputs/tables/siniestros_en_zona_revision.csv
 outputs/tables/siniestros_contraste_victimas.csv
+# Registros locales de las rondas de decisión de diseño (impeccable)
+.impeccable/questions/

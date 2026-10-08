@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semáforos SAST · Valledupar</title>
+<meta name="description" content="Sala de control de los cinco cruces semaforizados con cámaras SAST de Valledupar: ciclos, planes por hora y línea base de los equipos.">
+<meta name="theme-color" content="#05070a">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="vendor/maplibre-gl-6.11.1/maplibre-gl.css">
+<link rel="stylesheet" href="css/tablero.css">
+<script src="vendor/gsap-3.15.0/gsap.min.js" defer></script>
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+<a class="saltar" href="#principal">Ir a la pantalla principal</a>
+
+<header class="operador">
+  <div class="marca">
+    <svg class="marca-ico" viewBox="0 0 20 44" aria-hidden="true"><rect x="1" y="1" width="18" height="42" rx="5"/><circle cx="10" cy="10" r="5" class="m-r"/><circle cx="10" cy="22" r="5" class="m-a"/><circle cx="10" cy="34" r="5" class="m-v"/></svg>
+    <div>
+      <h1>Sala de control · Semáforos SAST</h1>
+      <p>Secretaría de Tránsito y Transporte de Valledupar</p>
+    </div>
+  </div>
+  <div class="hora" aria-live="off">
+    <span class="hora-dig" id="hora-bogota" role="img" aria-label="Hora de Bogotá"></span>
+    <span class="hora-dia" id="hora-dia"></span>
+  </div>
+  <nav class="acciones" aria-label="Acciones">
+    <button type="button" class="btn btn-presentar" id="btn-presentar"><span class="led-punto" aria-hidden="true"></span>Presentar</button>
+    <button type="button" class="btn" id="btn-acerca" aria-haspopup="dialog">Fuentes</button>
+  </nav>
+</header>
+
+<main class="muro" id="muro">
+  <section class="fuentes" aria-label="Fuentes del muro: mapa y cruces" id="fuentes"></section>
+
+  <section class="monitor principal" aria-label="Pantalla principal">
+    <div class="pantalla" id="principal" tabindex="-1">
+      <div class="capa capa-mapa" id="capa-mapa"><div id="mapa" class="mapa"></div></div>
+      <div class="capa capa-cruce" id="capa-cruce" hidden></div>
+      <div class="aviso-carga" id="aviso-carga" role="status">Encendiendo el muro…</div>
+    </div>
+    <div class="rotulo"><span class="rotulo-txt" id="rotulo-principal">Pantalla principal · Mapa de la red</span><span class="tally on" aria-hidden="true"></span></div>
+  </section>
+
+  <section class="analisis" id="analisis" aria-label="Monitores de análisis"></section>
+
+  <section class="monitor franja" aria-label="Línea de tiempo">
+    <div class="pantalla" id="franja"></div>
+    <div class="rotulo"><span class="rotulo-txt" id="rotulo-franja">Programación de hoy</span><span class="tally" aria-hidden="true"></span></div>
+  </section>
+</main>
+
+<div class="subtitulos" id="subtitulos" hidden aria-live="polite"></div>
+<div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+
+<dialog class="acerca" id="acerca" aria-labelledby="acerca-t">
+  <form method="dialog"><button class="cerrar" aria-label="Cerrar"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg></button></form>
+  <h2 id="acerca-t">Fuentes y notas</h2>
+  <div id="acerca-cuerpo"></div>
+</dialog>
+
+<noscript><p class="sin-js">Este tablero necesita JavaScript para encender el muro.</p></noscript>
+</body>
+</html>
