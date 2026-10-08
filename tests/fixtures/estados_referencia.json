@@ -1,0 +1,237 @@
+{
+ "leyenda": {
+  "preparacion": "p",
+  "verde": "V",
+  "amarillo": "A",
+  "despeje": "D",
+  "rojo": "r"
+ },
+ "intersecciones": {
+  "la-vina": {
+   "P1": {
+    "ciclo": 85,
+    "estados": {
+     "G1": "VVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVV",
+     "G2": "rrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "rrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G4": "VVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVVVVVVV"
+    }
+   },
+   "P2": {
+    "ciclo": 100,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G2": "VVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVV",
+     "G3": "VVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVV",
+     "G4": "rrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+    }
+   },
+   "P3": {
+    "ciclo": 30,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrppVVVVVVVVVVAAA",
+     "G2": "ppVVVVVVVVVVAAArrrrrrrrrrrrrrr",
+     "G3": "rrVVVVVVVVDrrrrrrrrrrrrrrrrrrr",
+     "G4": "rrrrrrrrrrrrrrrrrrVVVVVVVVDrrr"
+    }
+   },
+   "P5": {
+    "ciclo": 100,
+    "estados": {
+     "G1": "rrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G2": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArr",
+     "G3": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDrrrrr",
+     "G4": "rrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+    }
+   }
+  },
+  "mercado": {
+   "P1": {
+    "ciclo": 85,
+    "estados": {
+     "G1": "VVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVV",
+     "G2": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVAAArrrrr",
+     "G4": "rrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G5": "rrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G6": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVDrrrrrrr",
+     "G7": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+    }
+   },
+   "P2": {
+    "ciclo": 110,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrr",
+     "G2": "rrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G4": "VVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVV",
+     "G5": "VVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVV",
+     "G6": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G7": "rrrrrrrrrrrVVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+    }
+   },
+   "P3": {
+    "ciclo": 55,
+    "estados": {
+     "G1": "ppVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G2": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVAAArrrrrrrrrrrrrr",
+     "G3": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVAAA",
+     "G4": "rrrrrrrrrrrrrrrppVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G5": "rrrrrrrrrrrrrrrrrVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G6": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVDrrrr",
+     "G7": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVDrrrrrrrrrrrrrrrr"
+    }
+   },
+   "P5": {
+    "ciclo": 100,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G2": "VVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVV",
+     "G3": "rrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G4": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrr",
+     "G5": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrr",
+     "G6": "rrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G7": "VVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVV"
+    }
+   }
+  },
+  "manguitos": {
+   "P1": {
+    "ciclo": 75,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrr",
+     "G2": "rrrrrrrrrrrrrrrrrppVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVAAAr",
+     "G4": "ppVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G5": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVAAA"
+    }
+   },
+   "P2": {
+    "ciclo": 110,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVAAAr",
+     "G2": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "ppVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G4": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G5": "VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVV"
+    }
+   },
+   "P3": {
+    "ciclo": 65,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVAAArrrrrrrrrrrrrrrrr",
+     "G2": "rrrrrrrrrrrrrrrppVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVAAA",
+     "G4": "ppVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G5": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVAAA"
+    }
+   },
+   "P5": {
+    "ciclo": 110,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVAAAr",
+     "G2": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "ppVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G4": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G5": "VVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVV"
+    }
+   }
+  },
+  "loperena": {
+   "P1": {
+    "ciclo": 85,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrr",
+     "G2": "VVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVV",
+     "G3": "rrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G4": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G5": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G6": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G7": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+    }
+   },
+   "P2": {
+    "ciclo": 100,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G2": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVAAArr",
+     "G3": "VVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrpp",
+     "G4": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G5": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G6": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G7": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+    }
+   },
+   "P4": {
+    "ciclo": 50,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVAAA",
+     "G2": "ppVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "rrrrrrrrrrrrrrrppVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrr",
+     "G4": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVDrrrrrrrrrrrrrr",
+     "G5": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVDrrrrrrrrrrrrrr",
+     "G6": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVDrrrrrrrrrrrrrr",
+     "G7": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVDrrrrrrrrrrrrrr"
+    }
+   },
+   "P5": {
+    "ciclo": 100,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G2": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrr",
+     "G3": "VVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVV",
+     "G4": "rrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G5": "rrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G6": "rrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G7": "rrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+    }
+   }
+  },
+  "area-andina": {
+   "P1": {
+    "ciclo": 90,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVAAA",
+     "G2": "rrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G4": "VVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV",
+     "G5": "VVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G6": "VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+    }
+   },
+   "P2": {
+    "ciclo": 105,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVAAArrr",
+     "G2": "rrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G4": "VVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV",
+     "G5": "VVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVV",
+     "G6": "VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVV"
+    }
+   },
+   "P4": {
+    "ciclo": 75,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVAAA",
+     "G2": "rrrrrrppVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G4": "VVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV",
+     "G5": "VVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G6": "VVVVVVVVVVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+    }
+   },
+   "P5": {
+    "ciclo": 105,
+    "estados": {
+     "G1": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVAAA",
+     "G2": "rrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G3": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrppVVVVVVVVVVVVVVVVVVVVVVVVVAAArrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G4": "VVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV",
+     "G5": "VVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+     "G6": "rrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVDrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+    }
+   }
+  }
+ }
+}

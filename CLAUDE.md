@@ -23,6 +23,8 @@
 - `src/sast/` — funciones (lectura, ubicación, indicadores, reportes).
 - `scripts/NN_*.py` — pipeline numerado, se corre en orden.
 - `outputs/` — HTML y Excel de entrega. `docs/` — metodología y fichas.
+- `src/sast/semaforos/` — lectura de los reportes SISTRA, modelo de tiempos, validaciones, geometría OSM.
+- `tests/` — pruebas (`unittest`; `tests/fixtures/` = estados de referencia que comparten Python y JS).
 
 ## Comandos frecuentes
 ```bash
@@ -37,6 +39,8 @@ python scripts/05_indicadores.py       # tabla larga equipo × mes × indicador 
 python scripts/06_reportes.py          # Excel ANSV + HTML en outputs/
 python scripts/07_revision_geocodificacion.py  # listas para revisar la geocodificación a mano
 python scripts/08_reporte_ejecutivo.py # informe ejecutivo (gerencia) + Excel para copiar a la plataforma ANSV (+15 m)
+python scripts/09_semaforos.py         # planes semafóricos (PDF SISTRA), validaciones, borrador de accesos y página de validación
+python -m unittest discover -s tests   # pruebas (las de PDF se saltan si falta data/raw/semaforos/)
 ```
 Los insumos de `data/raw/` los copia Santiago (`docs/ingesta.md`). `SAST_RAW=<carpeta>` corre el
 pipeline contra otra carpeta de insumos (ensayos), sin tocar `data/raw/`.
@@ -129,3 +133,11 @@ Decisiones del 2026-10-08, Santiago (tablero de semáforos SAST, `tablero/`):
     amigos y lo valida Santiago; sin validación el tablero no anima vehículos en ese cruce.
 29. **Así se ve en campo:** TIRA→TIV (2 s) es solo rojo; el último segundo peatonal (TFV→TFA) es
     rojo intermitente; las cinco intersecciones tienen contador regresivo.
+30. **Nombres de los grupos SISTRA = codificación de trayectorias SDM Bogotá** (Manual de Planeación y
+    Diseño para la Administración del Tránsito y el Transporte, 2005, Tomo III, num. 5.2.1; figura
+    aportada por Santiago). Accesos: 1 Norte, 2 Sur, 3 Oeste, 4 Este (de dónde viene el vehículo).
+    «Flujo k» = directo desde el acceso k; 5–8 = giro a la izquierda desde el acceso k−4; 9(k) = giro a
+    la derecha. «Peatonal 2k» = cruce sobre la mitad de entrada del acceso k; «Peatonal 3k» = cruce sobre
+    la mitad por donde sale el directo k (31 brazo sur, 32 norte, 33 este, 34 oeste). Verificado contra
+    las matrices de grupos amigos y los sentidos de las cámaras SAST. Lo que falta validar en campo es
+    qué brazo físico es cada acceso y el movimiento de la «Flecha» de Los Manguitos.

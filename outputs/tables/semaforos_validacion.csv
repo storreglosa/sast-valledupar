@@ -1,0 +1,44 @@
+﻿nivel,interseccion,plan,codigo,texto
+INFO,la-vina,,ubicacion,"Reporte: «CRA 9 CON CALLE 16B»; planes: «CRUCE 917, UBICADO EN cra 9 con calle 17»"
+INFO,la-vina,P1,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 3 s (G1 → G2)
+INFO,la-vina,P2,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 4 s (G2 → G1)
+INFO,la-vina,P3,tfa_fin_ciclo,TFA = 30 (fin del ciclo) en G1: equivale a 0
+INFO,la-vina,P3,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 2 s (G1 → G2)
+AVISO,la-vina,P5,tira_vacia,"G1 (vehicular): TIRA en blanco en la tabla; se deja sin preparación (en campo es rojo igual, decisión 29)"
+INFO,la-vina,P5,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 3 s (G1 → G2)
+INFO,la-vina,,fin_dia,La leyenda termina tramos a las 23:59: se toma como 24:00
+INFO,mercado,,ubicacion,"Reporte: «Calle21 X Carrera12»; planes: «CRUCE 2112, UBICADO EN Calle 20 x Cra 12»"
+INFO,mercado,P1,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 1 s (G1 → G5)
+INFO,mercado,P2,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 1 s (G4 → G7)
+INFO,mercado,P3,tfa_fin_ciclo,TFA = 55 (fin del ciclo) en G3: equivale a 0
+INFO,mercado,P3,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 2 s (G1 → G4)
+INFO,mercado,P5,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 2 s (G1 → G4)
+INFO,mercado,P1,plan_sin_horario,P1 está programado en el controlador pero no tiene horario: no corre
+INFO,mercado,,fin_dia,La leyenda termina tramos a las 23:59: se toma como 24:00
+INFO,manguitos,,ubicacion,"Reporte: «CARRERA 19 CON DIAGONAL 21»; planes: «CRUCE 1921, UBICADO EN CRA 19 CON DG 21»"
+INFO,manguitos,P1,tfa_fin_ciclo,TFA = 75 (fin del ciclo) en G5: equivale a 0
+INFO,manguitos,P1,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 2 s (G4 → G2)
+INFO,manguitos,P2,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 1 s (G4 → G2)
+INFO,manguitos,P3,tfa_fin_ciclo,"TFA = 65 (fin del ciclo) en G3, G5: equivale a 0"
+INFO,manguitos,P3,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 2 s (G1 → G3)
+INFO,manguitos,P5,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 1 s (G4 → G2)
+INFO,manguitos,,fin_dia,La leyenda termina tramos a las 23:59: se toma como 24:00
+INFO,loperena,,ubicacion,"Reporte: «4159»; planes: «CRUCE 1612, UBICADO EN CRA 12 CON CLL 16»"
+INFO,loperena,P1,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 1 s (G3 → G4)
+INFO,loperena,P2,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 1 s (G3 → G4)
+INFO,loperena,P4,tfa_fin_ciclo,TFA = 50 (fin del ciclo) en G1: equivale a 0
+INFO,loperena,P4,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 1 s (G3 → G4)
+AVISO,loperena,P5,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 0 s (G3 → G4)
+INFO,loperena,P1,plan_sin_horario,P1 está programado en el controlador pero no tiene horario: no corre
+INFO,loperena,,fin_dia,La leyenda termina tramos a las 23:59: se toma como 24:00
+INFO,area-andina,,ubicacion,"Reporte: «CRA 23 CON CALLE 6»; planes: «CRUCE 2306, UBICADO EN CRA 23X CLL 6»"
+INFO,area-andina,P1,tfa_fin_ciclo,TFA = 90 (fin del ciclo) en G1: equivale a 0
+AVISO,area-andina,P1,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 0 s (G1 → G5)
+AVISO,area-andina,P2,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 0 s (G1 → G5)
+INFO,area-andina,P4,tfa_fin_ciclo,TFA = 75 (fin del ciclo) en G1: equivale a 0
+AVISO,area-andina,P4,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 0 s (G1 → G5)
+INFO,area-andina,P5,tfa_fin_ciclo,TFA = 105 (fin del ciclo) en G1: equivale a 0
+AVISO,area-andina,P5,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 0 s (G1 → G5)
+INFO,area-andina,,fin_dia,La leyenda termina tramos a las 23:59: se toma como 24:00
+INFO,mercado,,matriz_permisiva,La matriz deja a G2 (2) y G6 (22) en verde a la vez aunque sus trayectorias se cruzan; en los planes nunca coinciden
+AVISO,area-andina,,acceso_sin_grupo,El brazo este (CL 6) recibe tránsito en OSM pero ningún grupo vehicular lo controla

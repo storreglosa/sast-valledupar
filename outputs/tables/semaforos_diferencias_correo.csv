@@ -1,0 +1,6 @@
+﻿interseccion,plan,campo,correo,controlador,decision
+La Viña,P1,ciclo,60 s,85 s,"Manda el controlador (decisión 27, Santiago, 2026-10-08)"
+Mercado Público,P1,horario domingo,05:30–17:00,sin horario,"Manda el controlador (decisión 27, Santiago, 2026-10-08)"
+Mercado Público,P1,horario festivo,05:30–17:00,sin horario,"Manda el controlador (decisión 27, Santiago, 2026-10-08)"
+Mercado Público,P2,ciclo,100 s,110 s,"Manda el controlador (decisión 27, Santiago, 2026-10-08)"
+Universidad Área Andina,,interseccion,no incluida en el correo,4 planes,"Manda el controlador (decisión 27, Santiago, 2026-10-08)"

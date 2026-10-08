@@ -1,0 +1,34 @@
+# Tabla del correo «Remisión de planeamientos semafóricos – intersecciones con SAST en
+# operación» (Directora Técnica, 29/09/2026), tal como llegó al jefe. Sirve solo para listar las
+# diferencias con los controladores (decisión 27: manda el controlador).
+#
+# Transcripción manual: el PDF del correo es una impresión de Outlook SIN capa de texto (pdffonts
+# no lista fuentes; pdftotext devuelve vacío). Archivo:
+#   data/raw/semaforos/2026-09-29_sttv_correo-planeamientos.pdf
+# Transcrito por Claude el 2026-10-08 a partir de la imagen de la p. 1; 09_semaforos.py verifica
+# que el SHA-256 del PDF sea el de abajo (si el correo cambia, hay que volver a transcribir).
+#
+# Horarios: lun-sab | dom-fes | todos  ->  tramos "HH:MM-HH:MM" (23:59 = fin del día)
+
+sha256_pdf: 82774689a73ee3d3714420c899176f7cf6af3baf0a101dbc0c72c8000a395d16
+
+intersecciones:
+  "La Viña – Cra. 9 con Calle 16B/17":
+    P1: {ciclo: 60, dom-fes: ["05:30-20:00"]}
+    P2: {ciclo: 100, lun-sab: ["05:30-11:30", "13:30-17:00"]}
+    P5: {ciclo: 100, lun-sab: ["11:30-13:30", "17:00-20:00"]}
+    P3: {ciclo: 30, todos: ["00:00-05:30", "20:00-23:59"]}
+  "Mercado – Calle 21 con Carrera 12":
+    P1: {ciclo: 85, dom-fes: ["05:30-17:00"]}
+    P2: {ciclo: 100, lun-sab: ["05:30-17:00"], dom-fes: ["05:30-16:00"]}
+    P5: {ciclo: 100, lun-sab: ["17:00-20:00"], dom-fes: ["16:00-20:00"]}
+    P3: {ciclo: 55, todos: ["00:00-05:30", "20:00-23:59"]}
+  "Los Manguitos – Cra. 19 con Diagonal 21":
+    P1: {ciclo: 75, todos: ["20:00-23:59"]}
+    P2: {ciclo: 110, lun-sab: ["05:30-11:30", "13:30-17:00"], dom-fes: ["05:30-16:00"]}
+    P5: {ciclo: 110, lun-sab: ["11:30-13:30", "17:00-20:00"], dom-fes: ["16:00-20:00"]}
+    P3: {ciclo: 65, todos: ["00:00-05:30"]}
+  "Loperena – Cra. 12 con Calle 16":
+    P2: {ciclo: 100, lun-sab: ["05:30-11:30", "13:30-17:00"], dom-fes: ["05:30-16:00"]}
+    P5: {ciclo: 100, lun-sab: ["11:30-13:30", "17:00-20:00"], dom-fes: ["16:00-20:00"]}
+    P4: {ciclo: 50, todos: ["00:00-05:30", "20:00-23:59"]}
