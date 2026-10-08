@@ -38,7 +38,7 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
     gAsfalto.append(asf);
     trazos.push({ el: asf, largo: trazo(v.p).largo });
     if (v.ctx) continue;
-    if (!v.unico) gMarcas.append(s('polyline', { points: pts(v.p), fill: 'none', stroke: '#d6aa1f', 'stroke-width': 0.16, 'stroke-dasharray': '3 3', opacity: 0.8 }));
+    if (!v.unico) gMarcas.append(s('polyline', { points: pts(v.p), fill: 'none', stroke: 'var(--cajon)', 'stroke-width': 0.16, 'stroke-dasharray': '3 3', opacity: 0.7 }));
     else if (v.ancho >= 6) gMarcas.append(s('polyline', { points: pts(v.p), fill: 'none', stroke: '#dfe5e9', 'stroke-width': 0.13, 'stroke-dasharray': '3 4', opacity: 0.55 }));
     if (v.unico) {
       const tr = trazo(v.p);

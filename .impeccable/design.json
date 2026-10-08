@@ -1,0 +1,629 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-08T17:20:57+00:00",
+  "title": "Design System: Sala de control · Semáforos SAST",
+  "extensions": {
+    "colorMeta": {
+      "sala": {
+        "role": "neutral",
+        "displayName": "Negro de sala",
+        "canonical": "oklch(12.7% 0.009 253.7)",
+        "tonalRamp": [
+          "#090b0f",
+          "#212428",
+          "#3d4044",
+          "#5a5e63",
+          "#7a7e82",
+          "#9b9fa4",
+          "#c0c4ca",
+          "#eaeff4"
+        ]
+      },
+      "sala-2": {
+        "role": "neutral",
+        "displayName": "Negro de sala, segundo plano",
+        "canonical": "oklch(15.8% 0.010 255.7)",
+        "tonalRamp": [
+          "#080b0f",
+          "#212429",
+          "#3c4045",
+          "#5a5e63",
+          "#797e83",
+          "#9a9fa5",
+          "#c0c4cb",
+          "#eaeff5"
+        ]
+      },
+      "bisel": {
+        "role": "neutral",
+        "displayName": "Bisel grafito",
+        "canonical": "oklch(21.1% 0.010 248.3)",
+        "tonalRamp": [
+          "#080c0f",
+          "#202529",
+          "#3c4045",
+          "#595e63",
+          "#797e83",
+          "#9a9fa4",
+          "#bfc5ca",
+          "#e9eff5"
+        ]
+      },
+      "bisel-2": {
+        "role": "neutral",
+        "displayName": "Bisel grafito, luz alta",
+        "canonical": "oklch(25.2% 0.013 243.4)",
+        "tonalRamp": [
+          "#070c10",
+          "#1f252a",
+          "#3a4146",
+          "#585f64",
+          "#777e84",
+          "#989fa6",
+          "#bdc5cc",
+          "#e7f0f7"
+        ]
+      },
+      "bisel-luz": {
+        "role": "neutral",
+        "displayName": "Arista de bisel",
+        "canonical": "oklch(32.0% 0.017 244.7)",
+        "tonalRamp": [
+          "#060c12",
+          "#1d252c",
+          "#394148",
+          "#565f67",
+          "#757f87",
+          "#96a0a8",
+          "#bcc6ce",
+          "#e6f0f9"
+        ]
+      },
+      "pantalla": {
+        "role": "neutral",
+        "displayName": "Pantalla apagada",
+        "canonical": "oklch(16.5% 0.012 242.6)",
+        "tonalRamp": [
+          "#070c10",
+          "#1f2529",
+          "#3b4145",
+          "#585f64",
+          "#787e84",
+          "#989fa5",
+          "#bec5cb",
+          "#e8f0f6"
+        ]
+      },
+      "pantalla-2": {
+        "role": "neutral",
+        "displayName": "Pantalla apagada, centro",
+        "canonical": "oklch(19.2% 0.014 243.7)",
+        "tonalRamp": [
+          "#070c11",
+          "#1e252a",
+          "#3a4147",
+          "#575f65",
+          "#777e85",
+          "#97a0a6",
+          "#bdc5cc",
+          "#e7f0f7"
+        ]
+      },
+      "filete": {
+        "role": "neutral",
+        "displayName": "Filete",
+        "canonical": "oklch(27.8% 0.021 240.1)",
+        "tonalRamp": [
+          "#040c13",
+          "#1b262d",
+          "#36414a",
+          "#535f69",
+          "#727f89",
+          "#93a1ab",
+          "#b8c6d1",
+          "#e2f1fc"
+        ]
+      },
+      "filete-2": {
+        "role": "neutral",
+        "displayName": "Filete marcado",
+        "canonical": "oklch(33.4% 0.026 244.2)",
+        "tonalRamp": [
+          "#030c15",
+          "#192630",
+          "#34414d",
+          "#51606c",
+          "#717f8c",
+          "#91a1ae",
+          "#b7c6d4",
+          "#e1f1fe"
+        ]
+      },
+      "tinta": {
+        "role": "neutral",
+        "displayName": "Tinta",
+        "canonical": "oklch(94.6% 0.008 236.6)",
+        "tonalRamp": [
+          "#080c0e",
+          "#202528",
+          "#3c4044",
+          "#595e62",
+          "#797e82",
+          "#9a9fa3",
+          "#bfc5c9",
+          "#e9eff3"
+        ]
+      },
+      "tinta-2": {
+        "role": "neutral",
+        "displayName": "Tinta secundaria",
+        "canonical": "oklch(76.9% 0.019 237.9)",
+        "tonalRamp": [
+          "#040c12",
+          "#1b262c",
+          "#364149",
+          "#545f67",
+          "#737f88",
+          "#94a0a9",
+          "#b9c6cf",
+          "#e3f1fa"
+        ]
+      },
+      "tinta-3": {
+        "role": "neutral",
+        "displayName": "Tinta de rótulo",
+        "canonical": "oklch(62.9% 0.022 238.9)",
+        "tonalRamp": [
+          "#030c13",
+          "#1a262e",
+          "#35424a",
+          "#526069",
+          "#727f89",
+          "#92a1ab",
+          "#b8c6d1",
+          "#e2f1fc"
+        ]
+      },
+      "rojo": {
+        "role": "primary",
+        "displayName": "Rojo de lente",
+        "canonical": "oklch(65.4% 0.232 28.7)",
+        "tonalRamp": [
+          "#1f0000",
+          "#4a0302",
+          "#7b0706",
+          "#af100e",
+          "#e71916",
+          "#fe6656",
+          "#fdaca0",
+          "#ffe9e5"
+        ]
+      },
+      "rojo-off": {
+        "role": "primary",
+        "displayName": "Rojo de lente apagado",
+        "canonical": "oklch(21.1% 0.045 23.9)",
+        "tonalRamp": [
+          "#1a0303",
+          "#371b19",
+          "#553634",
+          "#755451",
+          "#977370",
+          "#b99491",
+          "#e0b9b6",
+          "#ffe9e7"
+        ]
+      },
+      "ambar": {
+        "role": "primary",
+        "displayName": "Ámbar de lente",
+        "canonical": "oklch(81.2% 0.170 76.4)",
+        "tonalRamp": [
+          "#130900",
+          "#322002",
+          "#563904",
+          "#7c550a",
+          "#a57211",
+          "#d19004",
+          "#ffb42a",
+          "#feecd1"
+        ]
+      },
+      "ambar-off": {
+        "role": "primary",
+        "displayName": "Ámbar de lente apagado",
+        "canonical": "oklch(25.4% 0.039 85.7)",
+        "tonalRamp": [
+          "#110a00",
+          "#2d230c",
+          "#493e27",
+          "#685c44",
+          "#887c63",
+          "#a99d83",
+          "#d0c3a8",
+          "#faedd1"
+        ]
+      },
+      "verde": {
+        "role": "primary",
+        "displayName": "Verde de lente",
+        "canonical": "oklch(80.0% 0.187 156.5)",
+        "tonalRamp": [
+          "#000f05",
+          "#022c17",
+          "#044d2c",
+          "#0b7042",
+          "#12955a",
+          "#22bb74",
+          "#2ee790",
+          "#c4ffd9"
+        ]
+      },
+      "verde-off": {
+        "role": "primary",
+        "displayName": "Verde de lente apagado",
+        "canonical": "oklch(24.3% 0.042 160.0)",
+        "tonalRamp": [
+          "#000f06",
+          "#0f2a1d",
+          "#2c4738",
+          "#496556",
+          "#688575",
+          "#89a796",
+          "#aecdbb",
+          "#d8f8e5"
+        ]
+      },
+      "sast": {
+        "role": "secondary",
+        "displayName": "Naranja SAST",
+        "canonical": "oklch(72.4% 0.187 48.9)",
+        "tonalRamp": [
+          "#180500",
+          "#3d1802",
+          "#662d04",
+          "#93430a",
+          "#c25b11",
+          "#f77205",
+          "#fdaf86",
+          "#feeadf"
+        ]
+      },
+      "sast-off": {
+        "role": "secondary",
+        "displayName": "Naranja SAST apagado",
+        "canonical": "oklch(27.1% 0.052 53.7)",
+        "tonalRamp": [
+          "#170600",
+          "#371c09",
+          "#553825",
+          "#755642",
+          "#967560",
+          "#b99681",
+          "#e0bca5",
+          "#feeade"
+        ]
+      },
+      "cajon": {
+        "role": "tertiary",
+        "displayName": "Amarillo de cajón",
+        "canonical": "oklch(88.1% 0.181 94.0)",
+        "tonalRamp": [
+          "#100b00",
+          "#2c2300",
+          "#4d3e01",
+          "#705c02",
+          "#957b05",
+          "#bb9c13",
+          "#e7c11d",
+          "#ffeeb5"
+        ]
+      },
+      "tally": {
+        "role": "secondary",
+        "displayName": "Rojo tally",
+        "canonical": "oklch(64.5% 0.241 27.4)",
+        "tonalRamp": [
+          "#1f0001",
+          "#4b0002",
+          "#7a090c",
+          "#af1216",
+          "#e61c21",
+          "#fd665a",
+          "#ffaba0",
+          "#fee9e6"
+        ]
+      },
+      "ciclo-1": {
+        "role": "tertiary",
+        "displayName": "Ciclo corto (≤55 s)",
+        "canonical": "oklch(44.7% 0.019 239.5)",
+        "tonalRamp": [
+          "#05070a",
+          "#1d2328",
+          "#4b565e",
+          "#5f6b74",
+          "#76828b",
+          "#8f9ba3",
+          "#aab4bb",
+          "#e3e8eb"
+        ]
+      },
+      "ciclo-2": {
+        "role": "tertiary",
+        "displayName": "Ciclo ≤80 s",
+        "canonical": "oklch(60.0% 0.020 240.2)",
+        "tonalRamp": [
+          "#05070a",
+          "#1d2328",
+          "#4b565e",
+          "#5f6b74",
+          "#76828b",
+          "#8f9ba3",
+          "#aab4bb",
+          "#e3e8eb"
+        ]
+      },
+      "ciclo-3": {
+        "role": "tertiary",
+        "displayName": "Ciclo ≤95 s",
+        "canonical": "oklch(76.4% 0.015 238.1)",
+        "tonalRamp": [
+          "#05070a",
+          "#1d2328",
+          "#4b565e",
+          "#5f6b74",
+          "#76828b",
+          "#8f9ba3",
+          "#aab4bb",
+          "#e3e8eb"
+        ]
+      },
+      "ciclo-4": {
+        "role": "tertiary",
+        "displayName": "Ciclo largo (≥100 s)",
+        "canonical": "oklch(92.8% 0.007 233.6)",
+        "tonalRamp": [
+          "#05070a",
+          "#1d2328",
+          "#4b565e",
+          "#5f6b74",
+          "#76828b",
+          "#8f9ba3",
+          "#aab4bb",
+          "#e3e8eb"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Nombre de cruce",
+        "purpose": "Nombre del cruce en la pantalla principal."
+      },
+      "headline": {
+        "displayName": "Barra del operador",
+        "purpose": "Título de la sala en la barra superior."
+      },
+      "title": {
+        "displayName": "Título de monitor",
+        "purpose": "Encabezado de cada monitor de análisis."
+      },
+      "numeral": {
+        "displayName": "Cifra",
+        "purpose": "KPI y cifras de la ficha SAST, tabulares."
+      },
+      "body": {
+        "displayName": "Texto",
+        "purpose": "Explicaciones y texto corrido en Public Sans."
+      },
+      "caption": {
+        "displayName": "Nota",
+        "purpose": "Etiquetas de cifra y notas en tinta-3."
+      },
+      "subtitle": {
+        "displayName": "Subtítulo",
+        "purpose": "Subtítulos del modo presentación."
+      },
+      "label": {
+        "displayName": "Rótulo de operador",
+        "purpose": "Rótulo bajo cada pantalla, botones, sellos y pestañas, en mayúsculas."
+      }
+    },
+    "shadows": [
+      {
+        "name": "monitor",
+        "value": "0 14px 30px -12px rgba(0,0,0,.85), 0 2px 0 rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.07), inset 0 0 0 1px rgba(255,255,255,.025)",
+        "purpose": "Todo bisel del muro."
+      },
+      {
+        "name": "pantalla-hundida",
+        "value": "inset 0 0 0 1px #000, inset 0 0 28px rgba(0,0,0,.55)",
+        "purpose": "Interior de cada pantalla."
+      },
+      {
+        "name": "lente-encendido",
+        "value": "0 0 10px 2px color-mix(in srgb, var(--rojo) 70%, transparent), 0 0 24px color-mix(in srgb, var(--rojo) 35%, transparent)",
+        "purpose": "Halo doble de una luz de cabeza (se cambia --rojo por la luz encendida)."
+      },
+      {
+        "name": "led",
+        "value": "0 0 6px var(--verde)",
+        "purpose": "Tallies, puntos de estado y LEDs; siempre del color de la luz."
+      },
+      {
+        "name": "display",
+        "value": "drop-shadow(0 0 3px color-mix(in srgb, var(--rojo) 55%, transparent))",
+        "purpose": "Resplandor (filter) de los displays de 7 segmentos."
+      },
+      {
+        "name": "ventana",
+        "value": "0 30px 80px rgba(0,0,0,.8)",
+        "purpose": "Diálogo de fuentes y glosario."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Curva propia del CSS (fuentes, subtítulos); en GSAP equivale a expo.out."
+      },
+      {
+        "name": "vuelo",
+        "value": "0.55s expo.inOut + 0.3s fundido; contenido nuevo a los 380ms",
+        "purpose": "Firma: el monitor elegido vuela a la pantalla principal."
+      },
+      {
+        "name": "cruce-se-dibuja",
+        "value": "stroke-dashoffset 0.9s expo.out, stagger 0.04s; luego demarcación, cebras, cabezas y lienzo",
+        "purpose": "Entrada del diagrama del cruce."
+      },
+      {
+        "name": "anillo-entra",
+        "value": "opacity 0→1, scale 0.94→1, 0.5s expo.out",
+        "purpose": "Entrada del reloj grande al cambiar de plan."
+      },
+      {
+        "name": "subtitulo",
+        "value": "0.4s, translateY 8px→0",
+        "purpose": "Entrada CSS de los subtítulos de la presentación."
+      },
+      {
+        "name": "parpadeo",
+        "value": "0.5s steps(1) infinite",
+        "purpose": "Despeje peatonal (rojo intermitente)."
+      },
+      {
+        "name": "barrido-camara",
+        "value": "3.6s ease-in-out infinite alternate, ±28°",
+        "purpose": "Cono de las cámaras SAST operativas en el mapa."
+      },
+      {
+        "name": "ticker",
+        "value": "gsap.ticker, lagSmoothing(0), pausa con la pestaña oculta",
+        "purpose": "Bucle único de todo lo que corre por cuadro."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "movil",
+        "value": "760px"
+      },
+      {
+        "name": "tableta",
+        "value": "1180px"
+      },
+      {
+        "name": "proyector",
+        "value": "1700px"
+      },
+      {
+        "name": "muro-grande",
+        "value": "2200px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Monitor",
+      "kind": "card",
+      "refersTo": "monitor",
+      "description": "Bisel grafito + pantalla negra con reflejo + rótulo de operador con tally; contenedor de toda vista.",
+      "html": "<div class=\"ds-monitor\"><div class=\"ds-pantalla\"><span class=\"ds-nombre\">Mercado Público</span></div><div class=\"ds-rotulo\"><span>Mercado Público · 4162/2112</span><span class=\"ds-tally ds-on\"></span></div></div>",
+      "css": ":root{--sala:#05070a;--bisel:#15191d;--bisel-2:#1d2328;--bisel-luz:#2c343b;--pantalla:#0a0f13;--pantalla-2:#0f151a;--filete:#1f2a32;--filete-2:#2b3843;--tinta:#e8eef2;--tinta-2:#a9b6bf;--tinta-3:#7d8b95;--rojo:#ff3b30;--rojo-off:#2a0f0e;--ambar:#ffb000;--ambar-off:#2b210a;--verde:#1fe08a;--verde-off:#0b2619;--sast:#ff7a1a;--tally:#ff2d2d;--f-rotulo:'Barlow Condensed','Arial Narrow',sans-serif;--f-texto:'Public Sans','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1)}.ds-monitor{width:260px;background:linear-gradient(160deg,var(--bisel-2),var(--bisel) 55%,#111518);border-radius:6px;padding:6px 6px 0;box-shadow:0 14px 30px -12px rgba(0,0,0,.85),0 2px 0 rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.07),inset 0 0 0 1px rgba(255,255,255,.025);transition:transform .25s var(--ease)}.ds-monitor:hover{transform:translateY(-1px)}.ds-pantalla{position:relative;height:110px;border-radius:3px;background:radial-gradient(130% 120% at 50% 40%,var(--pantalla-2),var(--pantalla) 70%);box-shadow:inset 0 0 0 1px #000,inset 0 0 28px rgba(0,0,0,.55);padding:10px;overflow:hidden}.ds-pantalla::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.035),transparent 32%)}.ds-nombre{font:600 1.06rem/1.05 var(--f-rotulo);color:var(--tinta)}.ds-rotulo{height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 6px;font:600 .78rem/1.4 var(--f-rotulo);letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-3)}.ds-tally{width:7px;height:7px;border-radius:50%;background:#2a1414}.ds-tally.ds-on{background:var(--tally);box-shadow:0 0 8px var(--tally),0 0 2px #fff inset}"
+    },
+    {
+      "name": "Botón",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Botón de consola de la barra del operador; «Presentar» lleva el punto tally.",
+      "html": "<button class=\"ds-btn ds-presentar\"><span class=\"ds-led\"></span>Presentar</button> <button class=\"ds-btn\">Fuentes</button>",
+      "css": ":root{--sala:#05070a;--bisel:#15191d;--bisel-2:#1d2328;--bisel-luz:#2c343b;--pantalla:#0a0f13;--pantalla-2:#0f151a;--filete:#1f2a32;--filete-2:#2b3843;--tinta:#e8eef2;--tinta-2:#a9b6bf;--tinta-3:#7d8b95;--rojo:#ff3b30;--rojo-off:#2a0f0e;--ambar:#ffb000;--ambar-off:#2b210a;--verde:#1fe08a;--verde-off:#0b2619;--sast:#ff7a1a;--tally:#ff2d2d;--f-rotulo:'Barlow Condensed','Arial Narrow',sans-serif;--f-texto:'Public Sans','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1)}.ds-btn{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;border-radius:5px;background:linear-gradient(#1a2026,#12171b);border:1px solid var(--bisel-luz);cursor:pointer;font:600 .95rem/1 var(--f-rotulo);letter-spacing:.04em;text-transform:uppercase;color:var(--tinta);transition:border-color .18s,background .18s,transform .12s}.ds-btn:hover{border-color:#46525c;background:linear-gradient(#20272e,#161b20)}.ds-btn:active{transform:translateY(1px)}.ds-btn:focus-visible{outline:2px solid var(--sast);outline-offset:2px}.ds-btn[aria-pressed=true]{border-color:var(--sast);color:#fff}.ds-presentar{border-color:color-mix(in srgb,var(--tally) 55%,var(--bisel-luz))}.ds-led{width:8px;height:8px;border-radius:50%;background:var(--tally);box-shadow:0 0 6px var(--tally)}"
+    },
+    {
+      "name": "Chip de plan",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Selector de plan del controlador; vigente con LED verde, sin horario con borde discontinuo.",
+      "html": "<button class=\"ds-chip\"><i class=\"ds-sw\" style=\"background:#4b565e\"></i>P1 · 85 s</button> <button class=\"ds-chip\" aria-pressed=\"true\"><i class=\"ds-sw\" style=\"background:#e3e8eb\"></i>P5 · 100 s<i class=\"ds-vig\"></i></button> <button class=\"ds-chip ds-sinh\">P3 · 55 s</button>",
+      "css": ":root{--sala:#05070a;--bisel:#15191d;--bisel-2:#1d2328;--bisel-luz:#2c343b;--pantalla:#0a0f13;--pantalla-2:#0f151a;--filete:#1f2a32;--filete-2:#2b3843;--tinta:#e8eef2;--tinta-2:#a9b6bf;--tinta-3:#7d8b95;--rojo:#ff3b30;--rojo-off:#2a0f0e;--ambar:#ffb000;--ambar-off:#2b210a;--verde:#1fe08a;--verde-off:#0b2619;--sast:#ff7a1a;--tally:#ff2d2d;--f-rotulo:'Barlow Condensed','Arial Narrow',sans-serif;--f-texto:'Public Sans','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1)}.ds-chip{height:32px;padding:0 10px;border-radius:4px;border:1px solid var(--filete-2);background:#0d1216;cursor:pointer;font:600 .9rem/1 var(--f-rotulo);letter-spacing:.03em;color:var(--tinta-2);display:inline-flex;align-items:center;gap:6px;transition:border-color .15s,color .15s,background .15s}.ds-chip:hover{border-color:#46525c;color:var(--tinta)}.ds-chip:focus-visible{outline:2px solid var(--sast);outline-offset:2px}.ds-chip[aria-pressed=true]{border-color:var(--tinta-2);color:#fff;background:#172028}.ds-sw{width:10px;height:10px;border-radius:2px}.ds-vig{width:7px;height:7px;border-radius:50%;background:var(--verde);box-shadow:0 0 6px var(--verde)}.ds-sinh{opacity:.62;border-style:dashed}"
+    },
+    {
+      "name": "Sello",
+      "kind": "chip",
+      "refersTo": "sello",
+      "description": "Etiqueta de estado sobre la pantalla principal: en vivo, ilustrativo, por validar.",
+      "html": "<span class=\"ds-sello ds-vivo\"><span class=\"ds-led\"></span>En vivo</span> <span class=\"ds-sello\">Fase ilustrativa</span> <span class=\"ds-sello ds-borrador\">Accesos por validar</span>",
+      "css": ":root{--sala:#05070a;--bisel:#15191d;--bisel-2:#1d2328;--bisel-luz:#2c343b;--pantalla:#0a0f13;--pantalla-2:#0f151a;--filete:#1f2a32;--filete-2:#2b3843;--tinta:#e8eef2;--tinta-2:#a9b6bf;--tinta-3:#7d8b95;--rojo:#ff3b30;--rojo-off:#2a0f0e;--ambar:#ffb000;--ambar-off:#2b210a;--verde:#1fe08a;--verde-off:#0b2619;--sast:#ff7a1a;--tally:#ff2d2d;--f-rotulo:'Barlow Condensed','Arial Narrow',sans-serif;--f-texto:'Public Sans','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1)}.ds-sello{display:inline-flex;align-items:center;gap:7px;padding:5px 9px;border-radius:4px;font:600 .82rem/1 var(--f-rotulo);letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--filete-2);color:var(--tinta-2);background:rgba(5,7,10,.75)}.ds-borrador{border-color:color-mix(in srgb,var(--ambar) 60%,#000);color:var(--ambar)}.ds-led{width:8px;height:8px;border-radius:50%;background:var(--verde);box-shadow:0 0 6px var(--verde)}"
+    },
+    {
+      "name": "Cabeza semafórica",
+      "kind": "custom",
+      "refersTo": "lente",
+      "description": "Lentes LED con apagado teñido, regresiva de 7 segmentos y palabra de estado.",
+      "html": "<div class=\"ds-cab\"><div class=\"ds-caja\"><div class=\"ds-lente ds-r ds-on\"></div><div class=\"ds-lente ds-a\"></div><div class=\"ds-lente ds-v\"></div></div><svg class=\"ds-siete\" viewBox=\"-0.5 0 22.2 18\" height=\"40\" aria-hidden=\"true\"><g transform=\"translate(0 0) skewX(-6)\"><polygon points=\"1.6,0.6 8.4,0.6 7.2,1.9 2.8,1.9\" fill=\"var(--rojo)\"/><polygon points=\"8.9,1.1 8.9,8.4 7.8,9.0 7.6,2.4\" fill=\"var(--rojo)\"/><polygon points=\"8.9,9.6 8.9,16.9 7.6,15.6 7.8,10.2\" fill=\"#2a0f0e\"/><polygon points=\"2.8,16.1 7.2,16.1 8.4,17.4 1.6,17.4\" fill=\"var(--rojo)\"/><polygon points=\"1.1,9.6 2.2,10.2 2.4,15.6 1.1,16.9\" fill=\"var(--rojo)\"/><polygon points=\"1.1,1.1 2.4,2.4 2.2,8.0 1.1,8.4\" fill=\"#2a0f0e\"/><polygon points=\"2.2,8.4 7.8,8.4 8.6,9.0 7.8,9.6 2.2,9.6 1.4,9.0\" fill=\"var(--rojo)\"/></g><g transform=\"translate(11.2 0) skewX(-6)\"><polygon points=\"1.6,0.6 8.4,0.6 7.2,1.9 2.8,1.9\" fill=\"var(--rojo)\"/><polygon points=\"8.9,1.1 8.9,8.4 7.8,9.0 7.6,2.4\" fill=\"#2a0f0e\"/><polygon points=\"8.9,9.6 8.9,16.9 7.6,15.6 7.8,10.2\" fill=\"var(--rojo)\"/><polygon points=\"2.8,16.1 7.2,16.1 8.4,17.4 1.6,17.4\" fill=\"var(--rojo)\"/><polygon points=\"1.1,9.6 2.2,10.2 2.4,15.6 1.1,16.9\" fill=\"#2a0f0e\"/><polygon points=\"1.1,1.1 2.4,2.4 2.2,8.0 1.1,8.4\" fill=\"var(--rojo)\"/><polygon points=\"2.2,8.4 7.8,8.4 8.6,9.0 7.8,9.6 2.2,9.6 1.4,9.0\" fill=\"var(--rojo)\"/></g></svg><span class=\"ds-palabra\">PARE</span></div>",
+      "css": ":root{--sala:#05070a;--bisel:#15191d;--bisel-2:#1d2328;--bisel-luz:#2c343b;--pantalla:#0a0f13;--pantalla-2:#0f151a;--filete:#1f2a32;--filete-2:#2b3843;--tinta:#e8eef2;--tinta-2:#a9b6bf;--tinta-3:#7d8b95;--rojo:#ff3b30;--rojo-off:#2a0f0e;--ambar:#ffb000;--ambar-off:#2b210a;--verde:#1fe08a;--verde-off:#0b2619;--sast:#ff7a1a;--tally:#ff2d2d;--f-rotulo:'Barlow Condensed','Arial Narrow',sans-serif;--f-texto:'Public Sans','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1)}.ds-cab{display:inline-grid;justify-items:center;gap:6px;padding:8px}.ds-caja{display:grid;gap:4px;padding:5px;border-radius:6px;background:#0d1114;box-shadow:0 0 0 1px #262f36,0 4px 10px rgba(0,0,0,.6)}.ds-lente{width:20px;height:20px;border-radius:50%;box-shadow:inset 0 -2px 3px rgba(0,0,0,.6)}.ds-r{background:var(--rojo-off)}.ds-a{background:var(--ambar-off)}.ds-v{background:var(--verde-off)}.ds-r.ds-on{background:radial-gradient(circle at 40% 35%,#ffb3ad,var(--rojo) 55%,#b51d14);box-shadow:0 0 10px 2px color-mix(in srgb,var(--rojo) 70%,transparent),0 0 24px color-mix(in srgb,var(--rojo) 35%,transparent)}.ds-siete{height:24px;width:auto;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rojo) 55%,transparent))}.ds-palabra{font:700 .78rem/1 var(--f-rotulo);letter-spacing:.08em;color:var(--rojo)}"
+    },
+    {
+      "name": "Pestañas de monitor",
+      "kind": "nav",
+      "refersTo": "rotulo",
+      "description": "Navegación interna de un monitor de análisis.",
+      "html": "<div class=\"ds-pestanas\" role=\"tablist\"><button class=\"ds-pestana\" aria-selected=\"true\">Explicación</button><button class=\"ds-pestana\">Semana</button><button class=\"ds-pestana\">Tiempos</button></div>",
+      "css": ":root{--sala:#05070a;--bisel:#15191d;--bisel-2:#1d2328;--bisel-luz:#2c343b;--pantalla:#0a0f13;--pantalla-2:#0f151a;--filete:#1f2a32;--filete-2:#2b3843;--tinta:#e8eef2;--tinta-2:#a9b6bf;--tinta-3:#7d8b95;--rojo:#ff3b30;--rojo-off:#2a0f0e;--ambar:#ffb000;--ambar-off:#2b210a;--verde:#1fe08a;--verde-off:#0b2619;--sast:#ff7a1a;--tally:#ff2d2d;--f-rotulo:'Barlow Condensed','Arial Narrow',sans-serif;--f-texto:'Public Sans','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1)}.ds-pestanas{display:flex;gap:2px;border-bottom:1px solid var(--filete);background:var(--pantalla);padding:8px 8px 0}.ds-pestana{background:none;border:0;border-bottom:2px solid transparent;padding:6px 8px;cursor:pointer;font:600 .86rem/1 var(--f-rotulo);letter-spacing:.05em;text-transform:uppercase;color:var(--tinta-3)}.ds-pestana:hover{color:var(--tinta-2)}.ds-pestana:focus-visible{outline:2px solid var(--sast);outline-offset:2px}.ds-pestana[aria-selected=true]{color:var(--tinta);border-bottom-color:var(--tinta-2)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "La sala de control de la STTV",
+    "overview": "**Creative North Star: \"La sala de control de la STTV\"**\n\nEl sistema es un muro de video en una sala a oscuras. Todo lo que se ve es hardware de sala: monitores con bisel grafito, pantallas negras con un leve reflejo de vidrio, un rótulo de operador bajo cada pantalla y una luz tally que dice cuál está al aire. La información vive dentro de las pantallas; nada flota sobre el muro salvo el subtítulo de la presentación, la ventana de fuentes y el tooltip.\n\nLa luz es el contenido. Los únicos colores saturados son los que emite un semáforo de campo (rojo, ámbar y verde con brillo LED real), el naranja de las cámaras SAST y el amarillo de la demarcación del cajón. El resto es negro, grafito y tinta fría. Los números se leen como se leen en la calle: en displays de 7 segmentos, del color de la luz que cuentan.\n\nLa densidad es de sala de control, no de página: muchos monitores pequeños y uno grande, rótulos condensados, cifras tabulares. El movimiento sirve para explicar el ciclo (la aguja barre, el cruce se dibuja, el monitor vuela a la pantalla principal) y desaparece con movimiento reducido. Las indicaciones semafóricas nunca dependen solo del color: forma, palabra y posición las acompañan (rayado para el amarillo, punteado e intermitencia para el despeje, SIGA / PREVENCIÓN / PARE / NO INICIE bajo cada cabeza).",
+    "keyCharacteristics": [
+      "Negro de sala con biseles grafito; el color saturado se reserva a luces emitidas.",
+      "Monitor = bisel + pantalla + rótulo de operador + tally.",
+      "Displays de 7 segmentos para todo contador; Barlow Condensed para rótulos y cifras, Public Sans para texto.",
+      "Lentes LED con gradiente radial y halo; apagados con su tono \"off\" propio, nunca grises.",
+      "Un solo bucle de animación (ticker de GSAP) y movimiento que se apaga con `prefers-reduced-motion`."
+    ],
+    "rules": [
+      {
+        "name": "The Luz Emitida Rule",
+        "body": "El color saturado se reserva a lo que en la sala o en la calle emite luz: lentes, contadores, tallies, cámaras SAST y la demarcación del cajón. La interfaz (botones, chips, paneles) es grafito y tinta. Los vehículos y peatones simulados son objetos del mundo y llevan colores de calle; no son interfaz.",
+        "section": "colors"
+      },
+      {
+        "name": "The Apagado Teñido Rule",
+        "body": "Todo lente y todo segmento apagado conserva un rastro de su color (tokens `-off`, o `color-mix` al 9 % sobre negro en los displays). Un semáforo apagado sigue mostrando qué luz tiene.",
+        "section": "colors"
+      },
+      {
+        "name": "The Contador de Campo Rule",
+        "body": "Todo contador que el semáforo real muestra (regresiva de cada cabeza, segundos del ciclo, hora de Bogotá) se dibuja con el display de 7 segmentos en el color de la luz que cuenta, nunca con texto tipográfico.",
+        "section": "typography"
+      },
+      {
+        "name": "The Cifra Tabular Rule",
+        "body": "Cifras de tablas, barras y KPI van con `tabular-nums` para que no bailen mientras corre el ciclo.",
+        "section": "typography"
+      },
+      {
+        "name": "The Brillo Es Del Color Rule",
+        "body": "Un halo siempre es del color de la luz que lo emite. No hay sombras de color ajenas ni sombras duras desplazadas.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** meter toda vista nueva en un monitor: bisel, pantalla, rótulo de operador en mayúsculas condensadas y tally.",
+      "**Do** usar el display de 7 segmentos para cualquier contador en tiempo real, en el color de la luz que cuenta.",
+      "**Do** acompañar cada estado semafórico con forma o palabra: amarillo rayado, despeje punteado o intermitente, palabra SIGA / PREVENCIÓN / PARE / NO INICIE.",
+      "**Do** dar a cada luz su tono apagado (`-off`) y su halo del mismo color.",
+      "**Do** colgar cualquier animación por cuadro del ticker único y darle una salida con `prefers-reduced-motion`.",
+      "**Do** marcar con un sello visible todo lo ilustrativo o pendiente de validar."
+    ],
+    "donts": [
+      "**Don't** rellenar botones, chips o paneles con rojo, ámbar o verde: esos colores significan una indicación semafórica (un punto LED o un borde de estado sí los usan).",
+      "**Don't** usar el naranja SAST para nada que no sea cámara SAST, foco, selección o enlace.",
+      "**Don't** apagar un lente en gris neutro; el apagado lleva su tono.",
+      "**Don't** escribir un contador en tipografía cuando el semáforo real lo muestra en segmentos.",
+      "**Don't** abrir un segundo bucle de `requestAnimationFrame` junto al ticker.",
+      "**Don't** usar sombras duras desplazadas ni halos de un color distinto al de su luz."
+    ]
+  }
+}

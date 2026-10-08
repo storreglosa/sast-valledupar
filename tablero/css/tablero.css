@@ -1,7 +1,7 @@
 /* Sala de control · Semáforos SAST — muro de video.
    Mundo: negro de sala, biseles de monitor grafito, rótulo de operador por pantalla, lentes LED
    con brillo real y contadores de 7 segmentos. Los únicos colores son las indicaciones
-   semafóricas, el naranja SAST y la escala azul de duración del ciclo. */
+   semafóricas, el naranja SAST y la escala grafito→blanco de duración del ciclo. */
 
 :root {
   color-scheme: dark;
