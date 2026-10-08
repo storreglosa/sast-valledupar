@@ -19,6 +19,16 @@ Sitio estático en `tablero/` (sin compilación), publicado en GitHub Pages por
 - **Vehículos y peatones ilustrativos:** no son aforos. Solo aparecen en los cruces cuya
   asignación grupo → acceso validó Santiago (decisión 28).
 
+## Requisitos de sistema
+Además del `.venv` (`requirements.txt`):
+- **poppler-utils** (`pdftotext`, `pdftoppm`, `pdfinfo`): `09_semaforos.py` lee los reportes SISTRA
+  con ellos. Probado con poppler 26.01.0; la versión usada queda registrada en la salida de 09. En
+  WSL/Ubuntu: `sudo apt install poppler-utils`. El lector depende de las coordenadas que entrega
+  `pdftotext -bbox`: si se cambia de versión, correr `python -m unittest discover -s tests` antes de
+  confiar en los tiempos leídos.
+- **Node.js 22** (probado con 22.22.1), solo para las pruebas del tablero (`node --test`). El sitio no
+  se compila: MapLibre y GSAP van copiados en `tablero/vendor/` (`tablero/vendor/LEEME.md`).
+
 ## Regenerar
 ```bash
 source .venv/bin/activate
@@ -36,7 +46,9 @@ python -m http.server 8765 -d tablero   # ver en http://127.0.0.1:8765
 2. En `config/semaforos.yaml`, dentro del cruce:
    `asignacion: {validado_por: Santiago Torreglosa, fecha: AAAA-MM-DD, desde_borrador: true}`
    y, si algún grupo cambia, `cambios: {G5: {movimiento: "…", acceso: norte, sale_por: oeste}}`.
-3. Correr `10_tablero.py` y la guardia; commit y push.
+3. Correr `09_semaforos.py` (traza los movimientos con la asignación nueva), `10_tablero.py` y la
+   guardia; commit y push. Si se salta 09, 10 se detiene: la asignación del config no coincide con
+   la que usó 09.
 
 ## Publicar
 El repo es público (decisión 26). En GitHub: Settings → Pages → Source: **GitHub Actions**.
