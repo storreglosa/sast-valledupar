@@ -267,7 +267,8 @@ export function explicacionMon(it, { alElegirPlan }) {
         for (const x of fasesEl) x.li.classList.toggle('activa', x.f === f);
         anuncio.textContent = `${f.titulo}: ${f.texto}`;
         // el monitor sigue a la aguja: la fase activa queda a la vista sin desplazar la página
-        lista?.scrollTo({ top: Math.max(0, li.offsetTop - 4), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        // instantáneo: la fase en curso queda arriba en el mismo cuadro (un scroll suave se queda atrás)
+        if (lista) lista.scrollTop = Math.max(0, li.offsetTop - 2);
         if (window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) window.gsap.fromTo(li, { x: -6 }, { x: 0, duration: 0.35, ease: 'expo.out' });
       }
     }

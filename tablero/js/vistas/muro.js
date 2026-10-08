@@ -200,7 +200,7 @@ export function crearMuro(datos) {
 
     // monitores de análisis
     analisis.replaceChildren();
-    analisis.style.gridTemplateRows = 'minmax(0, 1fr) minmax(170px, .9fr) minmax(0, 1.3fr)';
+    analisis.style.gridTemplateRows = 'minmax(0, .95fr) minmax(165px, .8fr) minmax(0, 1.5fr)';
     const rel = reloj(it, (p) => fasesDe(it, p));
     const cab2 = cabezasMon(it, (gid) => rel.enfocar(gid));
     const ex = explicacionMon(it, { alElegirPlan: (pid) => explorar(it, { plan: pid, t0: 0, real0: performance.now(), pausado: false }) });
