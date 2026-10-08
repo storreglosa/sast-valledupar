@@ -18,7 +18,8 @@
 #               (según los mapas de inventario de Santiago y el Excel de equipos).
 # geometria     correcciones de campo de Santiago a la red OSM (opcional; sin ellas todo sale de OSM):
 #                 radio_dibujo  m alrededor del centro que se dibujan y donde nacen las trayectorias (75)
-#                 sentidos      {vía: entra | sale | doble}: sentido real cuando OSM está desactualizado
+#                 sentidos      {vía: entra | sale | doble}: sentido real cuando OSM está desactualizado;
+#                               {vía: {sentido: sale, lado: este}} si la vía tiene brazos a los dos lados
 #                 accesos       {cardinal: vía}: qué vía es el acceso (manda sobre `ejes`)
 #                 salidas       {cardinal: vía}: por dónde sale quien va hacia ese cardinal, si no es
 #                               la misma vía del acceso
@@ -31,7 +32,9 @@
 #                 asignacion: {validado_por: Santiago Torreglosa, fecha: 2026-10-08, desde_borrador: true,
 #                              cambios: {G5: {movimiento: "...", acceso: norte, sale_por: oeste}}}
 #               (desde_borrador = se adopta outputs/tables/semaforos_accesos_borrador.csv; `cambios`
-#               corrige grupos puntuales).
+#               corrige grupos puntuales). `sale_por` puede ser una lista cuando el grupo habilita
+#               varios movimientos (p. ej. directo y giro). Sin `validado_por`, los `cambios` son una
+#               propuesta en revisión: se dibujan en la página de validación, no en el tablero.
 
 intersecciones:
   - id: la-vina
@@ -71,14 +74,22 @@ intersecciones:
     senalizacion: {cajon_amarillo: false, cebras_sin_semaforo: []}
     # mapa anotado por Santiago (2026-10-08): el acceso 4 es la Calle 21, de un solo sentido hacia el
     # cruce (OSM la tiene de doble sentido); los pares del 1 y del 4 quedan antes del empalme de la
-    # Calle 21 y el del 3 a la entrada del cruce; el del 2 no cambia. Pendiente de su revisión.
+    # Calle 21 y el del 3 a la entrada del cruce; el del 2 no cambia.
     geometria:
       radio_dibujo: 110
       sentidos: {CL 21: entra}
       accesos: {este: CL 21}
-      salidas: {este: KR 19}
       por_la_red: true
       pare_m: {norte: 58, oeste: 13, este: 77}
+    # movimientos de cada grupo según sus esquemas sobre Google Maps (2026-10-08). Oeste = Carrera 19
+    # hacia el noroccidente; nadie sale por la Carrera 19 al suroriente ni entra a la Calle 21.
+    # La Flecha (G5) queda como en el borrador: giro a la derecha desde el norte. En revisión.
+    asignacion:
+      cambios:
+        G1: {sale_por: [sur, oeste]}     # sigue al sur por la Diagonal 21 o gira en «U» a la Carrera 19
+        G2: {sale_por: [norte, oeste]}   # sigue al norte o gira a la izquierda a la Carrera 19
+        G3: {sale_por: [sur, norte]}     # sigue al sur por la Diagonal 21 o gira a la izquierda al norte
+        G4: {sale_por: [norte, sur]}     # gira a la derecha al norte o cruza a la calzada que baja
 
   - id: loperena
     nombre: Colegio Loperena
@@ -104,6 +115,10 @@ intersecciones:
     centro: {nodos_osm: [986872739, 986877534], nota: "CL 6 x KR 23 (calzada doble)", ejes: {norte_sur: [KR 23], este_oeste: [CL 6]}}
     senalizacion: {cajon_amarillo: true, cebras_sin_semaforo: [norte, este]}
     asignacion: {validado_por: Santiago Torreglosa, fecha: 2026-10-08, desde_borrador: true}
+    # Santiago (2026-10-08): la Calle 6 al este de la Carrera 23 es de un solo sentido hacia el
+    # oriente: solo se sale del cruce por ahí (OSM la tiene de doble sentido)
+    geometria:
+      sentidos: {CL 6: {sentido: sale, lado: este}}
 
 # Hallazgos de nivel ERROR que Santiago decidió aceptar (no detienen 09_semaforos.py):
 # - {interseccion: …, codigo: …, decision: "…", fecha: AAAA-MM-DD}

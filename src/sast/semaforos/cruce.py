@@ -21,15 +21,32 @@ from sast.semaforos.accesos import candidatos_flecha, conflicto, movimiento
 from sast.semaforos.tiempos import NO_ROJO, estado
 
 VISTA_R = 31.0   # media altura del diagrama del tablero (tablero/js/vistas/diagrama.js: R_VISTA)
-TEXTO_GIRO = {"directo": "directo", "izquierda": "giro a la izquierda", "derecha": "giro a la derecha"}
+TEXTO_GIRO = {"directo": "directo", "izquierda": "giro a la izquierda", "derecha": "giro a la derecha",
+              "retorno": "retorno"}
 
 
 def _xy(pts, c: Point) -> list[list[float]]:
     return [[round(float(x) - c.x, 1), round(float(y) - c.y, 1)] for x, y in pts]
 
 
+def _giro(acceso: str, salida: str) -> str:
+    """Giro según la codificación: salida opuesta = directo; la siguiente en sentido horario desde el
+    acceso = izquierda (quien viene del norte hacia el sur tiene el este a su izquierda)."""
+    d = (G.CARDINALES.index(salida) - G.CARDINALES.index(acceso)) % 4
+    return {1: "izquierda", 2: "directo", 3: "derecha"}.get(d, "retorno")
+
+
+def _salidas(m: dict) -> list[str]:
+    sal = m.get("sale_por")
+    return list(sal) if isinstance(sal, (list, tuple)) else ([sal] if sal else [])
+
+
 def _texto_mov(m: dict) -> str:
-    return f"{TEXTO_GIRO[m['giro']]} desde el {m['acceso']} (sale al {m['sale_por']})"
+    sal = _salidas(m)
+    if len(sal) == 1:
+        return f"{TEXTO_GIRO[m.get('giro') or _giro(m['acceso'], sal[0])]} desde el {m['acceso']} (sale al {sal[0]})"
+    return f"desde el {m['acceso']}: " + " y ".join(f"{TEXTO_GIRO.get(_giro(m['acceso'], x), x)} (sale al {x})"
+                                                       for x in sal)
 
 
 def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFrame,
@@ -123,6 +140,8 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
             hallazgos.append(("ERROR", "asignacion", f"La corrección validada nombra {gid}, que no existe"))
             continue
         movs[gid] = {**movs[gid], **{k: v for k, v in cambio.items() if k in ("acceso", "sale_por", "giro", "brazo", "mitad")}}
+        if "sale_por" in cambio and "giro" not in cambio:
+            movs[gid]["giro"] = None          # varias salidas o salida corregida: el giro sale de los cardinales
         if movs[gid].get("tipo") == "flecha":
             movs[gid]["tipo"] = "vehicular"
         quien = cfg["asignacion"].get("validado_por")
@@ -135,11 +154,13 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
     def chocan(i, j):
         a, b = movs[i], movs[j]
         if a["tipo"] == "vehicular" and b["tipo"] == "vehicular":
-            return conflicto(a, b)
+            # con varias salidas por grupo, basta que un par de movimientos se cruce
+            return any(conflicto({"acceso": a["acceso"], "sale_por": x}, {"acceso": b["acceso"], "sale_por": y})
+                       for x in _salidas(a) for y in _salidas(b))
         if a["tipo"] == "peatonal" and b["tipo"] == "peatonal":
             return False
         p, v = (a, b) if a["tipo"] == "peatonal" else (b, a)
-        return (v["acceso"] == p["brazo"]) if p["mitad"] == "entrada" else (v["sale_por"] == p["brazo"])
+        return (v["acceso"] == p["brazo"]) if p["mitad"] == "entrada" else (p["brazo"] in _salidas(v))
 
     tipo = {g["id"]: g["tipo"] for g in grupos}
     for i, j in combinations([g["id"] for g in grupos], 2):
@@ -160,21 +181,34 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
     # ---- geometría exportable
     tray, pare, cebras = {}, {}, {}
     pare_m = aj.get("pare_m") or {}
-    red = G.grafo_vial(vias, c, r_dib) if aj.get("por_la_red") else None
+    vias_cruce = {a["nomencla"] for a in [*por_card.values(), *por_sal.values()] if a["nomencla"]}
+    red = G.grafo_vial(vias, c, r_dib, vias_cruce) if aj.get("por_la_red") else None
     for gid, m in movs.items():
-        if m["tipo"] == "vehicular" and m.get("acceso") in por_card and m.get("sale_por") in por_sal:
-            a_in, a_out = por_card[m["acceso"]], por_sal[m["sale_por"]]
-            if red is not None:
-                t = G.trayectoria_red(a_in, a_out, c, red, pare_m.get(m["acceso"]))
-            else:
-                t = G.trayectoria(a_in, a_out, c)
-            if t is None:
-                hallazgos.append(("AVISO", "trayectoria", f"{gid}: no se pudo trazar {_texto_mov(m)}"))
+        sal = _salidas(m)
+        if m["tipo"] == "vehicular" and m.get("acceso") in por_card and sal and all(x in por_sal for x in sal):
+            a_in = por_card[m["acceso"]]
+            rutas = []
+            for x in sal:      # una trayectoria por salida; la primera es la principal (cabeza y pare)
+                if red is not None:
+                    t = G.trayectoria_red(a_in, por_sal[x], c, red, pare_m.get(m["acceso"]))
+                else:
+                    t = G.trayectoria(a_in, por_sal[x], c)
+                if t is None:
+                    hallazgos.append(("AVISO", "trayectoria", f"{gid}: no se pudo trazar {_texto_mov({**m, 'sale_por': x, 'giro': None})}"))
+                    continue
+                if red is None and m["acceso"] in pare_m:
+                    t["s_pare"] = G.s_a_distancia(t["linea"], c, pare_m[m["acceso"]])
+                    if t["s_pare"] is None:
+                        hallazgos.append(("AVISO", "pare", f"{gid}: la trayectoria no pasa a {pare_m[m['acceso']]} m del centro"))
+                        continue
+                rutas.append(t)
+            if not rutas:
                 continue
-            if red is None and m["acceso"] in pare_m:
-                t["s_pare"] = G.s_a_distancia(t["linea"], c, pare_m[m["acceso"]])
+            t = rutas[0]
             tray[gid] = {"puntos": _xy(t["linea"].coords, c), "s_pare": round(t["s_pare"], 1),
-                         "largo": round(t["largo"], 1)}
+                         "largo": round(t["largo"], 1),
+                         **({"otras": [{"puntos": _xy(o["linea"].coords, c), "s_pare": round(o["s_pare"], 1),
+                                        "largo": round(o["largo"], 1)} for o in rutas[1:]]} if len(rutas) > 1 else {})}
             if red is not None or m["acceso"] in pare_m:
                 ent = G.carril_entrada(a_in)
                 lp = G.linea_en(t["linea"], t["s_pare"], t.get("ancho_pare") or (ent[1] if ent else 3.3))
@@ -227,9 +261,9 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
     marcas = [q for l in pare.values() for q in l] + [q for z in cebras.values() for q in z["poligono"]]
     vista = None
     if marcas and max(math.hypot(x, y) for x, y in marcas) > VISTA_R - 5:
-        # encuadre en el plano de la codificación (norte arriba, como el diagrama), con margen extra
-        # arriba (título de la pantalla) y abajo (botones de planes); el centro vuelve a metros CTM12
-        n = math.radians(norte)
+        # encuadre con el norte del mapa arriba (como el diagrama del tablero), con margen extra
+        # arriba (título de la pantalla) y abajo (botones de planes)
+        n = 0.0
         rot = [(x * math.cos(n) - y * math.sin(n), x * math.sin(n) + y * math.cos(n)) for x, y in marcas + [(0.0, 0.0)]]
         x0, x1 = min(u for u, _ in rot) - 12, max(u for u, _ in rot) + 12
         y0, y1 = min(v for _, v in rot) - 14, max(v for _, v in rot) + 20
@@ -265,7 +299,8 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
             texto, brazo = "sin movimiento compatible", None
         a = por_card.get(brazo) or por_sal.get(brazo)
         borrador[g["id"]] = {"nombre": g["nombre"], "tipo": g["tipo"], "codigo": m.get("codigo"),
-                             "movimiento": texto, "acceso": m.get("acceso"), "sale_por": m.get("sale_por"),
+                             "movimiento": texto, "acceso": m.get("acceso"),
+                             "sale_por": ", ".join(_salidas(m)) or None,
                              "brazo": brazo, "mitad": m.get("mitad"),
                              "via": (a["nomencla"] or "sin nombre") if a else None,
                              **asign[g["id"]]}

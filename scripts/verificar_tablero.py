@@ -26,7 +26,7 @@ CLAVES = {
     "geometria.json": {"esquema", "unidad", "crs_origen", "atribucion", "intersecciones", "norte", "vias", "p", "ancho",
                        "unico", "ctx", "n", "brazos", "id", "cardinal", "rumbo", "nomencla", "r_caja", "cajon", "cebras",
                        "grupo", "codigo", "poligono", "eje", "pare", "trayectorias", "puntos", "s_pare", "largo",
-                       "camaras", "equipo", "x", "y", "vista", "r"},
+                       "camaras", "equipo", "x", "y", "vista", "r", "otras"},
     "sast.json": {"esquema", "criterio", "cortes", "siniestros", "comparendos", "version", "salvedades", "infracciones",
                   "equipos", "type", "features", "geometry", "coordinates", "properties", "equipo", "numero",
                   "solicitud", "punto", "direccion", "direccion_ansv", "estado", "fecha_inicio", "codigo_unico",

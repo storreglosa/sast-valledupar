@@ -28,13 +28,12 @@ PREGUNTAS = {
                 "también marca semáforo en Cl 17 × Kr 8 y Cl 16B × Kr 9."],
     "mercado": ["¿El cruce es la Calle 21 con la vía que OSM llama Carrera 16 al sur y deja sin nombre al norte "
                 "(la «Transversal 12» del equipo 032)? El controlador dice «Calle21 X Carrera12» y «Calle 20 x Cra 12»."],
-    "manguitos": ["Rehecho con tu mapa anotado (2026-10-08): acceso 4 = Calle 21, de un solo sentido hacia el cruce; "
-                  "pare del Flujo 1 y de la Flecha a ~58 m (antes del empalme de la Calle 21), del Flujo 4 en la "
-                  "Calle 21 a ~77 m del centro y del Flujo 3 a ~13 m; el del Flujo 2 no cambió. ¿Quedaron donde los marcaste?",
-                  "Flujo 3 (Carrera 19 desde el noroccidente): está dibujado siguiendo por la Carrera 19 hacia el "
-                  "suroriente (sube por la Diagonal 21 y gira). ¿Es así, o sigue al sur por la Diagonal 21?",
-                  "Flujo 4 (Calle 21): está dibujado como el «directo» de la codificación: baja por la Diagonal 21 "
-                  "y gira a la Carrera 19 hacia el noroccidente. ¿Es así, o sigue al sur por la Diagonal 21?"],
+    "manguitos": ["Rehecho con tu mapa anotado y tus esquemas sobre Google Maps (2026-10-08): acceso 4 = Calle 21, "
+                  "de un solo sentido hacia el cruce; pares a ~58 m (Flujo 1 y Flecha), ~13 m (Flujo 3), ~77 m "
+                  "(Flujo 4, en la Calle 21) y el del Flujo 2 sin cambio.",
+                  "Movimientos: G1 sigue al sur o gira en «U» a la Carrera 19; G2 sigue al norte o gira a la izquierda "
+                  "a la Carrera 19; G3 sigue al sur o gira a la izquierda al norte; G4 gira a la derecha al norte o cruza "
+                  "a la calzada que baja; la Flecha (G5) solo hace la «U». ¿Quedaron como en tus esquemas?"],
     "loperena": ["¿La vía de entrada desde el oeste (OSM: «DG 21») es la que el Excel llama Diagonal 16 y la "
                  "ANSV Calle 16?"],
     "area-andina": ["La Calle 6 al este de la Carrera 23 es de doble sentido en OSM, pero ningún grupo controla "
@@ -92,6 +91,7 @@ def escribir(datos: dict, diferencias: pd.DataFrame, hallazgos: dict, destino: P
             "vias": [{"p": [ll(q) for q in v["puntos"]], "a": v["ancho"], "ctx": v["contexto"],
                       "n": v["nomencla"] or "sin nombre"} for v in geo["vias"]],
             "tray": [{"p": [ll(q) for q in t["puntos"]], "c": color[g], "g": g,
+                      "o": [[ll(q) for q in o["puntos"]] for o in t.get("otras", [])],
                       "pare": ll(_punto_en(t["puntos"], t["s_pare"]))} for g, t in geo["trayectorias"].items()],
             "cebras": [{"p": [ll(q) for q in z["poligono"]], "c": color.get(g, "#ffffff"), "g": g,
                         "cod": it["borrador"][g]["codigo"] if g in it["borrador"] else "sin semáforo"}
@@ -174,8 +174,10 @@ for (const [id,d] of Object.entries(M)) {{
   if (d.cajon) L.polygon(d.cajon,{{color:'#ffd400',weight:2,fillOpacity:.15,dashArray:'4 3'}}).bindTooltip('cajón amarillo').addTo(m);
   for (const z of d.cebras) L.polygon(z.p,{{color:z.c,weight:2,fillOpacity:.35}}).bindTooltip(`<span class="cod">${{z.g}} · ${{z.cod}}</span>`,{{permanent:true,direction:'center',className:'rot'}}).addTo(m);
   for (const t of d.tray) {{
-    L.polyline(t.p,{{color:t.c,weight:4,opacity:.95}}).bindTooltip(t.g).addTo(m);
-    const f=t.p[t.p.length-1]; L.circleMarker(f,{{radius:5,color:t.c,fillOpacity:1}}).addTo(m);
+    for (const q of [t.p, ...t.o]) {{   // un grupo puede habilitar varios movimientos
+      L.polyline(q,{{color:t.c,weight:4,opacity:.95}}).bindTooltip(t.g).addTo(m);
+      const f=q[q.length-1]; L.circleMarker(f,{{radius:5,color:t.c,fillOpacity:1}}).bindTooltip(t.g+' sale aquí').addTo(m);
+    }}
     L.circleMarker(t.pare,{{radius:4,color:'#000',fillColor:'#000',fillOpacity:1}}).bindTooltip('pare '+t.g).addTo(m);
   }}
   for (const b of d.brazos) L.marker(b.p,{{opacity:0}}).bindTooltip(b.t,{{permanent:true,direction:'center',className:'rot'}}).addTo(m);

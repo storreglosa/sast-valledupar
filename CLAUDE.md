@@ -153,3 +153,10 @@ Decisiones del 2026-10-08, Santiago (tablero de semáforos SAST, `tablero/`):
     del Flujo 4 en la Calle 21 a ~77 m y el del Flujo 3 a ~13 m. La Flecha (giro a la derecha desde el
     norte) es correcta. Estas correcciones de campo van en `config/semaforos.yaml` (`geometria`) y quedan
     pendientes de su revisión.
+32. **Ajustes de Santiago al tablero (2026-10-08, tarde):** Los Manguitos con los movimientos de sus
+    esquemas sobre Google Maps (G1: sur y «U» a la Carrera 19; G2: norte e izquierda a la Carrera 19;
+    G3: sur e izquierda al norte; G4: derecha al norte y cruce a la calzada que baja; G5: solo la «U»;
+    nadie sale por la Carrera 19 al sureste); un grupo puede tener varias salidas (`sale_por` lista).
+    Área Andina: la Calle 6 al este es de un solo sentido de salida. El diagrama va con el norte del
+    mapa arriba, con nombres de vías y cabezas paralelas a su vía, fuera de la calzada. El reloj y la
+    explicación muestran el rojo máximo y el verde promedio (flujos vehiculares) del plan.

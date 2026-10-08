@@ -4378,10 +4378,10 @@
       "cardinal": null,
       "rumbo": 131.7,
       "nomencla": "KR 19",
-      "r_caja": 7.0,
+      "r_caja": null,
       "entrante": true,
       "saliente": true,
-      "salida": "este",
+      "salida": null,
       "ancho_supuesto": true
      },
      {
@@ -4472,7 +4472,95 @@
        ]
       ],
       "s_pare": 52.0,
-      "largo": 219.4
+      "largo": 219.4,
+      "otras": [
+       {
+        "puntos": [
+         [
+          33.4,
+          104.7
+         ],
+         [
+          17.6,
+          50.8
+         ],
+         [
+          17.1,
+          49.2
+         ],
+         [
+          16.6,
+          47.5
+         ],
+         [
+          16.0,
+          45.9
+         ],
+         [
+          15.5,
+          44.3
+         ],
+         [
+          14.8,
+          42.7
+         ],
+         [
+          14.2,
+          41.1
+         ],
+         [
+          13.5,
+          39.6
+         ],
+         [
+          8.7,
+          28.4
+         ],
+         [
+          3.6,
+          17.8
+         ],
+         [
+          2.9,
+          16.5
+         ],
+         [
+          2.2,
+          15.6
+         ],
+         [
+          1.4,
+          15.2
+         ],
+         [
+          0.8,
+          15.2
+         ],
+         [
+          0.1,
+          15.7
+         ],
+         [
+          -0.6,
+          16.6
+         ],
+         [
+          -1.2,
+          18.0
+         ],
+         [
+          -15.9,
+          54.1
+         ],
+         [
+          -35.7,
+          103.9
+         ]
+        ],
+        "s_pare": 52.0,
+        "largo": 192.3
+       }
+      ]
      },
      "G2": {
       "puntos": [
@@ -4518,7 +4606,75 @@
        ]
       ],
       "s_pare": 98.8,
-      "largo": 220.5
+      "largo": 220.5,
+      "otras": [
+       {
+        "puntos": [
+         [
+          -46.6,
+          -99.5
+         ],
+         [
+          -38.5,
+          -83.9
+         ],
+         [
+          -19.4,
+          -49.6
+         ],
+         [
+          -1.0,
+          -11.8
+         ],
+         [
+          3.0,
+          -3.1
+         ],
+         [
+          3.5,
+          -1.8
+         ],
+         [
+          3.9,
+          -0.4
+         ],
+         [
+          4.1,
+          1.0
+         ],
+         [
+          4.1,
+          2.3
+         ],
+         [
+          4.0,
+          3.7
+         ],
+         [
+          3.7,
+          5.1
+         ],
+         [
+          3.3,
+          6.5
+         ],
+         [
+          1.0,
+          12.4
+         ],
+         [
+          -15.9,
+          54.1
+         ],
+         [
+          -35.7,
+          103.9
+         ]
+        ],
+        "s_pare": 98.8,
+        "largo": 223.2
+       }
+      ]
      },
      "G3": {
       "puntos": [
@@ -4531,92 +4687,128 @@
         93.2
        ],
        [
-        -5.2,
-        -2.2
+        -7.4,
+        3.3
        ],
        [
-        -2.9,
-        -7.5
+        -6.9,
+        1.7
        ],
        [
-        -2.3,
-        -8.5
+        -6.5,
+        0.2
        ],
        [
-        -1.8,
-        -9.2
+        -6.4,
+        -1.4
        ],
        [
-        -1.2,
-        -9.6
+        -6.5,
+        -3.0
        ],
        [
-        -0.7,
-        -9.6
+        -6.7,
+        -4.5
        ],
        [
-        -0.2,
-        -9.2
+        -7.2,
+        -6.1
        ],
        [
-        0.4,
-        -8.5
+        -7.9,
+        -7.6
        ],
        [
-        1.0,
-        -7.5
+        -27.1,
+        -45.9
        ],
        [
-        5.1,
-        1.6
+        -43.0,
+        -75.4
        ],
        [
-        15.8,
-        23.7
-       ],
-       [
-        19.7,
-        33.8
-       ],
-       [
-        20.4,
-        35.2
-       ],
-       [
-        21.0,
-        36.1
-       ],
-       [
-        21.7,
-        36.6
-       ],
-       [
-        22.4,
-        36.6
-       ],
-       [
-        23.2,
-        36.2
-       ],
-       [
-        23.9,
-        35.4
-       ],
-       [
-        24.7,
-        34.1
-       ],
-       [
-        62.0,
-        -37.9
-       ],
-       [
-        80.6,
-        -73.8
+        -54.6,
+        -95.4
        ]
       ],
       "s_pare": 98.2,
-      "largo": 296.1
+      "largo": 214.6,
+      "otras": [
+       {
+        "puntos": [
+         [
+          -46.6,
+          99.5
+         ],
+         [
+          -44.2,
+          93.2
+         ],
+         [
+          -5.2,
+          -2.2
+         ],
+         [
+          -2.9,
+          -7.5
+         ],
+         [
+          -2.3,
+          -8.5
+         ],
+         [
+          -1.8,
+          -9.2
+         ],
+         [
+          -1.2,
+          -9.6
+         ],
+         [
+          -0.7,
+          -9.6
+         ],
+         [
+          -0.2,
+          -9.2
+         ],
+         [
+          0.4,
+          -8.5
+         ],
+         [
+          1.0,
+          -7.5
+         ],
+         [
+          5.1,
+          1.6
+         ],
+         [
+          15.8,
+          23.7
+         ],
+         [
+          22.7,
+          39.8
+         ],
+         [
+          28.7,
+          57.2
+         ],
+         [
+          34.4,
+          76.4
+         ],
+         [
+          41.8,
+          101.7
+         ]
+        ],
+        "s_pare": 98.2,
+        "largo": 238.4
+       }
+      ]
      },
      "G4": {
       "puntos": [
@@ -4633,112 +4825,148 @@
         60.9
        ],
        [
-        32.1,
+        32.2,
+        60.0
+       ],
+       [
+        31.3,
+        59.6
+       ],
+       [
+        30.6,
+        59.5
+       ],
+       [
+        30.1,
         59.8
        ],
        [
-        30.8,
-        58.7
+        30.0,
+        60.5
        ],
        [
-        29.5,
-        57.7
+        30.0,
+        61.5
        ],
        [
-        28.1,
-        56.5
+        30.4,
+        63.0
        ],
        [
-        26.9,
-        55.4
+        34.4,
+        76.4
        ],
        [
-        25.6,
-        54.3
-       ],
-       [
-        24.3,
-        53.1
-       ],
-       [
-        20.3,
-        49.2
-       ],
-       [
-        19.1,
-        48.0
-       ],
-       [
-        17.9,
-        46.7
-       ],
-       [
-        16.9,
-        45.4
-       ],
-       [
-        15.9,
-        44.0
-       ],
-       [
-        15.1,
-        42.6
-       ],
-       [
-        14.3,
-        41.1
-       ],
-       [
-        13.5,
-        39.6
-       ],
-       [
-        8.7,
-        28.4
-       ],
-       [
-        3.6,
-        17.8
-       ],
-       [
-        2.9,
-        16.5
-       ],
-       [
-        2.2,
-        15.6
-       ],
-       [
-        1.4,
-        15.2
-       ],
-       [
-        0.8,
-        15.2
-       ],
-       [
-        0.1,
-        15.7
-       ],
-       [
-        -0.6,
-        16.6
-       ],
-       [
-        -1.2,
-        18.0
-       ],
-       [
-        -15.9,
-        54.1
-       ],
-       [
-        -35.7,
-        103.9
+        41.8,
+        101.7
        ]
       ],
       "s_pare": 34.5,
-      "largo": 196.2
+      "largo": 90.1,
+      "otras": [
+       {
+        "puntos": [
+         [
+          67.1,
+          87.0
+         ],
+         [
+          45.8,
+          70.1
+         ],
+         [
+          33.5,
+          60.9
+         ],
+         [
+          32.1,
+          59.8
+         ],
+         [
+          30.8,
+          58.7
+         ],
+         [
+          29.5,
+          57.7
+         ],
+         [
+          28.1,
+          56.5
+         ],
+         [
+          26.9,
+          55.4
+         ],
+         [
+          25.6,
+          54.3
+         ],
+         [
+          24.3,
+          53.1
+         ],
+         [
+          20.3,
+          49.2
+         ],
+         [
+          19.1,
+          48.0
+         ],
+         [
+          17.9,
+          46.7
+         ],
+         [
+          16.9,
+          45.4
+         ],
+         [
+          15.9,
+          44.0
+         ],
+         [
+          15.1,
+          42.6
+         ],
+         [
+          14.3,
+          41.1
+         ],
+         [
+          13.5,
+          39.6
+         ],
+         [
+          8.7,
+          28.4
+         ],
+         [
+          1.0,
+          12.4
+         ],
+         [
+          -5.2,
+          -2.2
+         ],
+         [
+          -27.1,
+          -45.9
+         ],
+         [
+          -43.0,
+          -75.4
+         ],
+         [
+          -54.6,
+          -95.4
+         ]
+        ],
+        "s_pare": 34.5,
+        "largo": 223.3
+       }
+      ]
      },
      "G5": {
       "puntos": [
@@ -4904,13 +5132,12 @@
      "B2 CL 21 rumbo 38° -> este (desvío 78°)",
      "B3 KR 19 rumbo 132° -> sin acceso",
      "B4 DG 21 rumbo 206° -> sur (desvío 0°)",
-     "B5 KR 19 rumbo 338° -> oeste (desvío 42°)",
-     "B3 (KR 19) es la salida este por corrección de campo (config: geometria.salidas)"
+     "B5 KR 19 rumbo 338° -> oeste (desvío 42°)"
     ],
     "vista": {
-     "x": 13.1,
-     "y": 33.6,
-     "r": 61.3
+     "x": 14.1,
+     "y": 29.9,
+     "r": 57.2
     }
    },
    "borrador": {
@@ -4918,53 +5145,53 @@
      "nombre": "Flujo 1",
      "tipo": "vehicular",
      "codigo": "1",
-     "movimiento": "directo desde el norte (sale al sur)",
+     "movimiento": "desde el norte: directo (sale al sur) y giro a la derecha (sale al oeste)",
      "acceso": "norte",
-     "sale_por": "sur",
+     "sale_por": "sur, oeste",
      "brazo": "norte",
      "mitad": null,
      "via": "DG 21",
-     "confianza": "alta",
-     "evidencia": "Nombre «Flujo 1» = movimiento 1 (codificación SDM); la cámara EQUIPO022 vigila el tránsito que entra desde el norte (la misma cámara orienta el cruce: no es evidencia independiente del acceso); en OSM ese brazo es de un solo sentido y entra al cruce"
+     "confianza": "media",
+     "evidencia": "Corrección de campo de Santiago; pendiente de su revisión"
     },
     "G2": {
      "nombre": "Flujo 2",
      "tipo": "vehicular",
      "codigo": "2",
-     "movimiento": "directo desde el sur (sale al norte)",
+     "movimiento": "desde el sur: directo (sale al norte) y giro a la izquierda (sale al oeste)",
      "acceso": "sur",
-     "sale_por": "norte",
+     "sale_por": "norte, oeste",
      "brazo": "sur",
      "mitad": null,
      "via": "DG 21",
-     "confianza": "alta",
-     "evidencia": "Nombre «Flujo 2» = movimiento 2 (codificación SDM); la cámara EQUIPO021 vigila el tránsito que entra desde el sur (la misma cámara orienta el cruce: no es evidencia independiente del acceso); en OSM ese brazo es de un solo sentido y entra al cruce"
+     "confianza": "media",
+     "evidencia": "Corrección de campo de Santiago; pendiente de su revisión"
     },
     "G3": {
      "nombre": "Flujo 3",
      "tipo": "vehicular",
      "codigo": "3",
-     "movimiento": "directo desde el oeste (sale al este)",
+     "movimiento": "desde el oeste: giro a la derecha (sale al sur) y giro a la izquierda (sale al norte)",
      "acceso": "oeste",
-     "sale_por": "este",
+     "sale_por": "sur, norte",
      "brazo": "oeste",
      "mitad": null,
      "via": "KR 19",
      "confianza": "media",
-     "evidencia": "Nombre «Flujo 3» = movimiento 3 (codificación SDM); en OSM ese brazo es de un solo sentido y entra al cruce"
+     "evidencia": "Corrección de campo de Santiago; pendiente de su revisión"
     },
     "G4": {
      "nombre": "Flujo 4",
      "tipo": "vehicular",
      "codigo": "4",
-     "movimiento": "directo desde el este (sale al oeste)",
+     "movimiento": "desde el este: giro a la derecha (sale al norte) y giro a la izquierda (sale al sur)",
      "acceso": "este",
-     "sale_por": "oeste",
+     "sale_por": "norte, sur",
      "brazo": "este",
      "mitad": null,
      "via": "CL 21",
      "confianza": "media",
-     "evidencia": "Nombre «Flujo 4» = movimiento 4 (codificación SDM); ese brazo es de un solo sentido y entra al cruce (corrección de campo de Santiago; OSM lo tiene de doble sentido)"
+     "evidencia": "Corrección de campo de Santiago; pendiente de su revisión"
     },
     "G5": {
      "nombre": "Flecha",
@@ -4980,7 +5207,7 @@
      "evidencia": "Compatible solo con giros que no cruzan a sus amigos; arranca con el acceso norte en 4 de 4 planes. Alternativas: giro a la derecha desde el este (sale al norte). POR CONFIRMAR."
     }
    },
-   "asignacion_usada": "{}"
+   "asignacion_usada": "{\"cambios\": {\"G1\": {\"sale_por\": [\"sur\", \"oeste\"]}, \"G2\": {\"sale_por\": [\"norte\", \"oeste\"]}, \"G3\": {\"sale_por\": [\"sur\", \"norte\"]}, \"G4\": {\"sale_por\": [\"norte\", \"sur\"]}}}"
   },
   {
    "id": "loperena",
@@ -7899,6 +8126,21 @@
        [
         6.9,
         2.1
+       ]
+      ]
+     },
+     {
+      "nomencla": "CL 6",
+      "tipo_via": "residential",
+      "unico": true,
+      "carriles": 1,
+      "ancho": 3.3,
+      "supuesto": true,
+      "contexto": false,
+      "puntos": [
+       [
+        6.9,
+        2.1
        ],
        [
         71.0,
@@ -8002,8 +8244,8 @@
       "cardinal": "este",
       "rumbo": 71.6,
       "nomencla": "CL 6",
-      "r_caja": 11.5,
-      "entrante": true,
+      "r_caja": 11.2,
+      "entrante": false,
       "saliente": true,
       "salida": null,
       "ancho_supuesto": true
@@ -8013,7 +8255,7 @@
       "cardinal": "sur",
       "rumbo": 152.7,
       "nomencla": "KR 23",
-      "r_caja": 9.4,
+      "r_caja": 8.5,
       "entrante": true,
       "saliente": true,
       "salida": null,
@@ -8059,55 +8301,55 @@
        ],
        [
         -8.5,
-        1.8
+        1.9
        ],
        [
-        -8.1,
-        0.9
+        -8.2,
+        1.1
        ],
        [
-        -7.6,
-        0.0
+        -7.8,
+        0.3
        ],
        [
-        -7.2,
-        -0.9
+        -7.4,
+        -0.5
        ],
        [
-        -6.8,
-        -1.8
+        -7.1,
+        -1.2
        ],
        [
-        -6.4,
-        -2.6
+        -6.7,
+        -2.0
+       ],
+       [
+        -6.3,
+        -2.8
        ],
        [
         -6.0,
-        -3.5
+        -3.6
        ],
        [
-        -5.5,
+        -5.6,
         -4.4
        ],
        [
-        -5.1,
-        -5.3
+        -5.2,
+        -5.2
        ],
        [
-        -4.7,
-        -6.2
+        -4.8,
+        -5.9
        ],
        [
-        -4.3,
-        -7.1
+        -4.5,
+        -6.7
        ],
        [
-        -3.8,
-        -7.9
-       ],
-       [
-        -3.4,
-        -8.8
+        -4.1,
+        -7.5
        ],
        [
         18.5,
@@ -8132,24 +8374,20 @@
         -45.9
        ],
        [
-        9.2,
-        -2.3
+        8.5,
+        -1.0
        ],
        [
-        8.7,
-        -1.5
+        8.1,
+        -0.3
        ],
        [
-        8.3,
-        -0.7
+        7.7,
+        0.5
        ],
        [
-        7.9,
-        0.2
-       ],
-       [
-        7.5,
-        1.0
+        7.4,
+        1.2
        ],
        [
         7.0,
@@ -8161,27 +8399,31 @@
        ],
        [
         6.2,
-        3.5
+        3.4
        ],
        [
-        5.8,
-        4.4
+        5.9,
+        4.2
        ],
        [
-        5.3,
-        5.2
+        5.5,
+        4.9
        ],
        [
-        4.9,
-        6.1
+        5.1,
+        5.6
        ],
        [
-        4.5,
-        6.9
+        4.7,
+        6.4
+       ],
+       [
+        4.4,
+        7.1
        ],
        [
         4.0,
-        7.7
+        7.8
        ],
        [
         3.6,
@@ -8204,7 +8446,7 @@
         70.0
        ]
       ],
-      "s_pare": 63.4,
+      "s_pare": 64.9,
       "largo": 149.2
      },
      "G3": {
@@ -8218,60 +8460,60 @@
         -5.3
        ],
        [
-        -8.7,
-        -4.7
+        -8.8,
+        -4.6
        ],
        [
-        -7.0,
-        -4.2
+        -7.2,
+        -3.9
        ],
        [
-        -5.4,
-        -3.6
+        -5.5,
+        -3.3
        ],
        [
-        -3.7,
-        -3.0
+        -3.9,
+        -2.6
        ],
        [
-        -2.0,
-        -2.5
-       ],
-       [
-        -0.3,
+        -2.3,
         -1.9
        ],
        [
-        1.4,
-        -1.4
+        -0.7,
+        -1.3
        ],
        [
-        3.0,
-        -0.8
+        1.0,
+        -0.6
        ],
        [
-        4.7,
-        -0.3
+        2.6,
+        0.1
        ],
        [
-        6.4,
-        0.3
-       ],
-       [
-        8.1,
+        4.2,
         0.8
        ],
        [
-        9.8,
+        5.8,
         1.4
        ],
        [
-        11.4,
-        1.9
+        7.4,
+        2.1
        ],
        [
-        71.5,
-        22.4
+        9.1,
+        2.8
+       ],
+       [
+        10.7,
+        3.4
+       ],
+       [
+        71.0,
+        24.0
        ]
       ],
       "s_pare": 58.3,
@@ -8291,12 +8533,12 @@
      ],
      "G2": [
       [
-       9.2,
-       -9.6
+       8.6,
+       -8.5
       ],
       [
-       15.1,
-       -6.6
+       14.5,
+       -5.5
       ]
      ],
      "G3": [
@@ -8314,30 +8556,30 @@
      "G4": {
       "eje": [
        [
-        13.4,
-        -3.3
+        12.8,
+        -2.2
        ],
        [
-        7.5,
-        -6.3
+        6.9,
+        -5.2
        ]
       ],
       "poligono": [
        [
-        12.4,
-        -1.5
+        11.9,
+        -0.4
        ],
        [
-        6.6,
-        -4.5
+        6.0,
+        -3.4
        ],
        [
-        8.4,
-        -8.1
+        7.8,
+        -7.0
        ],
        [
-        14.3,
-        -5.0
+        13.7,
+        -3.9
        ]
       ]
      },
@@ -8374,30 +8616,30 @@
      "G6": {
       "eje": [
        [
-        0.8,
-        -9.8
+        0.2,
+        -8.6
        ],
        [
-        -5.1,
-        -12.8
+        -5.6,
+        -11.7
        ]
       ],
       "poligono": [
        [
-        -0.1,
-        -8.0
+        -0.7,
+        -6.9
        ],
        [
-        -6.0,
-        -11.0
+        -6.6,
+        -9.9
        ],
        [
-        -4.2,
-        -14.6
+        -4.7,
+        -13.4
        ],
        [
-        1.7,
-        -11.5
+        1.1,
+        -10.4
        ]
       ]
      },
@@ -8434,30 +8676,30 @@
      "sin_semaforo_este": {
       "eje": [
        [
-        12.0,
-        7.4
+        12.1,
+        5.6
        ],
        [
-        14.1,
-        1.1
+        13.1,
+        2.5
        ]
       ],
       "poligono": [
        [
-        10.1,
-        6.7
+        10.2,
+        5.0
        ],
        [
-        12.2,
-        0.5
+        11.2,
+        1.9
        ],
        [
-        16.0,
-        1.7
+        15.0,
+        3.1
        ],
        [
-        13.9,
-        8.0
+        14.0,
+        6.3
        ]
       ]
      }
@@ -8488,24 +8730,24 @@
       1.0
      ],
      [
-      8.5,
-      6.2
+      -5.0,
+      1.9
+     ],
+     [
+      9.3,
+      4.7
      ],
      [
       9.8,
       3.6
      ],
      [
-      11.6,
-      0.2
+      10.8,
+      1.7
      ],
      [
-      8.0,
-      -1.0
-     ],
-     [
-      7.9,
-      -1.0
+      -2.1,
+      -4.1
      ],
      [
       -8.5,

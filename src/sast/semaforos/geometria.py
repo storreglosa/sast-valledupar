@@ -99,13 +99,23 @@ def aplicar_sentidos(vias: gpd.GeoDataFrame, c: Point, sentidos: dict, radio: fl
     """Corrige el sentido de vías que OSM tiene desactualizado (config: geometria.sentidos), solo en
     los tramos a menos de `radio` m del cruce. «entra»: un solo sentido hacia el cruce; «sale»: un
     solo sentido alejándose; «doble»: doble sentido. Un tramo de un solo sentido se reorienta para
-    que su digitalización siga el sentido (así lo lee el resto del módulo)."""
+    que su digitalización siga el sentido (así lo lee el resto del módulo). Si la vía cruza el cruce
+    (dos brazos con el mismo nombre), `{sentido: sale, lado: este}` corrige solo el lado indicado
+    (rumbo del tramo desde el centro a menos de 60° de ese punto cardinal de la cuadrícula)."""
     if not sentidos:
         return vias
     v = vias.copy()
     cerca = v.distance(c) < radio
+    lados = {"norte": 0, "este": 90, "sur": 180, "oeste": 270}
     for nom, sentido in sentidos.items():
         sel = cerca & (v["nomencla"] == nom)
+        if isinstance(sentido, dict):
+            lado = lados[sentido["lado"]]
+            def del_lado(g, lado=lado):
+                m = g.interpolate(0.5, normalized=True)
+                return dif_angular(rumbo(m.x - c.x, m.y - c.y), lado) < 60
+            sel = sel & v.geometry.apply(del_lado)
+            sentido = sentido["sentido"]
         if not sel.any():
             raise ValueError(f"geometria.sentidos: no hay tramos de «{nom}» a menos de {radio:.0f} m del cruce")
         if sentido == "doble":
@@ -362,20 +372,25 @@ def trayectoria(arm_in: dict, arm_out: dict, c: Point) -> dict | None:
     return {"linea": ln, "s_pare": s_pare, "largo": ln.length}
 
 
-def s_a_distancia(ln: LineString, c: Point, d: float) -> float:
-    """Primer punto de `ln` (recorrida desde su inicio) a `d` m del centro o menos."""
+def s_a_distancia(ln: LineString, c: Point, d: float) -> float | None:
+    """Primer punto de `ln` (recorrida desde su inicio) a `d` m del centro o menos; None si nunca llega."""
     for s in np.arange(0, ln.length, 0.25):
         if ln.interpolate(s).distance(c) <= d:
             return float(s)
-    return ln.length
+    return None
 
 
-def grafo_vial(vias: gpd.GeoDataFrame, c: Point, r_dibujo: float) -> nx.DiGraph:
+def grafo_vial(vias: gpd.GeoDataFrame, c: Point, r_dibujo: float, nomenclas: set | None = None) -> nx.DiGraph:
     """Grafo dirigido de las calzadas dentro del círculo de dibujo: un solo sentido = un arco a favor
-    de la digitalización; doble sentido = dos arcos. Los nodos son vértices (al centímetro)."""
+    de la digitalización; doble sentido = dos arcos. Los nodos son vértices (al centímetro).
+    `nomenclas`: solo esas vías (las del cruce), para que ninguna ruta se vaya por una calle lateral
+    o un tramo sin nombre."""
     circulo = c.buffer(r_dibujo)
     g = nx.DiGraph()
-    for r in vias[vias.intersects(circulo)].itertuples():
+    sel = vias[vias.intersects(circulo)]
+    if nomenclas is not None:
+        sel = sel[sel["nomencla"].isin(nomenclas)]
+    for r in sel.itertuples():
         geom = r.geometry.intersection(circulo)
         carr, _ = _carriles(r)
         doble = r.sentido != "Unidireccional"
@@ -448,6 +463,8 @@ def trayectoria_red(arm_in: dict, arm_out: dict, c: Point, g: nx.DiGraph,
     ln = LineString(_redondear(pts))
     d_pare = pare_m if pare_m is not None else arm_in["r_caja"] + CEBRA + 1.0
     s_pare = s_a_distancia(ln, c, d_pare)
+    if s_pare is None or s_pare < 3:      # la ruta no pasa por su línea de pare: no se dibuja
+        return None
     ancho = pin["ancho"] / (1 if pin["unico"] else 2)
     return {"linea": ln, "s_pare": s_pare, "largo": ln.length, "ancho_pare": ancho}
 

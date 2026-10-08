@@ -192,6 +192,15 @@ function corrientePeatonal({ clave, eje, ti, c }) {
  * Simulación de un cruce para un plan. `geo`: geometria.json del cruce (trayectorias, cebras).
  * Devuelve {listo, enT(T) -> {vehiculos, peatones}}; sin trayectorias (asignación pendiente) no hay agentes.
  */
+/** Giro de una trayectoria después de la línea de pare, en radianes (+ = izquierda, − = derecha). */
+function giro(tr, sPare) {
+  const a = puntoEn(tr, sPare), b = puntoEn(tr, tr.largo - 0.5);
+  let d = b.ang - a.ang;
+  while (d > Math.PI) d -= 2 * Math.PI;
+  while (d < -Math.PI) d += 2 * Math.PI;
+  return d;
+}
+
 export function crearSim(it, geo, plan) {
   const c = plan.ciclo;
   const grupos = Object.fromEntries(it.grupos.map((g) => [g.id, g]));
@@ -199,18 +208,26 @@ export function crearSim(it, geo, plan) {
   for (const [gid, t] of Object.entries(geo.trayectorias || {})) {
     const ti = plan.tiempos[gid];
     if (!ti) continue;
-    const tr = trazo(t.puntos);
+    // un grupo puede habilitar varios movimientos (directo y giro): cada carril toma uno, el de la
+    // izquierda el más a la izquierda y el de la derecha el más a la derecha; todos comparten el
+    // tramo hasta la línea de pare, así que la cola es una sola
+    const rutas = [t, ...(t.otras || [])].map((r) => ({ tr: trazo(r.puntos), sPare: r.s_pare }));
+    rutas.forEach((r) => { r.giro = rutas.length > 1 ? giro(r.tr, r.sPare) : 0; });
+    rutas.sort((a, b) => b.giro - a.giro);
+    const izq = rutas[0], der = rutas[rutas.length - 1];
+    const recta = rutas.reduce((m, r) => (Math.abs(r.giro) < Math.abs(m.giro) ? r : m), rutas[0]);
     const verde = dur(ti.tiv, ti.tfv, c);
     const via = (geo.vias || []).reduce((m, v) => Math.max(m, v.ancho), 6);
     const carriles = verde > 0 && via >= 6 ? 2 : 1;
-    const comun = { gid, tr, sPare: t.s_pare, ti, c, verde, carriles };
+    const comun = { gid, ti, c, verde, carriles };
+    const ruta = (r) => ({ tr: r.tr, sPare: r.sPare });
     if (carriles > 1) {
-      corrientes.push(corrienteVehicular({ ...comun, clave: `${it.id}${gid}${plan.id}L`, lat: -1.6, motos: false }));
-      corrientes.push(corrienteVehicular({ ...comun, clave: `${it.id}${gid}${plan.id}R`, lat: 1.6, motos: false }));
-      corrientes.push(corrienteVehicular({ ...comun, clave: `${it.id}${gid}${plan.id}M`, lat: 0, motos: true }));
+      corrientes.push(corrienteVehicular({ ...comun, ...ruta(izq), clave: `${it.id}${gid}${plan.id}L`, lat: -1.6, motos: false }));
+      corrientes.push(corrienteVehicular({ ...comun, ...ruta(der), clave: `${it.id}${gid}${plan.id}R`, lat: 1.6, motos: false }));
+      corrientes.push(corrienteVehicular({ ...comun, ...ruta(recta), clave: `${it.id}${gid}${plan.id}M`, lat: 0, motos: true }));
     } else {
-      corrientes.push(corrienteVehicular({ ...comun, clave: `${it.id}${gid}${plan.id}C`, lat: -0.4, motos: false }));
-      corrientes.push(corrienteVehicular({ ...comun, clave: `${it.id}${gid}${plan.id}M`, lat: 1.1, motos: true }));
+      corrientes.push(corrienteVehicular({ ...comun, ...ruta(izq), clave: `${it.id}${gid}${plan.id}C`, lat: -0.4, motos: false }));
+      corrientes.push(corrienteVehicular({ ...comun, ...ruta(der), clave: `${it.id}${gid}${plan.id}M`, lat: 1.1, motos: true }));
     }
   }
   const peatonales = [];
