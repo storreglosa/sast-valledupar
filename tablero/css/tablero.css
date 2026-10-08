@@ -58,6 +58,8 @@ body {
 button { font: inherit; color: inherit; }
 .num { font-variant-numeric: tabular-nums; }
 .saltar { position: absolute; left: -999px; } .saltar:focus { left: 12px; top: 8px; z-index: 50; background: var(--bisel); padding: 6px 10px; }
+/* solo para lectores de pantalla: no ocupa ni asoma, aunque el texto sea largo */
+.solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 [hidden] { display: none !important; }
 
 /* ---------------------------------------------------------------- barra del operador */
@@ -447,14 +449,18 @@ svg .parpadea { animation: parpadeo .5s steps(1) infinite; }
 .sw.despeje { background: repeating-linear-gradient(90deg, var(--rojo) 0 2px, transparent 2px 4px); }
 .sw.aguja { height: 2px; background: #fff; box-shadow: 0 0 4px #fff; }
 /* cabezas compactas: caben hasta 7 grupos */
-.cabezas { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(40px, 1fr); gap: 4px; height: 100%; align-items: center; }
+.cabezas { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; height: 100%; align-items: center; }
 .cabeza { gap: 4px; padding: 6px 2px; border: 0; border-radius: 4px; }
 .cabeza:hover, .cabeza:focus-visible { background: #0f171c; }
 .cabeza .g { font-size: .9rem; } .cabeza .gn { font-size: .66rem; color: var(--tinta-3); white-space: nowrap; }
 .cabeza .lente { width: 16px; height: 16px; } .cabeza .lente.peat { width: 18px; height: 18px; } .cabeza .lente.peat svg { width: 13px; height: 13px; }
 .cabeza .cab-cuenta { height: 19px; }
 .cabeza .palabra { font-size: .62rem; letter-spacing: .05em; white-space: nowrap; }
-.analisis .monitor:nth-child(2) .mon-cuerpo { padding: 6px 8px; }
+.analisis .monitor:nth-child(2) .mon-cuerpo { padding: 6px 4px; }
+/* 7 grupos en ~300 px (1280 y 1366 de ancho): la palabra se ajusta al ancho de su cabeza;
+   «PREVENCIÓN» y «NO INICIE» caben sin invadir la vecina */
+.cabezas .cabeza { container-type: inline-size; }
+.cabezas .cabeza .palabra { font-size: min(.62rem, 23cqi); letter-spacing: .02em; }
 
 /* reloj: fila flexible, el anillo es un cuadrado del alto del monitor */
 .reloj { display: flex; align-items: stretch; gap: 14px; padding: 10px 12px; }
@@ -469,6 +475,7 @@ svg .parpadea { animation: parpadeo .5s steps(1) infinite; }
 .rl-info { gap: 5px; overflow: hidden; max-height: 100%; align-self: safe center; }
 .rl-foco:empty { display: none; }
 .rl-info { align-content: safe center; }
+.fase .corto { display: none; }
 .kpis-linea { display: none; flex: none; margin: 0 0 6px; font-size: .74rem; line-height: 1.35; color: var(--tinta-3); }
 .kpis-linea b { font: 700 .92rem var(--f-rotulo); color: var(--tinta); white-space: nowrap; }
 
@@ -482,8 +489,11 @@ svg .parpadea { animation: parpadeo .5s steps(1) infinite; }
   @container expl (max-height: 200px) {
     .expl .lead, .kpis { display: none; }
     .kpis-linea { display: block; }
-    .fases-scroll { min-height: 0; }
+    .pant-expl .fases-scroll { min-height: 0; }
+    .fase .largo { display: none; } .fase .corto { display: inline; }
   }
+  /* 1280×720: la fase en curso manda; los indicadores siguen en pantallas más altas */
+  @container expl (max-height: 160px) { .kpis-linea { display: none; } }
 }
 
 /* celular: marcadores, controles y sellos compactos */

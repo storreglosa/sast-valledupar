@@ -202,7 +202,7 @@ export function explicacionMon(it, { alElegirPlan }) {
   m.pantalla.append(cuerpo);
   const tabs = ['Explicación', 'Semana', 'Tiempos'];
   let pest = 'Explicación', planId = null, fasesEl = [], semanaVista = null, vivoPrevio = null;
-  const anuncio = h('div', { class: 'saltar', 'aria-live': 'polite' });
+  const anuncio = h('div', { class: 'solo-lector', 'aria-live': 'polite' });
   const barra = h('div', { class: 'pestanas', role: 'tablist' }, tabs.map((t) => h('button', { type: 'button', class: 'pestana', role: 'tab', 'aria-selected': String(t === pest), onclick: () => { pest = t; planId = null; } }, t)));
   const contenido = h('div', { class: 'contenido' });
   let lista = null;
@@ -230,7 +230,9 @@ export function explicacionMon(it, { alElegirPlan }) {
       const ol = h('ol', { class: 'fases' });
       lista = h('div', { class: 'fases-scroll' }, ol);
       for (const f of r.fases) {
-        const li = h('li', { class: `fase ${f.tipo}` }, h('span', { class: 'rango num' }, `${f.inicio}–${f.fin} s`), h('span', {}, h('b', {}, `${f.titulo}. `), f.texto));
+        // texto largo y corto: en pantallas bajas el CSS deja el corto para que la fase en curso quepa entera
+        const li = h('li', { class: `fase ${f.tipo}` }, h('span', { class: 'rango num' }, `${f.inicio}–${f.fin} s`),
+          h('span', {}, h('b', {}, `${f.titulo}. `), h('span', { class: 'largo' }, f.texto), h('span', { class: 'corto', title: f.texto }, f.corto)));
         ol.append(li);
         fasesEl.push({ f, li });
       }
