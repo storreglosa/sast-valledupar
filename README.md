@@ -17,6 +17,12 @@ código de infracción dentro de la zona de influencia de cada equipo
 | 5 | La Viña | 051, 052 |
 | 7 | Universidad Área Andina | 071 |
 
+## Tablero de semáforos SAST
+Sitio estático en `tablero/` (GitHub Pages): sala de control con el mapa de los 5 cruces
+semaforizados con SAST y las 15 cámaras autorizadas, la simulación del ciclo de cada semáforo
+(planes reales de los controladores SISTRA, plan vigente por hora de Bogotá y festivos) y la línea
+base oficial de cada equipo. Ver `docs/tablero.md`.
+
 ## Datos
 `data/raw/` no se versiona: los comparendos contienen datos personales.
 Ver `docs/` para la procedencia de cada insumo.

@@ -2,6 +2,22 @@
 
 Lista viva de pendientes. Lo hecho se tacha con la fecha.
 
+## Tablero de semáforos SAST (`tablero/`, decisiones 26–30)
+- [ ] Copiar los PDF a `data/raw/semaforos/` con sus fechas reales (`docs/ingesta.md`), correr
+      `00_manifiesto.py` y volver a correr 09 y 10 sin `SAST_RAW` (cierra la cadena de insumos).
+- [ ] Procedencia del reporte de Universidad Área Andina (PDF creado el 08/10/2026, no venía en el
+      correo): quién lo exportó y desde cuándo rige esa programación.
+- [ ] La Viña P5, G1: la tabla del PDF trae el TIRA en blanco y el diagrama dibuja rojo-amarillo de
+      0 a 2 s. Decidir cuál vale y registrarlo en `config/semaforos.yaml` (hoy: sin preparación).
+- [ ] Validar el borrador grupo → acceso (`outputs/semaforos_validacion-accesos.html`): Flecha de
+      Los Manguitos, brazo este de la Calle 6 sin grupo (Área Andina), centro de Mercado, desvío de
+      42° de la Carrera 19 en Manguitos, orientación de Área Andina con una sola cámara.
+- [ ] Revisar en campo los 9 pares con 0 s de despeje (Loperena P5; Área Andina P1, P2, P4, P5) y la
+      matriz permisiva de Mercado (G2 con G6).
+- [ ] Ficha de procedencia de las etapas 9 y 10 (después de cerrar la cadena de insumos).
+- [ ] Descripción de los códigos C31, D07 y D10 (solo equipos 061/062, que no operan).
+- [ ] Publicación: repo público, Pages con «GitHub Actions», push confirmado por Santiago.
+
 ## Datos y validación
 - [ ] Revisar a mano `outputs/tables/revision_geocodificacion_en_zona.csv`, que tiene todas las
       direcciones que deciden las cifras. Las 20 más frecuentes suman cerca de la mitad de lo que
