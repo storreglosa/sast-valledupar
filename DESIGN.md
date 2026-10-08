@@ -210,6 +210,8 @@ Un muro en rejilla de tres columnas y dos filas, alto de ventana menos la barra 
 
 La barra del operador es una rejilla de tres columnas: marca a la izquierda, hora en 7 segmentos y tipo de día al centro, acciones a la derecha.
 
+**Pantallas bajas de escritorio** (1366×768, 1280×720; consultas de contenedor sobre el alto de cada monitor): primero se ocultan las ayudas que repiten algo visible. Con el reloj del ciclo de 120px de alto o menos, la leyenda deja solo «despeje peatonal» y «aguja = ahora». Con la explicación de 200px o menos, desaparece la frase «Ahora rige…», los cuatro indicadores pasan a una línea y cada fase usa su texto corto. Con 160px o menos (1280×720), la línea de indicadores también se oculta. La regla: la fase en curso se ve siempre entera y ningún texto queda cortado a la mitad.
+
 **Por debajo de 1180px** el muro se vuelve columna de dos: las fuentes pasan a una tira horizontal desplazable (monitores de 200px × 104px), la principal ocupa `minmax(460px, 68vh)`, el análisis se reparte en monitores de mínimo 300px y la franja queda al final.
 
 **Por debajo de 760px** todo va en una columna, la barra baja a 52px y el gap a 8px; los textos de los botones desaparecen y quedan sus iconos; la principal mide `minmax(440px, 78vh)`; marcadores, sellos y leyenda se compactan.
