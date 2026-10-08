@@ -91,6 +91,16 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
                                            + ("" if ok else "; FALTA ese brazo en la red OSM")}
         movs[g["id"]] = m
 
+    # correcciones validadas por Santiago (config: asignacion.cambios) antes de trazar la geometría
+    for gid, cambio in ((cfg.get("asignacion") or {}).get("cambios") or {}).items():
+        if gid not in movs:
+            hallazgos.append(("ERROR", "asignacion", f"La corrección validada nombra {gid}, que no existe"))
+            continue
+        movs[gid] = {**movs[gid], **{k: v for k, v in cambio.items() if k in ("acceso", "sale_por", "giro", "brazo", "mitad")}}
+        if movs[gid].get("tipo") == "flecha":
+            movs[gid]["tipo"] = "vehicular"
+        asign[gid] = {"confianza": "validada", "evidencia": f"Corregido por {cfg['asignacion'].get('validado_por')}"}
+
     # ---- chequeo de seguridad: la matriz permite juntos pares que se cruzan
     planes = inter["planes"]
 

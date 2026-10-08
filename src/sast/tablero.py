@@ -38,7 +38,11 @@ def semaforos(proc: dict, conf: dict, borrador: bool) -> tuple[dict, dict]:
         c = cfg[it["id"]]
         val = c.get("asignacion")
         if val and val.get("validado_por"):
-            estado, mov = "validada", val["grupos"]
+            # validada: el borrador tal cual (desde_borrador) con las correcciones de Santiago encima
+            mov = {g: _mov(b) for g, b in it["borrador"].items()} if val.get("desde_borrador") else {}
+            for g, cambio in (val.get("cambios") or val.get("grupos") or {}).items():
+                mov[g] = {**mov.get(g, {}), **cambio}
+            estado = "validada"
         elif borrador:
             estado, mov = "borrador", {g: _mov(b) for g, b in it["borrador"].items()}
         else:

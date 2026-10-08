@@ -123,7 +123,8 @@ export function crearMuro(datos) {
     franja.replaceChildren();
     const hv = hoy(sem, Date.now(), (id, pid) => { ir(id, { plan: pid }); });
     franja.append(hv.el);
-    rotuloFranja.textContent = `Programación de hoy · ${hv.dia} · azul más claro = ciclo más largo · clic en un bloque para explorarlo`;
+    rotuloFranja.textContent = `Programación de hoy · ${hv.dia}`;
+    franja.title = 'Azul más claro = ciclo más largo. Clic en un bloque para explorar ese plan.';
     vistas = { r, f, hv };
   }
   function montarCruce(it) {
@@ -187,7 +188,8 @@ export function crearMuro(datos) {
       explorar(it, { plan: v.plan.id, t0: base + t, pausado: pausar });
     } });
     franja.append(gt.el);
-    rotuloFranja.textContent = `Línea de tiempo del ciclo · ${it.nombre} · arrastre para recorrer el ciclo`;
+    rotuloFranja.textContent = `Línea de tiempo del ciclo · ${it.nombre}`;
+    franja.title = 'Arrastre el cursor (o use ← →) para recorrer el ciclo.';
 
     let ctrlPrevio = '';
     function refrescarControles(v) {

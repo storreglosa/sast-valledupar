@@ -25,6 +25,7 @@
 - `outputs/` — HTML y Excel de entrega. `docs/` — metodología y fichas.
 - `src/sast/semaforos/` — lectura de los reportes SISTRA, modelo de tiempos, validaciones, geometría OSM.
 - `tests/` — pruebas (`unittest`; `tests/fixtures/` = estados de referencia que comparten Python y JS).
+- `tablero/` — sitio estático publicado en GitHub Pages (`docs/tablero.md`). Lo único que se publica.
 
 ## Comandos frecuentes
 ```bash
@@ -40,7 +41,10 @@ python scripts/06_reportes.py          # Excel ANSV + HTML en outputs/
 python scripts/07_revision_geocodificacion.py  # listas para revisar la geocodificación a mano
 python scripts/08_reporte_ejecutivo.py # informe ejecutivo (gerencia) + Excel para copiar a la plataforma ANSV (+15 m)
 python scripts/09_semaforos.py         # planes semafóricos (PDF SISTRA), validaciones, borrador de accesos y página de validación
+python scripts/10_tablero.py           # datos públicos del tablero (tablero/data/); --borrador = ensayo local
+python scripts/verificar_tablero.py    # guardia de publicación (la corre también GitHub Actions)
 python -m unittest discover -s tests   # pruebas (las de PDF se saltan si falta data/raw/semaforos/)
+node --test tests/js/*.test.mjs        # pruebas del tablero (modelo = Python, festivos, simulación)
 ```
 Los insumos de `data/raw/` los copia Santiago (`docs/ingesta.md`). `SAST_RAW=<carpeta>` corre el
 pipeline contra otra carpeta de insumos (ensayos), sin tocar `data/raw/`.

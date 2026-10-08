@@ -15,7 +15,11 @@
 # nombres_via   nombre con que se rotula una vía cuando OSM no la nombra o la nombra distinto
 #               (según los mapas de inventario de Santiago y el Excel de equipos).
 # asignacion    grupo -> acceso / cebra validada por Santiago (decisión 28). Mientras falte, el
-#               tablero no anima vehículos en ese cruce.
+#               tablero no anima vehículos en ese cruce. Forma:
+#                 asignacion: {validado_por: Santiago Torreglosa, fecha: 2026-10-08, desde_borrador: true,
+#                              cambios: {G5: {movimiento: "...", acceso: norte, sale_por: oeste}}}
+#               (desde_borrador = se adopta outputs/tables/semaforos_accesos_borrador.csv; `cambios`
+#               corrige grupos puntuales).
 
 intersecciones:
   - id: la-vina

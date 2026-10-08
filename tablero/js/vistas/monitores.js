@@ -123,7 +123,8 @@ export function ficha(sast, alVerSemaforo) {
 
 // ---------------------------------------------------------------- modo cruce
 export function reloj(it, fases) {
-  const m = monitor('Reloj del ciclo · pase el cursor por una cabeza para ver su cuenta');
+  const m = monitor('Reloj del ciclo');
+  m.el.title = 'Pase el cursor por una cabeza semafórica para ver su cuenta regresiva en el centro del reloj.';
   const a = anillo(it, { tam: 'completo', fases });
   const plan = h('div', { class: 'rl-plan' });
   const seg = h('div', { class: 'rl-seg num' });
