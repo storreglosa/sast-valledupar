@@ -15,19 +15,29 @@ export function monitor(titulo, { tally = '' } = {}) {
   return { el, pantalla, titulo: (t) => { txt.textContent = t; } };
 }
 
+const MENORES = new Set(['con', 'de', 'del', 'la', 'el', 'y', 'bis']);
+/** «CARRERA 12 - CALLE 16 (SUR - NORTE)» -> «Carrera 12 - Calle 16 (sur - norte)». */
+export const tipoTitulo = (t) => {
+  let dentro = false;
+  return String(t).toLowerCase().split(/(\s+|\(|\))/).map((w) => {
+    if (w === '(') dentro = true;
+    if (w === ')') dentro = false;
+    return !dentro && w.length > 1 && !MENORES.has(w) ? w[0].toUpperCase() + w.slice(1) : w;
+  }).join('');
+};
+
 // ---------------------------------------------------------------- modo mapa
 export function red(sem, alElegir) {
-  const m = monitor('Red semafórica · en vivo', { tally: 'vivo' });
+  const m = monitor('Red semafórica · fase ilustrativa', { tally: 'vivo' });
   const cuerpo = h('div', { class: 'mon-cuerpo' });
   const lista = h('ul', { class: 'red' });
-  cuerpo.append(h('h3', {}, 'Cinco cruces con cámaras SAST'), h('p', { class: 'sub' }, 'Plan que rige ahora, su ciclo y cuándo cambia.'), lista);
+  cuerpo.append(h('h3', {}, 'Cinco cruces con cámaras SAST'), lista);
   m.pantalla.append(cuerpo);
   const filas = sem.intersecciones.map((it) => {
     const leds = it.grupos.filter((g) => g.tipo !== 'peatonal').map(() => h('span', { class: 'led' }));
     const p = h('div', { class: 'p num' });
-    const d = h('div', { class: 'd' }, it.direccion);
-    const btn = h('button', { type: 'button', onclick: () => alElegir(it.id) },
-      h('span', { class: 'leds' }, leds), h('div', {}, h('div', { class: 'n' }, it.nombre), d), p);
+    const btn = h('button', { type: 'button', title: it.direccion, onclick: () => alElegir(it.id) },
+      h('span', { class: 'leds' }, leds), h('div', {}, h('div', { class: 'n' }, it.nombre)), p);
     lista.append(h('li', {}, btn));
     return { it, leds, p, prev: [] };
   });
@@ -40,11 +50,12 @@ export function red(sem, alElegir) {
         if (f.prev[i] !== e) { f.prev[i] = e; f.leds[i].className = `led ${e}`; }
       });
       const faltan = v.vigente.fin - v.vigente.b.minutos;
-      const txt = `${v.plan.id} · ${v.plan.ciclo} s|cambia en ${faltan >= 60 ? `${Math.floor(faltan / 60)} h ${Math.floor(faltan % 60)} min` : `${Math.ceil(faltan)} min`}`;
+      const txt = `${v.plan.id} · ${v.plan.ciclo} s|${faltan >= 60 ? `${Math.floor(faltan / 60)} h ${Math.floor(faltan % 60)} min` : `${Math.ceil(faltan)} min`}`;
       if (f.p.dataset.t !== txt) {
         f.p.dataset.t = txt;
         const [a, b] = txt.split('|');
-        f.p.replaceChildren(a, h('small', {}, b));
+        f.p.replaceChildren(a);
+        f.p.title = `El plan cambia en ${b}`;
       }
     }
   }
@@ -74,7 +85,7 @@ export function ficha(sast, alVerSemaforo) {
     m.titulo(`Ficha · ${p.equipo}`);
     const op = p.estado === 'Operando';
     cuerpo.append(h('div', { class: 'ficha-cab' },
-      h('div', {}, h('h3', {}, `Equipo ${p.numero} · ${p.punto}`), h('p', { class: 'sub' }, p.direccion_ansv || p.direccion)),
+      h('div', {}, h('h3', {}, `Equipo ${p.numero} · ${p.punto}`), h('p', { class: 'sub ficha-dir' }, tipoTitulo(p.direccion_ansv || p.direccion))),
       h('span', { class: `estado ${op ? 'op' : 'no'}` }, op ? 'Operando' : 'Autorizado, no opera')));
     const dl = h('dl', { class: 'dl' });
     const fila = (a, b) => b && dl.append(h('dt', {}, a), h('dd', {}, b));
@@ -101,7 +112,8 @@ export function ficha(sast, alVerSemaforo) {
           h('div', { class: 'cifra' }, h('div', { class: 'v num' }, lb.total_comparendos.toLocaleString('es-CO')), h('div', { class: 'e' }, 'comparendos'))));
       const max = Math.max(1, ...lb.comparendos.map((c) => c.total));
       const barras = h('div', { class: 'barras', role: 'table', 'aria-label': 'Comparendos por código' });
-      for (const c of lb.comparendos) {
+      const visibles = lb.comparendos.slice(0, 4), resto = lb.comparendos.slice(4);
+      for (const c of visibles) {
         const b = h('div', { class: 'barra', role: 'row' }, h('span', { class: 'c', role: 'cell' }, c.codigo),
           h('span', { class: 't', role: 'cell' }, h('i', { style: { width: `${(100 * c.total) / max}%` } })),
           h('span', { class: 'n', role: 'cell' }, c.total.toLocaleString('es-CO')));
@@ -109,6 +121,7 @@ export function ficha(sast, alVerSemaforo) {
         b.addEventListener('pointerleave', ocultarTip);
         barras.append(b);
       }
+      if (resto.length) barras.append(h('p', { class: 'resto' }, `Otros: ${resto.map((c) => `${c.codigo} ${c.total.toLocaleString('es-CO')}`).join(' · ')}`));
       cuerpo.append(barras, h('details', { class: 'salvedades' }, h('summary', {}, 'Cómo leer estas cifras'),
         h('ul', {}, sast.salvedades.map((x) => h('li', {}, x)))));
     } else {
@@ -204,8 +217,9 @@ export function explicacionMon(it, { alElegirPlan }) {
       contenido.append(h('div', { class: 'kpis' },
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${plan.ciclo} s`), h('div', { class: 'e' }, 'dura el ciclo')),
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, String(k.ciclos_hora).replace('.', ',')), h('div', { class: 'e' }, 'ciclos por hora')),
-        h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${k.todo_rojo_s} s`), h('div', { class: 'e' }, 'todo rojo por ciclo'))));
-      const ex = h('div', { class: 'expl' }, h('p', { class: 'lead' }, `${r.intro} ${r.ciclo}`), h('p', {}, r.espera));
+        h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${k.todo_rojo_s} s`), h('div', { class: 'e' }, 'todo rojo por ciclo')),
+        h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${Math.max(...Object.values(k.rojo_s))} s`), h('div', { class: 'e' }, 'espera máxima en rojo'))));
+      const ex = h('div', { class: 'expl' }, h('p', { class: 'lead' }, `${r.intro} ${r.ciclo}`));
       const ol = h('ol', { class: 'fases' });
       for (const f of r.fases) {
         const li = h('li', { class: `fase ${f.tipo}` }, h('span', { class: 'rango num' }, `${f.inicio}–${f.fin} s`), h('span', {}, h('b', {}, `${f.titulo}. `), f.texto));
@@ -250,6 +264,8 @@ export function explicacionMon(it, { alElegirPlan }) {
         faseActiva = f;
         for (const x of fasesEl) x.li.classList.toggle('activa', x.f === f);
         anuncio.textContent = `${f.titulo}: ${f.texto}`;
+        // el monitor sigue a la aguja: la fase activa queda a la vista sin desplazar la página
+        cuerpo.scrollTo({ top: Math.max(0, li.offsetTop - 70), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
         if (window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) window.gsap.fromTo(li, { x: -6 }, { x: 0, duration: 0.35, ease: 'expo.out' });
       }
     }

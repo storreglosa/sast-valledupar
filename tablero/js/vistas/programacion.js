@@ -1,11 +1,12 @@
 // Programación por hora del día: «hoy» (5 cruces × 24 h, franja del mapa) y «semana» (un cruce,
 // 8 filas × 24 h). El color dice cuánto dura el ciclo (escala azul validada: más claro = ciclo más
-// largo) y cada bloque lleva su etiqueta «P2 · 100 s»: la identidad nunca va solo en el color.
+// largo, escala grafito→blanco validada) y cada bloque lleva su etiqueta «P2 · 100 s»: la identidad
+// nunca va solo en el color.
 import { h, s, mostrarTip, ocultarTip } from '../util/dom.js';
 import { DIAS, NOMBRE_DIA, hhmm, bogota, diaHorario } from '../nucleo/horario.js';
 
 export const colorCiclo = (c) => (c <= 55 ? 'var(--ciclo-1)' : c <= 80 ? 'var(--ciclo-2)' : c <= 95 ? 'var(--ciclo-3)' : 'var(--ciclo-4)');
-const tintaSobre = (c) => (c > 80 ? '#06121f' : '#e8eef2');
+const tintaSobre = (c) => (c <= 55 ? '#e8eef2' : '#06121f');
 
 /**
  * filas: [{clave, etiqueta, bloques: [[ini, fin, plan]], planes, activa}]

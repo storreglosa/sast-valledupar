@@ -21,7 +21,7 @@ export function crearMapa(contenedor, datos, { alElegirCruce, alElegirEquipo }) 
   const todos = sast.equipos.features.map((f) => f.geometry.coordinates);
   const caja = (pts) => pts.reduce((b, [x, y]) => [[Math.min(b[0][0], x), Math.min(b[0][1], y)], [Math.max(b[1][0], x), Math.max(b[1][1], y)]], [[180, 90], [-180, -90]]);
 
-  const margen = () => (window.innerWidth < 760 ? 36 : 90);
+  const margen = () => (window.innerWidth < 760 ? { top: 70, bottom: 60, left: 70, right: 70 } : 90);
   const mapa = new maplibregl.Map({
     container: contenedor, style: ESTILO, bounds: caja(urbanos), fitBoundsOptions: { padding: margen() },
     attributionControl: { compact: true }, maxZoom: 19, minZoom: 10, pitchWithRotate: true, dragRotate: true,
@@ -65,7 +65,7 @@ export function crearMapa(contenedor, datos, { alElegirCruce, alElegirEquipo }) 
 
   // ---------------------------------------------------------------- leyenda y acciones
   const leyenda = h('div', { class: 'leyenda', role: 'group', 'aria-label': 'Leyenda' },
-    h('div', {}, h('span', { class: 'leyenda-ico', html: '<svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="#1fe08a" stroke-width="3"/><circle cx="11" cy="11" r="5" fill="none" stroke="#ff3b30" stroke-width="3" opacity=".7"/><path d="M11 11V1" stroke="#fff" stroke-width="1.6"/></svg>' }), 'Semáforo: reloj del ciclo en vivo'),
+    h('div', {}, h('span', { class: 'leyenda-ico', html: '<svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="#1fe08a" stroke-width="3"/><circle cx="11" cy="11" r="5" fill="none" stroke="#ff3b30" stroke-width="3" opacity=".7"/><path d="M11 11V1" stroke="#fff" stroke-width="1.6"/></svg>' }), 'Semáforo: reloj del ciclo (fase ilustrativa)'),
     h('div', {}, h('span', { class: 'leyenda-ico', html: CAMARA(true) }), 'Cámara SAST operando'),
     h('div', {}, h('span', { class: 'leyenda-ico', html: CAMARA(false) }), 'Cámara SAST autorizada, sin operar'));
   let vistaTodos = false;
@@ -74,7 +74,20 @@ export function crearMapa(contenedor, datos, { alElegirCruce, alElegirEquipo }) 
     mapa.fitBounds(caja(vistaTodos ? todos : urbanos), { padding: margen(), duration: 1400 });
     btnTodos.textContent = vistaTodos ? 'Ver la ciudad' : 'Ver también El Zanjón';
   } }, 'Ver también El Zanjón');
-  contenedor.parentElement.append(leyenda, h('div', { class: 'mapa-acciones' }, btnTodos));
+  const sello = h('span', { class: 'sello sello-mapa', tabindex: 0, title: 'El plan es el que rige a esta hora; el segundo del ciclo no está sincronizado con el controlador.' }, 'Fase ilustrativa');
+  contenedor.parentElement.append(leyenda, sello, h('div', { class: 'mapa-acciones' }, btnTodos));
+
+  // etiquetas sin choque: si dos semáforos quedan cerca en pantalla, la del de arriba sube
+  function acomodar() {
+    const pos = semaforos.map((x) => ({ x, p: mapa.project([x.it.centro.lon, x.it.centro.lat]) }));
+    for (const a of pos) a.x.mk.getElement().classList.remove('arriba');
+    for (let i = 0; i < pos.length; i++) for (let j = i + 1; j < pos.length; j++) {
+      const a = pos[i], b = pos[j];
+      if (Math.abs(a.p.x - b.p.x) < 140 && Math.abs(a.p.y - b.p.y) < 60) (a.p.y <= b.p.y ? a : b).x.mk.getElement().classList.add('arriba');
+    }
+  }
+  mapa.on('moveend', acomodar);
+  mapa.on('load', acomodar);
 
   function actualizar(ms) {
     for (const s of semaforos) {

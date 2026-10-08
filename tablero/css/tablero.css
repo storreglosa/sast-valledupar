@@ -29,11 +29,11 @@
   --cajon: #ffd400;
   --tally: #ff2d2d;
 
-  /* duración del ciclo (escala validada, un solo tono): ≤55 s · ≤80 · ≤95 · ≥100 */
-  --ciclo-1: #2c5694;
-  --ciclo-2: #3f78c8;
-  --ciclo-3: #6aa1e8;
-  --ciclo-4: #a7cdf8;
+  /* duración del ciclo (escala grafito→blanco, luminancia validada): ≤55 s · ≤80 · ≤95 · ≥100 */
+  --ciclo-1: #4b565e;
+  --ciclo-2: #76828b;
+  --ciclo-3: #aab4bb;
+  --ciclo-4: #e3e8eb;
 
   --f-rotulo: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
   --f-texto: "Public Sans", "Segoe UI", system-ui, sans-serif;
@@ -122,7 +122,7 @@ button { font: inherit; color: inherit; }
 }
 .rotulo {
   height: 24px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px 0 6px;
-  font: 600 .78rem/1 var(--f-rotulo); letter-spacing: .06em; text-transform: uppercase; color: var(--tinta-3);
+  font: 600 .78rem/1.4 var(--f-rotulo); letter-spacing: .06em; text-transform: uppercase; color: var(--tinta-3);
 }
 .rotulo-txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tally { width: 7px; height: 7px; border-radius: 50%; background: #2a1414; flex: none; }
@@ -487,3 +487,53 @@ svg .parpadea { animation: parpadeo .5s steps(1) infinite; }
 @keyframes subt { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 .subtitulos.entra { animation: subt .4s var(--ease); }
 @media (prefers-reduced-motion: reduce) { .subtitulos.entra { animation: none; } }
+
+/* --- revisión final: correcciones --- */
+.tally.pvw { background: var(--verde); box-shadow: 0 0 8px var(--verde); }
+.fuente-plan { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fuente-pie { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 6px; }
+.fuente-pie .fuente-leds { margin-top: 0; }
+.fuente-cuenta { display: flex; height: 20px; }
+.fuente-cuenta svg { height: 100%; width: auto; }
+.sello-mapa { position: absolute; left: 12px; top: 12px; z-index: 2; cursor: help; }
+.mk-sem.arriba .mk-nombre { top: auto; bottom: 100%; margin: 0 0 2px; }
+.red button { padding: 4px 6px; }
+.red .n { font-size: .95rem; }
+.ficha-dir { margin-top: 4px !important; }
+.diagrama.atenuado svg.base { opacity: .3; }
+.diagrama.atenuado .diag-nota { left: 50%; transform: translateX(-50%); text-align: center; bottom: 8px; }
+.gigante { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); align-items: center; gap: 22px; padding: 6px 28px 34px; pointer-events: none; }
+.gigante-anillo { height: min(100%, 420px); aspect-ratio: 1; position: relative; }
+.gigante-anillo .anillo { position: absolute; inset: 0; }
+.gigante-fase { max-width: 34ch; margin: 0; font-size: 1.05rem; line-height: 1.45; color: var(--tinta); }
+.gigante-fase b { font-family: var(--f-rotulo); font-size: 1.25rem; font-weight: 700; }
+.btn-ico { width: 15px; height: 15px; }
+@media (max-width: 760px) {
+  .operador { grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; }
+  .acciones { display: flex; gap: 6px; }
+  .acciones .btn { padding: 0 9px; }
+  .btn-txt { display: none; }
+  .hora { flex-direction: column; align-items: flex-end; gap: 2px; }
+  .hora-dia { display: block; font-size: .62rem; letter-spacing: .03em; }
+  .hora-dia b { display: inline; margin-left: 4px; }
+  .leyenda { top: 52px; bottom: auto; }
+  .sello-mapa { top: 12px; }
+  .gigante { grid-template-columns: 1fr; justify-items: center; padding: 8px 12px 40px; gap: 8px; }
+  .gigante-anillo { height: auto; width: min(78%, 300px); }
+  .gigante-fase { font-size: .86rem; text-align: center; }
+}
+.red button { padding: 6px 6px; grid-template-columns: 62px minmax(0, 1fr) auto; }
+.red .p small { margin-top: 2px; }
+@media (max-width: 760px) { .ciclo-largo { display: none; } }
+/* red semafórica en una línea por cruce; ficha compacta */
+.red button { padding: 5px 4px; }
+.red .p { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+.red .p small { display: inline; margin: 0; font-size: .7rem; }
+.barras { gap: 3px; }
+.barra .t { height: 7px; }
+.cifras { margin: 6px 0; }
+.cifra .v { font-size: 1.45rem; }
+.red .n { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.red button { padding: 4px 4px; }
+.mon-cuerpo h3 { margin-bottom: 6px; }
+.barras .resto { margin: 2px 0 0; font-size: .74rem; color: var(--tinta-2); font-variant-numeric: tabular-nums; }

@@ -3,7 +3,7 @@
 // principal (con un barrido de línea), y la pantalla y los monitores se reasignan a esa fuente.
 import { h, s, $, reducido } from '../util/dom.js';
 import { display } from '../util/siete.js';
-import { estado, luz } from '../nucleo/tiempos.js';
+import { estado, luz, dur } from '../nucleo/tiempos.js';
 import { bogota, diaHorario, NOMBRE_DIA } from '../nucleo/horario.js';
 import { E, cambiar, vivo, tiempo, inter, explorar, volverEnVivo, cadaCuadro, suscribir } from '../estado.js';
 import { anillo } from './anillo.js';
@@ -65,9 +65,11 @@ export function crearMuro(datos) {
     const a = anillo(it, { tam: 'mini' });
     const plan = h('div', { class: 'fuente-plan num' });
     const leds = it.grupos.filter((g) => g.tipo !== 'peatonal').map(() => h('span', { class: 'led' }));
-    const cuerpo = [h('div', { class: 'fuente-anillo' }, a.el), h('div', { class: 'fuente-txt' }, h('div', { class: 'fuente-nombre' }, it.nombre), plan, h('div', { class: 'fuente-leds' }, leds))];
+    const cuenta = display('00', { alto: 22 });
+    const cuerpo = [h('div', { class: 'fuente-anillo' }, a.el), h('div', { class: 'fuente-txt' }, h('div', { class: 'fuente-nombre' }, it.nombre), plan,
+      h('div', { class: 'fuente-pie' }, h('div', { class: 'fuente-leds' }, leds), h('div', { class: 'fuente-cuenta', title: 'Segundos para el próximo cambio de fase' }, cuenta.el)))];
     const f = fuenteMonitor(it.id, `${it.nombre} · ${it.controlador.equipo}/${it.controlador.cruce}`, cuerpo);
-    Object.assign(f, { it, a, plan, leds, prev: [] });
+    Object.assign(f, { it, a, plan, leds, cuenta, prev: [] });
     fuentesEl.append(f.el);
     fuentes.set(it.id, f);
   }
@@ -86,12 +88,17 @@ export function crearMuro(datos) {
       const v = vivo(f.it, ms);
       f.a.actualizar(v.t, v.plan);
       const txt = `${v.plan.id}|${v.plan.ciclo}`;
-      if (f.plan.dataset.t !== txt) { f.plan.dataset.t = txt; f.plan.replaceChildren(h('b', {}, v.plan.id), ` · ciclo ${v.plan.ciclo} s`); }
+      if (f.plan.dataset.t !== txt) { f.plan.dataset.t = txt; f.plan.replaceChildren(h('b', {}, v.plan.id), h('span', { class: 'ciclo-largo' }, ' · ciclo'), ` ${v.plan.ciclo} s`); }
       const veh = f.it.grupos.filter((g) => g.tipo !== 'peatonal');
       veh.forEach((g, i) => {
         const e = luz(estado(v.plan.tiempos[g.id], g.tipo, v.t, v.plan.ciclo));
         if (f.prev[i] !== e) { f.prev[i] = e; f.leds[i].className = `led ${e}`; }
       });
+      // cuenta regresiva: segundos para el próximo cambio de fase (etapas del plan)
+      const et = v.plan.etapas.find((x) => dur(x.inicio, v.t, v.plan.ciclo) < x.duracion) || v.plan.etapas[0];
+      const vehVerde = et.verdes.some((gid) => f.it.grupos.find((g) => g.id === gid)?.tipo !== 'peatonal');
+      f.cuenta.poner(String(Math.ceil(dur(v.t, et.fin, v.plan.ciclo) || v.plan.ciclo)).padStart(2, ' ').slice(-2),
+        vehVerde ? 'var(--verde)' : 'var(--rojo)');
       const pt = puntos.find((p) => p.it === f.it);
       const e0 = f.prev.includes('verde') ? 'var(--verde)' : f.prev.includes('amarillo') ? 'var(--ambar)' : 'var(--rojo)';
       if (pt.c.getAttribute('fill') !== e0) pt.c.setAttribute('fill', e0);
@@ -115,7 +122,7 @@ export function crearMuro(datos) {
   let modoActual = null, vistas = {};
   function montarMapa() {
     analisis.replaceChildren();
-    analisis.style.gridTemplateRows = 'minmax(0, 1fr) minmax(0, 1.25fr)';
+    analisis.style.gridTemplateRows = 'minmax(0, .82fr) minmax(0, 1.45fr)';
     const r = red(sem, (id) => ir(id));
     const f = ficha(sast, (id) => ir(id));
     analisis.append(r.el, f.el);
@@ -136,6 +143,21 @@ export function crearMuro(datos) {
       h('div', { class: 'cruce-titulo' }, h('h2', {}, it.nombre, h('span', { class: 'codigo' }, `controlador ${it.controlador.equipo} · cruce ${it.controlador.cruce}`)), h('p', {}, subt)),
       sellos);
     const d = diagrama(it, g);
+    // sin asignación validada, la pantalla grande explica con el reloj del ciclo a escala de muro
+    let gigante = null;
+    if (!Object.keys(g.trayectorias).length) {
+      d.el.classList.add('atenuado');
+      const ag = anillo(it, { tam: 'completo', fases: (p) => fasesDe(it, p) });
+      const cap = h('p', { class: 'gigante-fase', 'aria-live': 'polite' });
+      d.el.append(h('div', { class: 'gigante' }, h('div', { class: 'gigante-anillo' }, ag.el), cap));
+      let fPrev = null;
+      gigante = (t, p) => {
+        ag.actualizar(t, p);
+        const fs = fasesDe(it, p);
+        const f = fs.find((x) => dur(x.inicio, t, p.ciclo) < x.duracion) || fs[0];
+        if (f !== fPrev && f) { fPrev = f; cap.replaceChildren(h('b', {}, `${f.titulo}. `), f.texto); }
+      };
+    }
     const controles = h('div', { class: 'controles', role: 'toolbar', 'aria-label': 'Controles de la simulación' });
     capaCruce.append(h('div', { class: 'cruce' }, cab, d.el, controles));
 
@@ -209,7 +231,7 @@ export function crearMuro(datos) {
       sModo.replaceChildren(h('span', { class: 'led-punto' }), E.modo === 'vivo' ? 'En vivo' : `Explorando ${v.plan.id}${pausado ? ' · pausa' : ` · ×${String(Math.round(E.exp.vel * 10) / 10).replace('.', ',')}`}`);
       sModo.classList.toggle('vivo', E.modo === 'vivo');
     }
-    vistas = { it, d, rel, cab2, ex, gt, refrescarControles };
+    vistas = { it, d, rel, cab2, ex, gt, refrescarControles, gigante };
     requestAnimationFrame(() => { d.medir(); if (!reducido()) d.encender(); });
   }
 
@@ -220,6 +242,7 @@ export function crearMuro(datos) {
     } else if (vistas.it) {
       const v = tiempo(vistas.it, ms);
       vistas.d.actualizar(v.T, v.t, v.plan, ms);
+      vistas.gigante?.(v.t, v.plan);
       vistas.rel.actualizar(v.t, v.plan);
       vistas.cab2.actualizar(v.t, v.plan);
       vistas.ex.actualizar(v.t, v.plan, v, ms);
@@ -257,10 +280,15 @@ export function crearMuro(datos) {
       if (modoActual === 'mapa') { vistas.f?.mostrar(E.equipo); mapa?.seleccionarEquipo(E.equipo); }
       return;
     }
+    // bus de sala: la fuente elegida pasa por «preview» (verde) antes de salir «al aire» (rojo)
     for (const [id, f] of fuentes) {
       const on = id === destino;
       f.el.setAttribute('aria-pressed', String(on));
-      f.tally.classList.toggle('on', on);
+      f.tally.classList.remove('on', 'pvw');
+      if (on && modoActual !== null && !reducido()) {
+        f.tally.classList.add('pvw');
+        setTimeout(() => { f.tally.classList.remove('pvw'); if (E.fuente === id) f.tally.classList.add('on'); }, 320);
+      } else f.tally.classList.toggle('on', on);
     }
     const origen = fuentes.get(destino)?.pantalla;
     const primera = modoActual === null;
