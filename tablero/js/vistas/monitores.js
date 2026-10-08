@@ -197,18 +197,20 @@ export function cabezasMon(it, alEnfocar) {
 
 export function explicacionMon(it, { alElegirPlan }) {
   const m = monitor('Explicación del plan');
-  const cuerpo = h('div', { class: 'mon-cuerpo' });
+  const cuerpo = h('div', { class: 'mon-cuerpo col' });
   m.pantalla.append(cuerpo);
   const tabs = ['Explicación', 'Semana', 'Tiempos'];
   let pest = 'Explicación', planId = null, fasesEl = [], semanaVista = null, vivoPrevio = null;
   const anuncio = h('div', { class: 'saltar', 'aria-live': 'polite' });
   const barra = h('div', { class: 'pestanas', role: 'tablist' }, tabs.map((t) => h('button', { type: 'button', class: 'pestana', role: 'tab', 'aria-selected': String(t === pest), onclick: () => { pest = t; planId = null; } }, t)));
-  const contenido = h('div');
+  const contenido = h('div', { class: 'contenido' });
+  let lista = null;
   cuerpo.append(barra, contenido, anuncio);
 
   function render(plan, v) {
     for (const b of barra.children) b.setAttribute('aria-selected', String(b.textContent === pest));
     contenido.replaceChildren();
+    lista = null;
     fasesEl = [];
     semanaVista = null;
     if (pest === 'Explicación') {
@@ -219,16 +221,16 @@ export function explicacionMon(it, { alElegirPlan }) {
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, String(k.ciclos_hora).replace('.', ',')), h('div', { class: 'e' }, 'ciclos por hora')),
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${k.todo_rojo_s} s`), h('div', { class: 'e' }, 'todo rojo por ciclo')),
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${Math.max(...Object.values(k.rojo_s))} s`), h('div', { class: 'e' }, 'espera máxima en rojo'))));
-      const ex = h('div', { class: 'expl' }, h('p', { class: 'lead' }, `${r.intro} ${r.ciclo}`));
+      const ex = h('div', { class: 'expl' }, h('p', { class: 'lead', title: r.ciclo }, r.intro));
       const ol = h('ol', { class: 'fases' });
+      lista = h('div', { class: 'fases-scroll' }, ol);
       for (const f of r.fases) {
         const li = h('li', { class: `fase ${f.tipo}` }, h('span', { class: 'rango num' }, `${f.inicio}–${f.fin} s`), h('span', {}, h('b', {}, `${f.titulo}. `), f.texto));
         ol.append(li);
         fasesEl.push({ f, li });
       }
-      ex.append(ol);
-      if (r.noche) ex.append(h('p', { class: 'nota-noche' }, r.noche));
-      contenido.append(ex);
+      if (r.noche) lista.append(h('p', { class: 'nota-noche' }, r.noche));
+      contenido.append(ex, lista);
     } else if (pest === 'Semana') {
       contenido.append(h('p', { class: 'sub' }, 'Qué plan corre cada día y hora. Más claro = ciclo más largo. Clic en un bloque para explorarlo.'));
       const caja = h('div', { style: { position: 'relative', height: '250px' } });
@@ -265,7 +267,7 @@ export function explicacionMon(it, { alElegirPlan }) {
         for (const x of fasesEl) x.li.classList.toggle('activa', x.f === f);
         anuncio.textContent = `${f.titulo}: ${f.texto}`;
         // el monitor sigue a la aguja: la fase activa queda a la vista sin desplazar la página
-        cuerpo.scrollTo({ top: Math.max(0, li.offsetTop - 70), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        lista?.scrollTo({ top: Math.max(0, li.offsetTop - 4), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
         if (window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) window.gsap.fromTo(li, { x: -6 }, { x: 0, duration: 0.35, ease: 'expo.out' });
       }
     }

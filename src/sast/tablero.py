@@ -9,6 +9,7 @@ publicarla.
 
 from __future__ import annotations
 
+import json
 import re
 
 import openpyxl
@@ -37,11 +38,13 @@ def semaforos(proc: dict, conf: dict, borrador: bool) -> tuple[dict, dict]:
     for it in proc["intersecciones"]:
         c = cfg[it["id"]]
         val = c.get("asignacion")
+        huella = json.dumps(val or {}, sort_keys=True, default=str, ensure_ascii=False)
+        if it.get("asignacion_usada", "{}") != huella:
+            raise SystemExit(f"{it['id']}: la asignación de config/semaforos.yaml cambió desde la última corrida "
+                             "de la etapa 9; corre scripts/09_semaforos.py antes de 10_tablero.py")
         if val and val.get("validado_por"):
-            # validada: el borrador tal cual (desde_borrador) con las correcciones de Santiago encima
-            mov = {g: _mov(b) for g, b in it["borrador"].items()} if val.get("desde_borrador") else {}
-            for g, cambio in (val.get("cambios") or val.get("grupos") or {}).items():
-                mov[g] = {**mov.get(g, {}), **cambio}
+            # validada: el borrador de la etapa 9 ya trae las correcciones (cambios) con su geometría
+            mov = {g: _mov(b) for g, b in it["borrador"].items()}
             estado = "validada"
         elif borrador:
             estado, mov = "borrador", {g: _mov(b) for g, b in it["borrador"].items()}
@@ -51,6 +54,7 @@ def semaforos(proc: dict, conf: dict, borrador: bool) -> tuple[dict, dict]:
         for m in mov.values():
             if m.get("via") in nombres:
                 m["via"] = nombres[m["via"]]
+        publica = estado != "pendiente"
         grupos = [{"id": g["id"], "nombre": g["nombre"], "tipo": g["tipo"],
                    **({"mov": mov[g["id"]]} if g["id"] in mov else {})} for g in it["grupos"]]
         inters.append({
@@ -66,13 +70,13 @@ def semaforos(proc: dict, conf: dict, borrador: bool) -> tuple[dict, dict]:
                                                 if estado == "validada" else {})},
         })
         g = it["geometria"]
-        publica = estado != "pendiente"
         geos[it["id"]] = {
-            "norte": g["norte_codificacion"],
+            "norte": g["norte_codificacion"] if publica else 0.0,
             "vias": [{"p": v["puntos"], "ancho": v["ancho"], "unico": v["unico"], "ctx": v["contexto"],
                       "n": (c.get("nombres_via") or {}).get(v["nomencla"] or "sin nombre", v["nomencla"])}
                      for v in g["vias"]],
-            "brazos": [{k: b[k] for k in ("id", "cardinal", "rumbo", "nomencla", "r_caja")} for b in g["brazos"]],
+            "brazos": [{k: b[k] for k in ("id", "rumbo", "nomencla", "r_caja") + (("cardinal",) if publica else ())}
+                       for b in g["brazos"]],
             "cajon": g["cajon_amarillo"],
             "cebras": [{"grupo": k if k in mov else None, "codigo": mov.get(k, {}).get("codigo"),
                         "poligono": z["poligono"], "eje": z["eje"]}
@@ -83,7 +87,9 @@ def semaforos(proc: dict, conf: dict, borrador: bool) -> tuple[dict, dict]:
         }
     sem = {"esquema": ESQUEMAS["semaforos"], "generado": proc["generado"], "zona_horaria": "America/Bogota",
            "nota_fase": NOTA_FASE, "nota_vehiculos": NOTA_VEHICULOS,
-           "fuente": "Reportes del controlador SISTRA Wiseverse V3.0 (29/09/2026), leídos por scripts/09_semaforos.py",
+           "fuente": "Reportes del controlador SISTRA Wiseverse V3.0 (" + ", ".join(
+               f"{f[8:10]}/{f[5:7]}/{f[:4]}" for f in sorted({a["archivo"].split("/")[-1][:10] for a in proc["fuente"]}))
+               + "), leídos por scripts/09_semaforos.py",
            "intersecciones": inters}
     geo = {"esquema": ESQUEMAS["geometria"], "unidad": "m", "crs_origen": "EPSG:9377 (CTM12), relativo al centro",
            "atribucion": "Vías © colaboradores de OpenStreetMap (ODbL), corte 2026-08-05",
@@ -160,6 +166,8 @@ def sast(equipos: pd.DataFrame, ruta_excel, largo: pd.DataFrame, geocod: pd.Data
             "El registro de lesionados se fortaleció en 2026: los meses anteriores pueden mostrar menos lesionados "
             "de los que hubo; léanse como un piso. Los fallecidos también cambian de fuente entre años.",
             "Los comparendos de las propias cámaras SAST no cuentan en su línea base; se informan aparte.",
+            "Las zonas de las dos cámaras de un mismo punto pueden solaparse (p. ej. 021/022 y 041/042): un hecho "
+            "cuenta para cada equipo (decisión 5), así que no se suman las cifras de dos equipos del mismo punto.",
             "Cada equipo tiene su periodo: los 36 meses anteriores al mes en que empezó a operar (plataforma ANSV).",
         ],
         "infracciones": {c: INFRACCIONES.get(c) for c in usados},

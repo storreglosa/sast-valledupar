@@ -8,6 +8,7 @@ El borrador NO es un hecho: lo valida Santiago (config/semaforos.yaml: asignacio
 
 from __future__ import annotations
 
+import json
 from itertools import combinations
 
 import geopandas as gpd
@@ -79,7 +80,11 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
             conf = "alta" if anclado.get(m["acceso"]) and ok else ("media" if ok else "baja")
             ev = f"Nombre «{g['nombre']}» = movimiento {m['codigo']} (codificación SDM)"
             if anclado.get(m["acceso"]):
-                ev += f"; la cámara {anclado[m['acceso']]} vigila el tránsito que entra desde el {m['acceso']}"
+                ev += (f"; la cámara {anclado[m['acceso']]} vigila el tránsito que entra desde el {m['acceso']} "
+                       "(la misma cámara orienta el cruce: no es evidencia independiente del acceso)")
+            entra = [p for a in arms if a["cardinal"] == m["acceso"] for p in a["partes"] if p["entrante"]]
+            if entra and all(p["unico"] for p in entra):
+                ev += f"; en OSM ese brazo es de un solo sentido y entra al cruce"
             if not ok:
                 ev += "; FALTA el brazo de entrada o de salida en la red OSM"
             asign[g["id"]] = {"confianza": conf, "evidencia": ev}
@@ -123,7 +128,7 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
                         estado(p["tiempos"][j], tipo[j], k + 0.5, c_) in NO_ROJO for k in range(c_))
                 if n:
                     juntos.append(f"{p['id']} {n} s")
-            hallazgos.append(("AVISO" if juntos else "INFO", "matriz_permisiva",
+            hallazgos.append(("AVISO", "matriz_permisiva",
                               f"La matriz deja a {i} ({movs[i].get('codigo') or 'flecha'}) y {j} "
                               f"({movs[j].get('codigo') or 'flecha'}) en verde a la vez aunque sus trayectorias "
                               f"se cruzan; " + (f"corren juntos en {', '.join(juntos)}" if juntos
@@ -214,4 +219,5 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
                              "brazo": brazo, "mitad": m.get("mitad"),
                              "via": (a["nomencla"] or "sin nombre") if a else None,
                              **asign[g["id"]]}
-    return {"geometria": geo, "borrador": borrador, "hallazgos": hallazgos}
+    huella = json.dumps(cfg.get("asignacion") or {}, sort_keys=True, default=str, ensure_ascii=False)
+    return {"geometria": geo, "borrador": borrador, "hallazgos": hallazgos, "asignacion_usada": huella}

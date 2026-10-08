@@ -184,7 +184,7 @@ class LecturaPdf(unittest.TestCase):
     def test_ciclos(self):
         from sast.semaforos import pdf, planes
         for nombre, esperados in self.CICLOS.items():
-            ruta = CARPETA / f"2026-09-29_sistra_planes-{nombre}.pdf"
+            ruta = next(CARPETA.glob(f"*_sistra_planes-{nombre}.pdf"))
             leidos = {}
             for pag in range(3, pdf.n_paginas(ruta)):
                 p, _, _ = planes.leer_plan(ruta, pag)
@@ -194,7 +194,7 @@ class LecturaPdf(unittest.TestCase):
     def test_tabla_la_vina_p2(self):
         """Transcrita a mano de la p. 3 del reporte de La Viña."""
         from sast.semaforos import planes
-        p, g, cruce = planes.leer_plan(CARPETA / "2026-09-29_sistra_planes-la-vina.pdf", 3)
+        p, g, cruce = planes.leer_plan(next(CARPETA.glob("*_sistra_planes-la-vina.pdf")), 3)
         self.assertEqual(p.id, "P2")
         self.assertEqual(p.tiempos, {"G1": {"tira": 25, "tiv": 27, "tfv": 72, "tfa": 75},
                                      "G2": {"tira": 78, "tiv": 80, "tfv": 20, "tfa": 23},
@@ -205,7 +205,7 @@ class LecturaPdf(unittest.TestCase):
 
     def test_matriz_loperena_fase_peatonal_exclusiva(self):
         from sast.semaforos import matriz
-        m = matriz.leer_matriz(CARPETA / "2026-09-29_sistra_planes-loperena.pdf")
+        m = matriz.leer_matriz(next(CARPETA.glob("*_sistra_planes-loperena.pdf")))
         self.assertEqual(m["ambiguas"], [])
         for v in ("G1", "G2", "G3"):
             for p in ("G4", "G5", "G6", "G7"):

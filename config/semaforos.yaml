@@ -1,7 +1,9 @@
 # Intersecciones semaforizadas con SAST en operación (decisiones 27–29, Santiago, 2026-10-08).
 #
 # direccion     cómo se nombra el cruce en el tablero (Excel de equipos y mapas de inventario)
-# archivo       reporte del controlador SISTRA en data/raw/semaforos/ (docs/ingesta.md)
+# archivo       reporte del controlador SISTRA en data/raw/semaforos/ (docs/ingesta.md). La fecha del
+#               nombre es la de creación del PDF (corte de la programación): 26/08/2026 para los cuatro
+#               que adjuntó el correo y 08/10/2026 para Universidad Área Andina (no venía en el correo).
 # controlador   códigos que DEBE traer el reporte (p. 1): equipo controlador y cruce. Si no
 #               coinciden, 09_semaforos.py se detiene (archivo cambiado o mal nombrado).
 # solicitud     solicitud SAST del Excel de equipos; equipos = cámaras del punto.
@@ -25,7 +27,7 @@ intersecciones:
   - id: la-vina
     nombre: La Viña
     direccion: Carrera 9 con Calle 17
-    archivo: 2026-09-29_sistra_planes-la-vina.pdf
+    archivo: 2026-08-26_sistra_planes-la-vina.pdf
     controlador: {equipo: "4254", cruce: "917"}
     solicitud: 5
     equipos: [EQUIPO051, EQUIPO052]
@@ -36,7 +38,7 @@ intersecciones:
   - id: mercado
     nombre: Mercado Público
     direccion: Calle 21 con Transversal 12
-    archivo: 2026-09-29_sistra_planes-mercado.pdf
+    archivo: 2026-08-26_sistra_planes-mercado.pdf
     controlador: {equipo: "4162", cruce: "2112"}
     solicitud: 3
     equipos: [EQUIPO031, EQUIPO032]
@@ -48,7 +50,7 @@ intersecciones:
   - id: manguitos
     nombre: Los Manguitos
     direccion: Diagonal 21 con Carrera 19
-    archivo: 2026-09-29_sistra_planes-manguitos.pdf
+    archivo: 2026-08-26_sistra_planes-manguitos.pdf
     controlador: {equipo: "4190", cruce: "1921"}
     solicitud: 2
     equipos: [EQUIPO021, EQUIPO022]
@@ -59,7 +61,7 @@ intersecciones:
   - id: loperena
     nombre: Colegio Loperena
     direccion: Carrera 12 con Diagonal 16
-    archivo: 2026-09-29_sistra_planes-loperena.pdf
+    archivo: 2026-08-26_sistra_planes-loperena.pdf
     controlador: {equipo: "4159", cruce: "1612"}
     solicitud: 4
     equipos: [EQUIPO041, EQUIPO042]
@@ -71,7 +73,7 @@ intersecciones:
   - id: area-andina
     nombre: Universidad Área Andina
     direccion: Carrera 23 con Calle 6
-    archivo: 2026-09-29_sistra_planes-area-andina.pdf
+    archivo: 2026-10-08_sistra_planes-area-andina.pdf
     controlador: {equipo: "4255", cruce: "2306"}
     solicitud: 7
     equipos: [EQUIPO071]

@@ -28,14 +28,15 @@ export function anillo(it, { tam = 'completo', fases = null } = {}) {
   const capaArcos = s('g');
   const capaMarcas = s('g', { class: 'marcas' });
   const aguja = s('g', {},
-    s('line', { x1: 0, y1: 0, x2: 0, y2: -(R0 + (completo ? 10 : 6)), stroke: '#fff', 'stroke-width': completo ? 2 : 4, 'stroke-linecap': 'round', opacity: 0.92 }),
-    s('circle', { r: completo ? 4 : 7, fill: '#fff' }));
+    s('line', { x1: 0, y1: completo ? -(radio(n - 1) - w) : 0, x2: 0, y2: -(R0 + (completo ? 12 : 6)), stroke: '#fff', 'stroke-width': completo ? 2.4 : 4, 'stroke-linecap': 'round', opacity: 0.95 }),
+    ...(completo ? [] : [s('circle', { r: 7, fill: '#fff' })]));
   const halos = grupos.map((_, i) => s('circle', { cx: 0, cy: -radio(i), r: w * 1.15, fill: 'var(--rojo)', opacity: 0.28 }));
   const cuentas = grupos.map((_, i) => s('circle', { cx: 0, cy: -radio(i), r: w * 0.62, fill: 'var(--rojo)' }));
   const centro = s('g');
   const vista = { viewBox: `${-vb} ${-vb} ${2 * vb} ${2 * vb}` };
   const svgArcos = s('svg', vista, defs, capaMarcas, capaArcos);
-  const svgMovil = s('svg', { ...vista, class: 'movil', 'aria-hidden': 'true' }, ...halos, ...cuentas, aguja);
+  // en el reloj grande la aguja es un solo trazo (las cabezas ya muestran cada luz); en los mini, cuentas LED
+  const svgMovil = s('svg', { ...vista, class: 'movil', 'aria-hidden': 'true' }, ...(completo ? [] : [...halos, ...cuentas]), aguja);
   const svgCentro = s('svg', { ...vista, 'aria-hidden': 'true' }, centro);
   const svg = document.createElement('div');
   svg.className = `anillo ${tam}`;
@@ -43,15 +44,14 @@ export function anillo(it, { tam = 'completo', fases = null } = {}) {
   svg.setAttribute('aria-label', `Reloj del ciclo de ${it.nombre}`);
   svg.append(svgArcos, svgMovil, svgCentro);
 
-  let disp = null, txtPlan = null, txtSub = null;
+  let disp = null, txtSub = null;
   if (completo) {
     disp = display('000', { alto: 40 });
-    const fo = s('g', { transform: 'translate(-26 -40)' });
+    const fo = s('g', { transform: 'translate(-26 -36)' });
     disp.el.setAttribute('width', 52); disp.el.setAttribute('height', 40);
     fo.append(disp.el);
-    txtSub = s('text', { y: 16, 'text-anchor': 'middle', class: 'r-sub' }, 's del ciclo');
-    txtPlan = s('text', { y: 40, 'text-anchor': 'middle', class: 'r-plan' }, '');
-    centro.append(s('circle', { r: radio(n - 1) - w / 2 - 6, fill: 'rgba(5,7,10,.65)' }), fo, txtSub, txtPlan);
+    txtSub = s('text', { y: 22, 'text-anchor': 'middle', class: 'r-sub' }, 's del ciclo');
+    centro.append(s('circle', { r: radio(n - 1) - w / 2 - 6, fill: 'rgba(5,7,10,.65)' }), fo, txtSub);
   }
 
   let planId = null, estados = [];
@@ -94,7 +94,6 @@ export function anillo(it, { tam = 'completo', fases = null } = {}) {
         const r1 = R0 + w / 2 + 2, r2 = R0 + w / 2 + 16;
         capaMarcas.append(s('line', { x1: r1 * Math.cos(a), y1: r1 * Math.sin(a), x2: r2 * Math.cos(a), y2: r2 * Math.sin(a), stroke: 'var(--tinta-2)', 'stroke-width': 1.6 }));
       });
-      txtPlan.textContent = `${plan.id} · ${c} s`;
       if (window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         const tw = window.gsap.fromTo(capaArcos, { opacity: 0, scale: 0.94, transformOrigin: '0 0' }, { opacity: 1, scale: 1, duration: 0.5, ease: 'expo.out' });
         setTimeout(() => tw.progress(1), 1500);

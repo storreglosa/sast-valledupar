@@ -197,6 +197,12 @@ def cardinales(arms: list[dict], c: Point, camaras: list[dict], ejes: dict) -> l
             a["cardinal"] = None
         if not mismos:
             evidencia.append(f"Sin brazo para el acceso {card}")
+    if len(estimados) == 1:
+        evidencia.append("AVISO: la orientación se apoya en una sola cámara SAST; conviene confirmarla en campo")
+    for a in arms:
+        if a["cardinal"] and a["desvio"] > 30:
+            evidencia.append(f"AVISO: {a['id']} ({nombre(a)}) es el acceso {a['cardinal']} pero se desvía "
+                             f"{a['desvio']:.0f}° del eje ideal; confirmar en campo")
     for a in arms:
         evidencia.append(f"{a['id']} {nombre(a)} rumbo {a['rumbo']:.0f}° -> "
                          f"{a['cardinal'] or 'sin acceso'}" + (f" (desvío {a['desvio']:.0f}°)" if a["cardinal"] else ""))

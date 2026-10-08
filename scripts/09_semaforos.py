@@ -183,7 +183,7 @@ def main() -> None:
             "equipos": it["equipos"], "controlador": it["resumen"],
             "cruce_pie": it["planes"][0]["cruce_pie"], "grupos": it["grupos"], "amigos": amigos,
             "planes": planes_json, "horario": it["horario"], "leyenda": it["leyenda_dict"],
-            "geometria": it["geometria"], "borrador": it["borrador"]})
+            "geometria": it["geometria"], "borrador": it["borrador"], "asignacion_usada": it["asignacion_usada"]})
     PROCESSED.mkdir(parents=True, exist_ok=True)
     with open(PROCESSED / "semaforos.json", "w", encoding="utf-8") as f:
         json.dump(salida, f, ensure_ascii=False, indent=1)

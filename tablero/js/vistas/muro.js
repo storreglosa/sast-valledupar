@@ -149,13 +149,14 @@ export function crearMuro(datos) {
       d.el.classList.add('atenuado');
       const ag = anillo(it, { tam: 'completo', fases: (p) => fasesDe(it, p) });
       const cap = h('p', { class: 'gigante-fase', 'aria-live': 'polite' });
-      d.el.append(h('div', { class: 'gigante' }, h('div', { class: 'gigante-anillo' }, ag.el), cap));
+      const nota = h('p', { class: 'gigante-nota' }, 'Asignación de grupos a accesos pendiente de validación: los vehículos y las cabezas sobre el cruce aparecen cuando se valide (decisión 28).');
+      d.el.append(h('div', { class: 'gigante' }, h('div', { class: 'gigante-anillo' }, ag.el), h('div', { class: 'gigante-txt' }, cap, nota)));
       let fPrev = null;
       gigante = (t, p) => {
         ag.actualizar(t, p);
         const fs = fasesDe(it, p);
         const f = fs.find((x) => dur(x.inicio, t, p.ciclo) < x.duracion) || fs[0];
-        if (f !== fPrev && f) { fPrev = f; cap.replaceChildren(h('b', {}, `${f.titulo}. `), f.texto); }
+        if (f !== fPrev && f) { fPrev = f; cap.replaceChildren(h('b', {}, `${f.titulo}. `), h('span', { class: 'largo' }, f.texto), h('span', { class: 'corto' }, f.corto || f.texto)); }
       };
     }
     const controles = h('div', { class: 'controles', role: 'toolbar', 'aria-label': 'Controles de la simulación' });
@@ -166,6 +167,7 @@ export function crearMuro(datos) {
     const sFase = h('span', { class: 'sello', title: sem.nota_fase, tabindex: 0 }, 'Fase ilustrativa');
     sellos.append(sModo, sFase);
     if (it.asignacion.estado === 'borrador') sellos.append(h('span', { class: 'sello borrador', title: 'Asignación grupo → acceso sin validar (decisión 28)' }, 'Borrador sin validar'));
+    if (it.asignacion.estado === 'pendiente') sellos.append(h('span', { class: 'sello', tabindex: 0, title: 'La asignación de grupos a accesos está pendiente de validación: los vehículos y las cabezas sobre el cruce aparecen cuando se valide (decisión 28).' }, 'Accesos por validar'));
     if (Object.keys(g.trayectorias).length) sellos.append(h('span', { class: 'sello', title: sem.nota_vehiculos }, 'Vehículos ilustrativos'));
 
     // controles

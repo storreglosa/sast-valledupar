@@ -537,3 +537,37 @@ svg .parpadea { animation: parpadeo .5s steps(1) infinite; }
 .red button { padding: 4px 4px; }
 .mon-cuerpo h3 { margin-bottom: 6px; }
 .barras .resto { margin: 2px 0 0; font-size: .74rem; color: var(--tinta-2); font-variant-numeric: tabular-nums; }
+
+/* --- verificación final --- */
+.diagrama.atenuado .diag-nota { display: none; }
+.gigante-txt { display: grid; gap: 14px; align-content: center; }
+.gigante-nota { margin: 0; max-width: 40ch; font-size: .78rem; color: var(--tinta-3); }
+.gigante { padding-bottom: 14px; }
+.mon-cuerpo.col { display: flex; flex-direction: column; overflow: hidden; }
+.mon-cuerpo.col > .pestanas { flex: none; }
+.mon-cuerpo.col > .contenido { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; }
+.contenido > .kpis, .contenido > .expl { flex: none; }
+.fases-scroll { position: relative; flex: 1; min-height: 60px; overflow: auto; -webkit-mask-image: linear-gradient(#000 80%, transparent); mask-image: linear-gradient(#000 80%, transparent); padding-bottom: 24px; }
+.expl .lead { margin-bottom: 4px; font-size: .88rem; }
+@media (max-width: 760px) {
+  .fuentes { grid-auto-rows: 112px; }
+  .fuente-anillo { width: 46px; }
+  .gigante-txt { justify-items: center; text-align: center; }
+  .gigante-nota { font-size: .72rem; }
+}
+.kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.kpi .v { font-size: 1.3rem; } .kpi .e { font-size: .66rem; line-height: 1.2; }
+@media (max-width: 760px) {
+  .gigante-nota { display: none; }
+  .gigante-fase { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+}
+@media (max-width: 760px) {
+  .gigante-anillo { width: min(60%, 230px); }
+  .gigante-fase { -webkit-line-clamp: 3; font-size: .82rem; }
+}
+.gigante-fase .corto { display: none; }
+@media (max-width: 760px) {
+  .gigante-fase { display: block; -webkit-line-clamp: unset; overflow: visible; }
+  .gigante-fase .largo { display: none; } .gigante-fase .corto { display: inline; }
+  .diag-norte { top: 8px; right: 8px; bottom: auto; width: 36px; height: 36px; }
+}

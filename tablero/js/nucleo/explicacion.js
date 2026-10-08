@@ -33,6 +33,14 @@ export function rotulo(g, partidos = new Set()) {
   return `${g.nombre} (${nombreVia(m.via) || 'vía sin nombre'}, desde el ${m.acceso})`;
 }
 
+/** Rótulo breve para pantallas chicas: «cebra 22», «Flujo 2 (Carrera 9)», «P21». */
+export function corto(g) {
+  const m = g.mov;
+  if (g.tipo === 'peatonal') return m ? `cebra ${m.codigo}` : g.nombre.replace('Peatonal ', 'P');
+  if (g.tipo === 'flecha') return 'flecha';
+  return m?.via ? `${g.nombre} (${nombreVia(m.via)})` : g.nombre;
+}
+
 /** Segmentos del ciclo para narrar: fase vehicular, fase peatonal o cambio. */
 export function fases(it, plan) {
   const c = plan.ciclo;
@@ -81,22 +89,30 @@ export function fases(it, plan) {
       if (amarillo) partes.push(`${amarillo} s de amarillo${quien.length ? ` para ${lista(quien)}` : ''}`);
       if (todoRojo) partes.push(`${todoRojo} s de todo rojo para despejar el cruce`);
       return { tipo: 'cambio', inicio: s.inicio, fin: s.fin, duracion: d,
-        titulo: 'Cambio', texto: partes.length ? `${lista(partes)}.` : 'Transición.' };
+        titulo: 'Cambio', texto: partes.length ? `${lista(partes)}.` : 'Transición.',
+        corto: [amarillo ? `${amarillo} s amarillo` : '', todoRojo ? `${todoRojo} s todo rojo` : ''].filter(Boolean).join(' + ') || 'transición' };
     }
     const verdes = s.clave.slice(2).split(',');
     if (s.clave.startsWith('P:')) {
       const seg_ = verdes.map((id) => cuenta((e) => e[id] === 'verde'));
       const iguales = seg_.every((x) => x === seg_[0]);
-      return { tipo: 'peatonal', inicio: s.inicio, fin: s.fin, duracion: d, grupos: verdes,
-        titulo: 'Fase peatonal',
-        texto: `Todos los vehículos esperan en rojo y cruzan los peatones de ${lista(verdes.map((id) => rotulo(g[id], part)))}`
-          + (iguales ? ` durante ${seg_[0]} s.` : `: ${lista(verdes.map((id, i) => `${g[id].nombre} ${seg_[i]} s`))}.`) };
+      // vehículos que terminan su amarillo dentro de esta fase: no se puede decir «todos en rojo»
+      const enAmarillo = ids.filter((id) => g[id].tipo !== 'peatonal' && s.seg.some((e) => e[id] === 'amarillo'));
+      const nAmarillo = cuenta((e) => enAmarillo.some((id) => e[id] === 'amarillo'));
+      const quienes = lista(verdes.map((id) => rotulo(g[id], part)));
+      const cuanto = iguales ? ` durante ${seg_[0]} s` : `: ${lista(verdes.map((id, i) => `${g[id].nombre} ${seg_[i]} s`))}`;
+      const texto = enAmarillo.length
+        ? `Cruzan los peatones de ${quienes}${cuanto}. En los primeros ${nAmarillo} s, ${lista(enAmarillo.map((id) => g[id].nombre))} termina su amarillo; los demás vehículos esperan en rojo.`
+        : `Todos los vehículos esperan en rojo y cruzan los peatones de ${quienes}${cuanto}.`;
+      return { tipo: 'peatonal', inicio: s.inicio, fin: s.fin, duracion: d, grupos: verdes, titulo: 'Fase peatonal', texto,
+        corto: `Cruzan peatones: ${lista(verdes.map((id) => corto(g[id])))} · ${d} s` };
     }
     const peatones = ids.filter((id) => g[id].tipo === 'peatonal' && s.seg.some((e) => e[id] === 'verde'));
     let texto = `Verde para ${lista(verdes.map((id) => rotulo(g[id], part)))} durante ${d} s.`;
     if (peatones.length) texto += ` A la vez cruzan los peatones de ${lista(peatones.map((id) => rotulo(g[id], part)))}.`;
-    return { tipo: 'vehicular', inicio: s.inicio, fin: s.fin, duracion: d, grupos: verdes, titulo: 'Fase', texto };
-  }).map((f, i, arr) => ({ ...f, titulo: f.tipo === 'vehicular'
+    return { tipo: 'vehicular', inicio: s.inicio, fin: s.fin, duracion: d, grupos: verdes, titulo: 'Fase', texto,
+      corto: `Verde: ${lista(verdes.map((id) => corto(g[id])))} · ${d} s${peatones.length ? ` · cruzan ${lista(peatones.map((id) => corto(g[id])))}` : ''}` };
+  }).map((f) => ({ ...f, texto: f.texto.replace(/ de el /g, ' del ') })).map((f, i, arr) => ({ ...f, titulo: f.tipo === 'vehicular'
     ? `Fase ${arr.slice(0, i + 1).filter((x) => x.tipo === 'vehicular').length}` : f.titulo }));
 }
 

@@ -87,8 +87,9 @@ def validar(inter: dict) -> list[Hallazgo]:
             if t["tfa"] == c:
                 fin_ciclo.append(g)
             if t["tira"] is None and tipo[g] != "peatonal":
-                h("AVISO", pid, "tira_vacia", f"{g} ({tipo[g]}): TIRA en blanco en la tabla; se deja sin "
-                  "preparación (en campo es rojo igual, decisión 29)")
+                h("AVISO", pid, "tira_vacia", f"{g} ({tipo[g]}): TIRA en blanco en la tabla del PDF, aunque el "
+                  "diagrama de barras de esa página puede dibujar rojo-amarillo antes del verde; se deja sin "
+                  "preparación hasta que Santiago decida cuál vale (en campo es rojo igual, decisión 29)")
             prep = dur(t["tira"], t["tiv"], c) if t["tira"] is not None else 0
             verde, cola = dur(t["tiv"], t["tfv"], c), dur(t["tfv"], t["tfa"], c)
             if verde == 0:
@@ -125,8 +126,11 @@ def validar(inter: dict) -> list[Hallazgo]:
                         despejes.append((dur(ti["tfa"], tj["tiv"], c), i, j))
         if despejes:
             s, i, j = min(despejes)
-            nivel = "AVISO" if s == 0 else "INFO"
-            h(nivel, pid, "todo_rojo_min", f"Despeje mínimo entre grupos en conflicto: {s:g} s ({i} → {j})")
+            h("INFO", pid, "todo_rojo_min", f"Despeje mínimo entre grupos en conflicto: {s:g} s ({i} → {j})")
+            for s0, i0, j0 in sorted(despejes):
+                if s0 == 0:
+                    h("AVISO", pid, "despeje_cero", f"{i0} termina su amarillo o despeje y {j0} entra en verde "
+                      "en el mismo segundo: 0 s de despeje entre grupos en conflicto")
 
     # ---- horario
     planes = {p["id"] for p in inter["planes"]}

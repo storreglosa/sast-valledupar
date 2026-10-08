@@ -18,14 +18,16 @@ Siniestros: `scripts/00_snapshot_portal.py` los descarga del portal ANSV (solo l
 `PORTAL_URL`, `PORTAL_USERNAME` y `PORTAL_PASSWORD` (copiarlo de ArcgisManage: `cp ../ArcgisManage/.env .env`).
 
 Planeamientos semafóricos (reportes del controlador SISTRA Wiseverse V3.0 y correo de remisión del
-29/09/2026, decisión 27). La fecha del nombre es la de la remisión:
+29/09/2026, decisión 27). La fecha del nombre es la de creación de cada PDF (`pdfinfo`): los cuatro
+que adjuntó el correo son del 26/08/2026; el de Universidad Área Andina, del 08/10/2026 (no venía
+en el correo). El correo lleva la fecha en que se envió:
 
 ```bash
 D=/mnt/c/Users/santi/Downloads; R=data/raw/semaforos; mkdir -p $R
-cp "$D/01. SEM - LA VIÑA.pdf"                  $R/2026-09-29_sistra_planes-la-vina.pdf
-cp "$D/02. SEM - MERCADO.pdf"                  $R/2026-09-29_sistra_planes-mercado.pdf
-cp "$D/03. SEM - MANGUITOS.pdf"                $R/2026-09-29_sistra_planes-manguitos.pdf
-cp "$D/04. SEM - LOPERENA.pdf"                 $R/2026-09-29_sistra_planes-loperena.pdf
-cp "$D/05. SEM - UNIVERSIDAD AREA ANDINA.pdf"  $R/2026-09-29_sistra_planes-area-andina.pdf
+cp "$D/01. SEM - LA VIÑA.pdf"                  $R/2026-08-26_sistra_planes-la-vina.pdf
+cp "$D/02. SEM - MERCADO.pdf"                  $R/2026-08-26_sistra_planes-mercado.pdf
+cp "$D/03. SEM - MANGUITOS.pdf"                $R/2026-08-26_sistra_planes-manguitos.pdf
+cp "$D/04. SEM - LOPERENA.pdf"                 $R/2026-08-26_sistra_planes-loperena.pdf
+cp "$D/05. SEM - UNIVERSIDAD AREA ANDINA.pdf"  $R/2026-10-08_sistra_planes-area-andina.pdf
 cp "$D/correo.pdf"                             $R/2026-09-29_sttv_correo-planeamientos.pdf
 ```

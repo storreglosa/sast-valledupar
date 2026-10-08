@@ -4,23 +4,23 @@
  "poppler": "pdftotext version 26.01.0",
  "fuente": [
   {
-   "archivo": "semaforos/2026-09-29_sistra_planes-la-vina.pdf",
+   "archivo": "semaforos/2026-08-26_sistra_planes-la-vina.pdf",
    "sha256": "39a56fc0837c03763c80ef0f9176f793474a88602bf0b3c9b0658eb88a2b80cb"
   },
   {
-   "archivo": "semaforos/2026-09-29_sistra_planes-mercado.pdf",
+   "archivo": "semaforos/2026-08-26_sistra_planes-mercado.pdf",
    "sha256": "f07c5450fbc6bde8aebbcad890ffb72773dcc09869272140d6d7d87e1c22e6f0"
   },
   {
-   "archivo": "semaforos/2026-09-29_sistra_planes-manguitos.pdf",
+   "archivo": "semaforos/2026-08-26_sistra_planes-manguitos.pdf",
    "sha256": "2fdf9280ff5d4aa83365244857acad68c11a56696c44310755b524f4b62cb0ab"
   },
   {
-   "archivo": "semaforos/2026-09-29_sistra_planes-loperena.pdf",
+   "archivo": "semaforos/2026-08-26_sistra_planes-loperena.pdf",
    "sha256": "180d37fb27b9915e4b563a4f75d715848ad2b01acd44416dd5348de5266fa690"
   },
   {
-   "archivo": "semaforos/2026-09-29_sistra_planes-area-andina.pdf",
+   "archivo": "semaforos/2026-10-08_sistra_planes-area-andina.pdf",
    "sha256": "a4004e7c6890f19c0b8b08429840eadb25668a97d4723e644f6ed197d052c463"
   }
  ],
@@ -28,7 +28,7 @@
   {
    "id": "la-vina",
    "nombre": "La Viña",
-   "archivo": "2026-09-29_sistra_planes-la-vina.pdf",
+   "archivo": "2026-08-26_sistra_planes-la-vina.pdf",
    "solicitud": 5,
    "equipos": [
     "EQUIPO051",
@@ -1224,7 +1224,7 @@
      "mitad": null,
      "via": "KR 9",
      "confianza": "alta",
-     "evidencia": "Nombre «Flujo 2» = movimiento 2 (codificación SDM); la cámara EQUIPO051 vigila el tránsito que entra desde el sur"
+     "evidencia": "Nombre «Flujo 2» = movimiento 2 (codificación SDM); la cámara EQUIPO051 vigila el tránsito que entra desde el sur (la misma cámara orienta el cruce: no es evidencia independiente del acceso); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G2": {
      "nombre": "Flujo 4",
@@ -1237,7 +1237,7 @@
      "mitad": null,
      "via": "CL 17",
      "confianza": "alta",
-     "evidencia": "Nombre «Flujo 4» = movimiento 4 (codificación SDM); la cámara EQUIPO052 vigila el tránsito que entra desde el este"
+     "evidencia": "Nombre «Flujo 4» = movimiento 4 (codificación SDM); la cámara EQUIPO052 vigila el tránsito que entra desde el este (la misma cámara orienta el cruce: no es evidencia independiente del acceso); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G3": {
      "nombre": "Peatonal 22",
@@ -1265,12 +1265,13 @@
      "confianza": "media",
      "evidencia": "Nombre «Peatonal 24» = cruce 24 (codificación SDM): mitad de entrada del brazo este"
     }
-   }
+   },
+   "asignacion_usada": "{}"
   },
   {
    "id": "mercado",
    "nombre": "Mercado Público",
-   "archivo": "2026-09-29_sistra_planes-mercado.pdf",
+   "archivo": "2026-08-26_sistra_planes-mercado.pdf",
    "solicitud": 3,
    "equipos": [
     "EQUIPO031",
@@ -3084,7 +3085,7 @@
      "mitad": null,
      "via": "sin nombre",
      "confianza": "alta",
-     "evidencia": "Nombre «Flujo 1» = movimiento 1 (codificación SDM); la cámara EQUIPO032 vigila el tránsito que entra desde el norte"
+     "evidencia": "Nombre «Flujo 1» = movimiento 1 (codificación SDM); la cámara EQUIPO032 vigila el tránsito que entra desde el norte (la misma cámara orienta el cruce: no es evidencia independiente del acceso); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G2": {
      "nombre": "Flujo 2",
@@ -3097,7 +3098,7 @@
      "mitad": null,
      "via": "KR 16",
      "confianza": "media",
-     "evidencia": "Nombre «Flujo 2» = movimiento 2 (codificación SDM)"
+     "evidencia": "Nombre «Flujo 2» = movimiento 2 (codificación SDM); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G3": {
      "nombre": "Flujo 3",
@@ -3110,7 +3111,7 @@
      "mitad": null,
      "via": "CL 21",
      "confianza": "alta",
-     "evidencia": "Nombre «Flujo 3» = movimiento 3 (codificación SDM); la cámara EQUIPO031 vigila el tránsito que entra desde el oeste"
+     "evidencia": "Nombre «Flujo 3» = movimiento 3 (codificación SDM); la cámara EQUIPO031 vigila el tránsito que entra desde el oeste (la misma cámara orienta el cruce: no es evidencia independiente del acceso); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G4": {
      "nombre": "Flujo 4",
@@ -3123,7 +3124,7 @@
      "mitad": null,
      "via": "CL 21",
      "confianza": "media",
-     "evidencia": "Nombre «Flujo 4» = movimiento 4 (codificación SDM)"
+     "evidencia": "Nombre «Flujo 4» = movimiento 4 (codificación SDM); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G5": {
      "nombre": "Peatonal 21",
@@ -3164,12 +3165,13 @@
      "confianza": "media",
      "evidencia": "Nombre «Peatonal 24» = cruce 24 (codificación SDM): mitad de entrada del brazo este"
     }
-   }
+   },
+   "asignacion_usada": "{}"
   },
   {
    "id": "manguitos",
    "nombre": "Los Manguitos",
-   "archivo": "2026-09-29_sistra_planes-manguitos.pdf",
+   "archivo": "2026-08-26_sistra_planes-manguitos.pdf",
    "solicitud": 2,
    "equipos": [
     "EQUIPO021",
@@ -4749,6 +4751,7 @@
      "EQUIPO021 vigila «SUR - NORTE»; queda a 8° del brazo B3 (DG 21)",
      "EQUIPO022 vigila «NORTE - SUR»; queda a 4° del brazo B1 (DG 21)",
      "Norte de la codificación a 25° del norte de la cuadrícula CTM12",
+     "AVISO: B4 (KR 19) es el acceso oeste pero se desvía 42° del eje ideal; confirmar en campo",
      "B1 DG 21 rumbo 25° -> norte (desvío 0°)",
      "B2 KR 19 rumbo 121° -> este (desvío 6°)",
      "B3 DG 21 rumbo 206° -> sur (desvío 0°)",
@@ -4767,7 +4770,7 @@
      "mitad": null,
      "via": "DG 21",
      "confianza": "alta",
-     "evidencia": "Nombre «Flujo 1» = movimiento 1 (codificación SDM); la cámara EQUIPO022 vigila el tránsito que entra desde el norte"
+     "evidencia": "Nombre «Flujo 1» = movimiento 1 (codificación SDM); la cámara EQUIPO022 vigila el tránsito que entra desde el norte (la misma cámara orienta el cruce: no es evidencia independiente del acceso); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G2": {
      "nombre": "Flujo 2",
@@ -4780,7 +4783,7 @@
      "mitad": null,
      "via": "DG 21",
      "confianza": "alta",
-     "evidencia": "Nombre «Flujo 2» = movimiento 2 (codificación SDM); la cámara EQUIPO021 vigila el tránsito que entra desde el sur"
+     "evidencia": "Nombre «Flujo 2» = movimiento 2 (codificación SDM); la cámara EQUIPO021 vigila el tránsito que entra desde el sur (la misma cámara orienta el cruce: no es evidencia independiente del acceso); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G3": {
      "nombre": "Flujo 3",
@@ -4793,7 +4796,7 @@
      "mitad": null,
      "via": "KR 19",
      "confianza": "media",
-     "evidencia": "Nombre «Flujo 3» = movimiento 3 (codificación SDM)"
+     "evidencia": "Nombre «Flujo 3» = movimiento 3 (codificación SDM); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G4": {
      "nombre": "Flujo 4",
@@ -4821,12 +4824,13 @@
      "confianza": "baja",
      "evidencia": "Compatible solo con giros que no cruzan a sus amigos; arranca con el acceso norte en 4 de 4 planes. Alternativas: giro a la derecha desde el este (sale al norte). POR CONFIRMAR."
     }
-   }
+   },
+   "asignacion_usada": "{}"
   },
   {
    "id": "loperena",
    "nombre": "Colegio Loperena",
-   "archivo": "2026-09-29_sistra_planes-loperena.pdf",
+   "archivo": "2026-08-26_sistra_planes-loperena.pdf",
    "solicitud": 4,
    "equipos": [
     "EQUIPO041",
@@ -6526,7 +6530,7 @@
      "mitad": null,
      "via": "KR 12",
      "confianza": "media",
-     "evidencia": "Nombre «Flujo 1» = movimiento 1 (codificación SDM)"
+     "evidencia": "Nombre «Flujo 1» = movimiento 1 (codificación SDM); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G2": {
      "nombre": "Flujo 2",
@@ -6539,7 +6543,7 @@
      "mitad": null,
      "via": "KR 12",
      "confianza": "alta",
-     "evidencia": "Nombre «Flujo 2» = movimiento 2 (codificación SDM); la cámara EQUIPO042 vigila el tránsito que entra desde el sur"
+     "evidencia": "Nombre «Flujo 2» = movimiento 2 (codificación SDM); la cámara EQUIPO042 vigila el tránsito que entra desde el sur (la misma cámara orienta el cruce: no es evidencia independiente del acceso); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G3": {
      "nombre": "Flujo 3",
@@ -6552,7 +6556,7 @@
      "mitad": null,
      "via": "DG 21",
      "confianza": "alta",
-     "evidencia": "Nombre «Flujo 3» = movimiento 3 (codificación SDM); la cámara EQUIPO041 vigila el tránsito que entra desde el oeste"
+     "evidencia": "Nombre «Flujo 3» = movimiento 3 (codificación SDM); la cámara EQUIPO041 vigila el tránsito que entra desde el oeste (la misma cámara orienta el cruce: no es evidencia independiente del acceso); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G4": {
      "nombre": "Peatonal 21",
@@ -6606,12 +6610,13 @@
      "confianza": "media",
      "evidencia": "Nombre «Peatonal 34» = cruce 34 (codificación SDM): mitad de salida del brazo oeste"
     }
-   }
+   },
+   "asignacion_usada": "{}"
   },
   {
    "id": "area-andina",
    "nombre": "Universidad Área Andina",
-   "archivo": "2026-09-29_sistra_planes-area-andina.pdf",
+   "archivo": "2026-10-08_sistra_planes-area-andina.pdf",
    "solicitud": 7,
    "equipos": [
     "EQUIPO071"
@@ -8355,6 +8360,7 @@
     "evidencia": [
      "EQUIPO071 vigila «OESTE - ESTE»; queda a 22° del brazo B3 (CL 6)",
      "Norte de la codificación a 340° del norte de la cuadrícula CTM12",
+     "AVISO: la orientación se apoya en una sola cámara SAST; conviene confirmarla en campo",
      "B1 CL 6 rumbo 72° -> este (desvío 2°)",
      "B2 KR 23 rumbo 153° -> sur (desvío 7°)",
      "B3 CL 6 rumbo 250° -> oeste (desvío 0°)",
@@ -8373,7 +8379,7 @@
      "mitad": null,
      "via": "KR 23",
      "confianza": "media",
-     "evidencia": "Nombre «Flujo 1» = movimiento 1 (codificación SDM)"
+     "evidencia": "Nombre «Flujo 1» = movimiento 1 (codificación SDM); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G2": {
      "nombre": "Flujo 2",
@@ -8386,7 +8392,7 @@
      "mitad": null,
      "via": "KR 23",
      "confianza": "media",
-     "evidencia": "Nombre «Flujo 2» = movimiento 2 (codificación SDM)"
+     "evidencia": "Nombre «Flujo 2» = movimiento 2 (codificación SDM); en OSM ese brazo es de un solo sentido y entra al cruce"
     },
     "G3": {
      "nombre": "Flujo 3",
@@ -8399,7 +8405,7 @@
      "mitad": null,
      "via": "CL 6",
      "confianza": "alta",
-     "evidencia": "Nombre «Flujo 3» = movimiento 3 (codificación SDM); la cámara EQUIPO071 vigila el tránsito que entra desde el oeste"
+     "evidencia": "Nombre «Flujo 3» = movimiento 3 (codificación SDM); la cámara EQUIPO071 vigila el tránsito que entra desde el oeste (la misma cámara orienta el cruce: no es evidencia independiente del acceso)"
     },
     "G4": {
      "nombre": "Peatonal 22",
@@ -8440,7 +8446,8 @@
      "confianza": "media",
      "evidencia": "Nombre «Peatonal 31» = cruce 31 (codificación SDM): mitad de salida del brazo sur"
     }
-   }
+   },
+   "asignacion_usada": "{}"
   }
  ]
 }

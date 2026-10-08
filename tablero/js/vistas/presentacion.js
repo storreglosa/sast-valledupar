@@ -63,7 +63,7 @@ export function presentacion(muro) {
     }
     tl.addLabel('fin')
       .call(() => { cruceActual = null; cambiar({ fuente: 'mapa', modo: 'vivo' }); mapa?.vistaGeneral(1600);
-        decir(`<b>Fase ilustrativa.</b> El plan es el real de cada hora; el segundo del ciclo no está sincronizado con el controlador. Fuente: reportes SISTRA del 29/09/2026.`); })
+        decir(`<b>Fase ilustrativa.</b> El plan es el real de cada hora; el segundo del ciclo no está sincronizado con el controlador. Fuente: ${sem.fuente.replace(', leídos por scripts/09_semaforos.py', '')}.`); })
       .to({}, { duration: 8 });
     window.addEventListener('keydown', teclas);
     $('#btn-presentar').setAttribute('aria-pressed', 'true');
