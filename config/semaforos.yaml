@@ -3,7 +3,8 @@
 # direccion     cómo se nombra el cruce en el tablero (Excel de equipos y mapas de inventario)
 # archivo       reporte del controlador SISTRA en data/raw/semaforos/ (docs/ingesta.md). La fecha del
 #               nombre es la de creación del PDF (corte de la programación): 26/08/2026 para los cuatro
-#               que adjuntó el correo y 08/10/2026 para Universidad Área Andina (no venía en el correo).
+#               que adjuntó el correo y 08/10/2026 para Universidad Área Andina (no venía en el correo: lo
+#               descargó Santiago del controlador ese día).
 # controlador   códigos que DEBE traer el reporte (p. 1): equipo controlador y cruce. Si no
 #               coinciden, 09_semaforos.py se detiene (archivo cambiado o mal nombrado).
 # solicitud     solicitud SAST del Excel de equipos; equipos = cámaras del punto.

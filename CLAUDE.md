@@ -161,3 +161,10 @@ Decisiones del 2026-10-08, Santiago (tablero de semáforos SAST, `tablero/`):
     explicación muestran el rojo máximo y el verde promedio (flujos vehiculares) del plan.
     **Los Manguitos validado** por Santiago el mismo día sobre el ensayo: los cinco cruces quedan
     con la asignación validada.
+
+Decisiones del 2026-10-09, Santiago:
+33. **TIRA en blanco de La Viña P5 G1: manda la tabla** del controlador (queda sin preparación; el
+    diagrama de barras de la misma página dibuja 0–2 s). En campo se ve rojo igual (decisión 29), así
+    que el tablero no cambia; el hallazgo pasa de AVISO a INFO. **Procedencia del reporte de
+    Universidad Área Andina:** lo descargó Santiago del controlador el 08/10/2026 (no venía en el
+    correo del 29/09/2026).

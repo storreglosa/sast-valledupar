@@ -87,9 +87,10 @@ def validar(inter: dict) -> list[Hallazgo]:
             if t["tfa"] == c:
                 fin_ciclo.append(g)
             if t["tira"] is None and tipo[g] != "peatonal":
-                h("AVISO", pid, "tira_vacia", f"{g} ({tipo[g]}): TIRA en blanco en la tabla del PDF, aunque el "
-                  "diagrama de barras de esa página puede dibujar rojo-amarillo antes del verde; se deja sin "
-                  "preparación hasta que Santiago decida cuál vale (en campo es rojo igual, decisión 29)")
+                # decidido por Santiago (2026-10-09, decisión 33): manda la tabla; queda como constancia
+                h("INFO", pid, "tira_vacia", f"{g} ({tipo[g]}): TIRA en blanco en la tabla del PDF, aunque el "
+                  "diagrama de barras de esa página puede dibujar preparación antes del verde; manda la tabla "
+                  "y queda sin preparación (decisión 33; en campo se ve rojo igual, decisión 29)")
             prep = dur(t["tira"], t["tiv"], c) if t["tira"] is not None else 0
             verde, cola = dur(t["tiv"], t["tfv"], c), dur(t["tfv"], t["tfa"], c)
             if verde == 0:

@@ -20,7 +20,8 @@ Siniestros: `scripts/00_snapshot_portal.py` los descarga del portal ANSV (solo l
 Planeamientos semafóricos (reportes del controlador SISTRA Wiseverse V3.0 y correo de remisión del
 29/09/2026, decisión 27). La fecha del nombre es la de creación de cada PDF (`pdfinfo`): los cuatro
 que adjuntó el correo son del 26/08/2026; el de Universidad Área Andina, del 08/10/2026 (no venía
-en el correo). El correo lleva la fecha en que se envió:
+en el correo: lo descargó Santiago del controlador ese día, decisión 33). El correo lleva la fecha
+en que se envió:
 
 ```bash
 D=/mnt/c/Users/santi/Downloads; R=data/raw/semaforos; mkdir -p $R

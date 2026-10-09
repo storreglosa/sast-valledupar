@@ -4,7 +4,7 @@ INFO,la-vina,P1,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 3 s (G1
 INFO,la-vina,P2,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 4 s (G2 → G1)
 INFO,la-vina,P3,tfa_fin_ciclo,TFA = 30 (fin del ciclo) en G1: equivale a 0
 INFO,la-vina,P3,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 2 s (G1 → G2)
-AVISO,la-vina,P5,tira_vacia,"G1 (vehicular): TIRA en blanco en la tabla del PDF, aunque el diagrama de barras de esa página puede dibujar rojo-amarillo antes del verde; se deja sin preparación hasta que Santiago decida cuál vale (en campo es rojo igual, decisión 29)"
+INFO,la-vina,P5,tira_vacia,"G1 (vehicular): TIRA en blanco en la tabla del PDF, aunque el diagrama de barras de esa página puede dibujar preparación antes del verde; manda la tabla y queda sin preparación (decisión 33; en campo se ve rojo igual, decisión 29)"
 INFO,la-vina,P5,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 3 s (G1 → G2)
 INFO,la-vina,,fin_dia,La leyenda termina tramos a las 23:59: se toma como 24:00
 INFO,mercado,,ubicacion,"Reporte: «Calle21 X Carrera12»; planes: «CRUCE 2112, UBICADO EN Calle 20 x Cra 12»"
