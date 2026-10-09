@@ -74,7 +74,7 @@ intersecciones:
     senalizacion: {cajon_amarillo: false, cebras_sin_semaforo: []}
     # mapa anotado por Santiago (2026-10-08): el acceso 4 es la Calle 21, de un solo sentido hacia el
     # cruce (OSM la tiene de doble sentido); los pares del 1 y del 4 quedan antes del empalme de la
-    # Calle 21 y el del 3 a la entrada del cruce; el del 2 no cambia.
+    # Calle 21 y el del 3 a la entrada del cruce; el del 2 no cambia. Validado el 2026-10-08.
     geometria:
       radio_dibujo: 110
       sentidos: {CL 21: entra}
@@ -83,8 +83,12 @@ intersecciones:
       pare_m: {norte: 58, oeste: 13, este: 77}
     # movimientos de cada grupo según sus esquemas sobre Google Maps (2026-10-08). Oeste = Carrera 19
     # hacia el noroccidente; nadie sale por la Carrera 19 al suroriente ni entra a la Calle 21.
-    # La Flecha (G5) queda como en el borrador: giro a la derecha desde el norte. En revisión.
+    # La Flecha (G5) queda como en el borrador: giro a la derecha desde el norte. Validado por Santiago
+    # sobre la página de validación y el ensayo del tablero (2026-10-08).
     asignacion:
+      validado_por: Santiago Torreglosa
+      fecha: 2026-10-08
+      desde_borrador: true
       cambios:
         G1: {sale_por: [sur, oeste]}     # sigue al sur por la Diagonal 21 o gira en «U» a la Carrera 19
         G2: {sale_por: [norte, oeste]}   # sigue al norte o gira a la izquierda a la Carrera 19

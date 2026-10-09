@@ -5151,8 +5151,8 @@
      "brazo": "norte",
      "mitad": null,
      "via": "DG 21",
-     "confianza": "media",
-     "evidencia": "Corrección de campo de Santiago; pendiente de su revisión"
+     "confianza": "validada",
+     "evidencia": "Corregido por Santiago Torreglosa"
     },
     "G2": {
      "nombre": "Flujo 2",
@@ -5164,8 +5164,8 @@
      "brazo": "sur",
      "mitad": null,
      "via": "DG 21",
-     "confianza": "media",
-     "evidencia": "Corrección de campo de Santiago; pendiente de su revisión"
+     "confianza": "validada",
+     "evidencia": "Corregido por Santiago Torreglosa"
     },
     "G3": {
      "nombre": "Flujo 3",
@@ -5177,8 +5177,8 @@
      "brazo": "oeste",
      "mitad": null,
      "via": "KR 19",
-     "confianza": "media",
-     "evidencia": "Corrección de campo de Santiago; pendiente de su revisión"
+     "confianza": "validada",
+     "evidencia": "Corregido por Santiago Torreglosa"
     },
     "G4": {
      "nombre": "Flujo 4",
@@ -5190,8 +5190,8 @@
      "brazo": "este",
      "mitad": null,
      "via": "CL 21",
-     "confianza": "media",
-     "evidencia": "Corrección de campo de Santiago; pendiente de su revisión"
+     "confianza": "validada",
+     "evidencia": "Corregido por Santiago Torreglosa"
     },
     "G5": {
      "nombre": "Flecha",
@@ -5207,7 +5207,7 @@
      "evidencia": "Compatible solo con giros que no cruzan a sus amigos; arranca con el acceso norte en 4 de 4 planes. Alternativas: giro a la derecha desde el este (sale al norte). POR CONFIRMAR."
     }
    },
-   "asignacion_usada": "{\"cambios\": {\"G1\": {\"sale_por\": [\"sur\", \"oeste\"]}, \"G2\": {\"sale_por\": [\"norte\", \"oeste\"]}, \"G3\": {\"sale_por\": [\"sur\", \"norte\"]}, \"G4\": {\"sale_por\": [\"norte\", \"sur\"]}}}"
+   "asignacion_usada": "{\"cambios\": {\"G1\": {\"sale_por\": [\"sur\", \"oeste\"]}, \"G2\": {\"sale_por\": [\"norte\", \"oeste\"]}, \"G3\": {\"sale_por\": [\"sur\", \"norte\"]}, \"G4\": {\"sale_por\": [\"norte\", \"sur\"]}}, \"desde_borrador\": true, \"fecha\": \"2026-10-08\", \"validado_por\": \"Santiago Torreglosa\"}"
   },
   {
    "id": "loperena",
