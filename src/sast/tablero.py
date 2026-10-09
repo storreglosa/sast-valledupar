@@ -16,6 +16,7 @@ import openpyxl
 import pandas as pd
 
 from sast.ejecutivo import INFRACCIONES
+from sast.semaforos.cruce import huella_config
 
 ESQUEMAS = {"semaforos": "tablero-semaforos/1", "geometria": "tablero-geometria/1", "sast": "tablero-sast/1"}
 NOTA_FASE = ("Fase ilustrativa: el plan es el que rige a esta hora, pero el segundo del ciclo no está "
@@ -34,17 +35,20 @@ def _mov(b: dict) -> dict:
 def semaforos(proc: dict, conf: dict, borrador: bool) -> tuple[dict, dict]:
     """(semaforos.json, geometria.json) a partir de data/processed/semaforos.json y la config."""
     cfg = {c["id"]: c for c in conf["intersecciones"]}
+    if proc.get("errores_sin_decision"):
+        raise SystemExit(f"La etapa 9 terminó con {len(proc['errores_sin_decision'])} hallazgos de nivel ERROR sin "
+                         "decisión (outputs/tables/semaforos_validacion.csv): no se publica")
     inters, geos = [], {}
     for it in proc["intersecciones"]:
         c = cfg[it["id"]]
         val = c.get("asignacion")
-        huella = json.dumps(val or {}, sort_keys=True, default=str, ensure_ascii=False)
-        if it.get("asignacion_usada", "{}") != huella:
-            raise SystemExit(f"{it['id']}: la asignación de config/semaforos.yaml cambió desde la última corrida "
-                             "de la etapa 9; corre scripts/09_semaforos.py antes de 10_tablero.py")
+        if it.get("config_usada") != huella_config(c):
+            raise SystemExit(f"{it['id']}: la config del cruce en config/semaforos.yaml (asignación, geometría, centro "
+                             "o señalización) cambió desde la última corrida de la etapa 9; corre "
+                             "scripts/09_semaforos.py antes de 10_tablero.py")
         if val and val.get("validado_por"):
             # validada: el borrador de la etapa 9 ya trae las correcciones (cambios) con su geometría
-            mov = {g: _mov(b) for g, b in it["borrador"].items()}
+            mov = {g: {**_mov(b), "confirmada": True} for g, b in it["borrador"].items()}
             estado = "validada"
         elif borrador:
             estado, mov = "borrador", {g: _mov(b) for g, b in it["borrador"].items()}
@@ -61,7 +65,7 @@ def semaforos(proc: dict, conf: dict, borrador: bool) -> tuple[dict, dict]:
             "id": it["id"], "nombre": it["nombre"], "direccion": c["direccion"], "controlador": {"equipo": it["controlador"]["equipo"],
                                                                      "cruce": it["controlador"]["cruce"]},
             "cruce_pie": it["cruce_pie"].split("UBICADO EN ")[-1].strip(),
-            "equipos": it["equipos"], "centro": it["geometria"]["origen"],
+            "equipos": it["equipos"], "centro": {**it["geometria"]["origen"], "crs": "EPSG:4326"},
             "grupos": grupos, "amigos": it["amigos"],
             "planes": [{k: p[k] for k in ("id", "ciclo", "con_horario", "tiempos", "kpis", "etapas")}
                        for p in it["planes"]],
@@ -90,11 +94,13 @@ def semaforos(proc: dict, conf: dict, borrador: bool) -> tuple[dict, dict]:
     sem = {"esquema": ESQUEMAS["semaforos"], "generado": proc["generado"], "zona_horaria": "America/Bogota",
            "nota_fase": NOTA_FASE, "nota_vehiculos": NOTA_VEHICULOS,
            "fuente": "Reportes del controlador SISTRA Wiseverse V3.0 (" + ", ".join(
-               f"{f[8:10]}/{f[5:7]}/{f[:4]}" for f in sorted({a["archivo"].split("/")[-1][:10] for a in proc["fuente"]}))
+               f"{f[8:10]}/{f[5:7]}/{f[:4]}" for f in sorted({a["archivo"].split("/")[-1][:10] for a in proc["fuente"]
+                                                               if "_sistra_" in a["archivo"]}))
                + "), leídos por scripts/09_semaforos.py",
            "intersecciones": inters}
     geo = {"esquema": ESQUEMAS["geometria"], "unidad": "m", "crs_origen": "EPSG:9377 (CTM12), relativo al centro",
-           "atribucion": "Vías © colaboradores de OpenStreetMap (ODbL), corte 2026-08-05",
+           "atribucion": "Vías © colaboradores de OpenStreetMap (ODbL), corte "
+                         + next(a["archivo"].split("/")[-1][:10] for a in proc["fuente"] if a["archivo"].startswith("red_vial/")),
            "intersecciones": geos}
     return sem, geo
 

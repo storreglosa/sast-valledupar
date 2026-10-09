@@ -57,7 +57,7 @@ async function iniciar() {
       h('p', {}, h('b', {}, 'Simulación. '), sem.nota_vehiculos, ' Las cabezas muestran lo que se ve en campo: la preparación de 2 s antes del verde es rojo y el último segundo peatonal es rojo intermitente.'),
       h('p', {}, h('b', {}, 'Equipos SAST y línea base. '), `${sast.criterio} Cortes: siniestros ${sast.cortes.siniestros}, comparendos ${sast.cortes.comparendos}.`),
       h('p', {}, h('b', {}, 'Mapa. '), 'Mapa base OpenFreeMap con datos de OpenStreetMap. ', geo.atribucion, '.'),
-      h('p', {}, 'Secretaría de Tránsito y Transporte de Valledupar. Generado el ', sem.generado, '.'));
+      h('p', {}, 'Secretaría de Tránsito y Transporte de Valledupar. Datos al corte del ', sem.generado, '.'));
     dlg.showModal();
   });
 

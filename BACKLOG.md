@@ -3,20 +3,21 @@
 Lista viva de pendientes. Lo hecho se tacha con la fecha.
 
 ## Tablero de semáforos SAST (`tablero/`, decisiones 26–30)
-- [ ] Copiar los PDF a `data/raw/semaforos/` con sus fechas reales (`docs/ingesta.md`), correr
-      `00_manifiesto.py` y volver a correr 09 y 10 sin `SAST_RAW` (cierra la cadena de insumos).
-- [ ] Procedencia del reporte de Universidad Área Andina (PDF creado el 08/10/2026, no venía en el
-      correo): quién lo exportó y desde cuándo rige esa programación.
-- [ ] La Viña P5, G1: la tabla del PDF trae el TIRA en blanco y el diagrama dibuja rojo-amarillo de
-      0 a 2 s. Decidir cuál vale y registrarlo en `config/semaforos.yaml` (hoy: sin preparación).
-- [ ] Validar el borrador grupo → acceso (`outputs/semaforos_validacion-accesos.html`): Flecha de
-      Los Manguitos, brazo este de la Calle 6 sin grupo (Área Andina), centro de Mercado, desvío de
-      42° de la Carrera 19 en Manguitos, orientación de Área Andina con una sola cámara.
+- [x] ~~Copiar los PDF a `data/raw/semaforos/`, manifiesto y 09/10 sin `SAST_RAW`~~ (2026-10-08).
+- [x] ~~Procedencia del reporte de Universidad Área Andina~~: lo descargó Santiago del controlador el
+      08/10/2026 (decisión 33). Falta: desde cuándo rige esa programación en el controlador.
+- [x] ~~La Viña P5, G1, TIRA en blanco~~: manda la tabla (decisión 33, `config/semaforos.yaml: decisiones`).
+- [x] ~~Validar el borrador grupo → acceso~~: los cinco cruces validados (decisiones 31 y 32).
+- [ ] Los Manguitos: confirmar en campo si se puede entrar por la Carrera 19 desde el suroriente
+      (B3); hoy ningún grupo lo controla (AVISO `brazo_sin_acceso`).
+- [ ] Mercado: el tablero rotula «Carrera 16» y «Carrera 15» (nombres OSM) los brazos sur y
+      noroccidental; las otras fuentes hablan de Cra 12 / Tv 12. Confirmar y, si hace falta,
+      corregir con `nombres_via`.
 - [ ] Revisar en campo los 9 pares con 0 s de despeje (Loperena P5; Área Andina P1, P2, P4, P5) y la
       matriz permisiva de Mercado (G2 con G6).
-- [ ] Ficha de procedencia de las etapas 9 y 10 (después de cerrar la cadena de insumos).
+- [ ] Ficha de procedencia de las etapas 9 y 10 (revisor-datos del 2026-10-09: apto con correcciones).
 - [ ] Descripción de los códigos C31, D07 y D10 (solo equipos 061/062, que no operan).
-- [ ] Publicación: repo público, Pages con «GitHub Actions», push confirmado por Santiago.
+- [x] ~~Publicación: repo público, Pages con «GitHub Actions»~~ (2026-10-09).
 
 ## Datos y validación
 - [ ] Revisar a mano `outputs/tables/revision_geocodificacion_en_zona.csv`, que tiene todas las

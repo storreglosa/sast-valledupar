@@ -47,8 +47,9 @@ python -m http.server 8765 -d tablero   # ver en http://127.0.0.1:8765
    `asignacion: {validado_por: Santiago Torreglosa, fecha: AAAA-MM-DD, desde_borrador: true}`
    y, si algún grupo cambia, `cambios: {G5: {movimiento: "…", acceso: norte, sale_por: oeste}}`.
 3. Correr `09_semaforos.py` (traza los movimientos con la asignación nueva), `10_tablero.py` y la
-   guardia; commit y push. Si se salta 09, 10 se detiene: la asignación del config no coincide con
-   la que usó 09.
+   guardia; commit y push. Si se salta 09, 10 se detiene: la config del cruce (asignación, geometría,
+   centro o señalización) no coincide con la que usó 09. También se detiene si 09 terminó con
+   hallazgos de nivel ERROR sin decisión en `config/semaforos.yaml` (`decisiones`).
 
 Si lo que está mal es la geometría y no el grupo (una vía con el sentido desactualizado en OSM, un
 acceso que entra por otra calle, una línea de pare en otro sitio), se corrige en el mismo cruce con

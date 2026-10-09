@@ -125,6 +125,9 @@ intersecciones:
     geometria:
       sentidos: {CL 6: {sentido: sale, lado: este}}
 
-# Hallazgos de nivel ERROR que Santiago decidió aceptar (no detienen 09_semaforos.py):
-# - {interseccion: …, codigo: …, decision: "…", fecha: AAAA-MM-DD}
-decisiones: []
+# Decisiones de Santiago sobre hallazgos de 09_semaforos.py: aceptan un ERROR (no detiene la etapa) o
+# cierran un AVISO (queda como INFO con la decisión). Acotadas al cruce y al código y, si se dan, al
+# plan y al grupo: {interseccion: …, codigo: …, plan: P5, grupo: G1, decision: "…", fecha: AAAA-MM-DD}
+decisiones:
+  - {interseccion: la-vina, codigo: tira_vacia, plan: P5, grupo: G1, fecha: 2026-10-09,
+     decision: "manda la tabla del controlador, aunque el diagrama de barras de la página dibuja 0–2 s de preparación; queda sin preparación (decisión 33)"}

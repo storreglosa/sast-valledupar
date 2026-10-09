@@ -1,6 +1,6 @@
 // Explicación en lenguaje claro de un plan: fases, cambios, fase peatonal y comparación con la
 // noche. Solo afirma lo que sale de los tiempos del controlador (nada de aforos ni causas supuestas).
-import { estado, NO_ROJO, kpis } from './tiempos.js';
+import { estado, NO_ROJO, kpis, dur } from './tiempos.js';
 import { hhmm, NOMBRE_DIA } from './horario.js';
 
 const VIA = { KR: 'Carrera', CL: 'Calle', DG: 'Diagonal', TV: 'Transversal', AV: 'Avenida' };
@@ -29,7 +29,7 @@ export function rotulo(g, partidos = new Set()) {
     const lado = partidos.has(m.brazo) ? `, carriles de ${m.mitad}` : '';
     return `la cebra ${m.codigo} (${nombreVia(m.via) || 'vía'}, brazo ${m.brazo}${lado})`;
   }
-  if (g.tipo === 'flecha') return `la flecha de giro a la ${m.movimiento.includes('izquierda') ? 'izquierda' : 'derecha'} desde el ${m.acceso} (por confirmar)`;
+  if (g.tipo === 'flecha') return `la flecha de giro a la ${m.movimiento.includes('izquierda') ? 'izquierda' : 'derecha'} desde el ${m.acceso}${m.confirmada ? '' : ' (por confirmar)'}`;
   return `${g.nombre} (${nombreVia(m.via) || 'vía sin nombre'}, desde el ${m.acceso})`;
 }
 
@@ -122,7 +122,7 @@ export function fases(it, plan) {
 export function resumen(it, plan, vigente) {
   const k = kpis(plan, it.grupos);
   const g = Object.fromEntries(it.grupos.map((x) => [x.id, x]));
-  const { rojoMax, rojoMaxId, verdeProm } = claves(plan, it.grupos);
+  const { rojoMax, rojoMaxId, rojoPeatMax, rojoPeatMaxId, verdeProm } = claves(plan, it.grupos);
   const cuando = vigente
     ? `${NOMBRE_DIA[vigente.b.diaSemana]} ${hhmm(vigente.b.minutos)}${vigente.festivo ? ` (festivo: ${vigente.festivo})` : ''}`
     : null;
@@ -130,7 +130,8 @@ export function resumen(it, plan, vigente) {
     ? `Ahora (${cuando}) rige el plan ${plan.id}.`
     : `Plan ${plan.id}${plan.con_horario ? '' : ', programado en el controlador pero sin horario: hoy no corre'}.`;
   const ciclo = `El ciclo dura ${plan.ciclo} s: el semáforo repite la misma secuencia ${String(k.ciclos_hora).replace('.', ',')} veces por hora.`;
-  const espera = `Quien llega justo cuando se pone en rojo espera hasta ${rojoMax} s (${g[rojoMaxId].nombre}). `
+  const espera = `Un vehículo que llega justo cuando se pone en rojo espera hasta ${rojoMax} s (${g[rojoMaxId].nombre})`
+    + (rojoPeatMax != null ? `; un peatón, hasta ${rojoPeatMax} s (${g[rojoPeatMaxId].nombre}). ` : '. ')
     + `El verde de los flujos vehiculares dura en promedio ${verdeProm} s.`;
 
   // comparación con el plan más corto que sí corre (de noche)
@@ -141,22 +142,30 @@ export function resumen(it, plan, vigente) {
     const kc = kpis(corto, it.grupos);
     const bloques = Object.entries(it.horario).flatMap(([d, f]) => f.filter((b) => b[2] === corto.id).map((b) => b));
     const horas = [...new Set(bloques.map(([a, b]) => `${hhmm(a)}–${hhmm(b)}`))].join(' y ');
-    noche = `En ${horas} rige ${corto.id}, con un ciclo de ${corto.ciclo} s: la espera máxima en rojo baja de ${rojoMax} s a ${Math.max(...Object.values(kc.rojo_s))} s.`;
+    noche = `En ${horas} rige ${corto.id}, con un ciclo de ${corto.ciclo} s: la espera máxima de los vehículos en rojo baja de ${rojoMax} s a ${Math.max(...Object.values(kc.rojo_s))} s.`;
   }
   const verdes = Object.entries(k.verde_s).filter(([id]) => g[id].tipo !== 'peatonal')
     .map(([id, s]) => ({ id, s, pct: k.verde_pct[id] }));
-  return { intro, ciclo, espera, noche, verdes, kpis: k, rojoMax, rojoMaxId, verdeProm, fases: fases(it, plan) };
+  return { intro, ciclo, espera, noche, verdes, kpis: k, rojoMax, rojoMaxId, rojoPeatMax, rojoPeatMaxId, verdeProm, fases: fases(it, plan) };
 }
 
-/** Cifras clave de un plan: el rojo más largo (grupo vehicular o flecha) y el verde promedio de los
- *  flujos vehiculares (sin flechas ni peatonales, que se montan sobre otros verdes). */
+/** Cifras clave de un plan.
+ *  - rojoMax: el rojo más largo de un grupo vehicular o flecha (rojo = ciclo − (TFA − TIV): la
+ *    preparación cuenta como rojo, decisión 29).
+ *  - rojoPeatMax: lo mismo para los grupos peatonales (null si no hay); suele ser mayor.
+ *  - verdeProm: promedio del verde de los flujos vehiculares (sin flechas ni peatonales, que se montan
+ *    sobre otros verdes), redondeado al segundo; los ,5 suben (Math.round). */
 export function claves(plan, grupos) {
   const k = kpis(plan, grupos);
+  const c = plan.ciclo;
   const tipo = Object.fromEntries(grupos.map((g) => [g.id, g.tipo]));
-  const [rojoMaxId, rojoMax] = Object.entries(k.rojo_s).reduce((a, b) => (b[1] > a[1] ? b : a));
+  const mayor = (pares) => (pares.length ? pares.reduce((a, b) => (b[1] > a[1] ? b : a)) : [null, null]);
+  const [rojoMaxId, rojoMax] = mayor(Object.entries(k.rojo_s));
+  const [rojoPeatMaxId, rojoPeatMax] = mayor(Object.entries(plan.tiempos).filter(([id]) => tipo[id] === 'peatonal')
+    .map(([id, t]) => [id, c - dur(t.tiv, t.tfa, c)]));
   const veh = Object.entries(k.verde_s).filter(([id]) => tipo[id] === 'vehicular').map(([, v]) => v);
   const verdeProm = veh.length ? Math.round(veh.reduce((a, b) => a + b, 0) / veh.length) : null;
-  return { rojoMax, rojoMaxId, verdeProm, ciclo: plan.ciclo, ciclosHora: k.ciclos_hora };
+  return { rojoMax, rojoMaxId, rojoPeatMax, rojoPeatMaxId, verdeProm, ciclo: c, ciclosHora: k.ciclos_hora };
 }
 
 export const GLOSARIO = [

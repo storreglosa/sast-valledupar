@@ -4,7 +4,7 @@ INFO,la-vina,P1,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 3 s (G1
 INFO,la-vina,P2,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 4 s (G2 → G1)
 INFO,la-vina,P3,tfa_fin_ciclo,TFA = 30 (fin del ciclo) en G1: equivale a 0
 INFO,la-vina,P3,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 2 s (G1 → G2)
-INFO,la-vina,P5,tira_vacia,"G1 (vehicular): TIRA en blanco en la tabla del PDF, aunque el diagrama de barras de esa página puede dibujar preparación antes del verde; manda la tabla y queda sin preparación (decisión 33; en campo se ve rojo igual, decisión 29)"
+INFO,la-vina,P5,tira_vacia,"G1 (vehicular): TIRA en blanco en la tabla del PDF; revisar si el diagrama de barras de esa página dibuja preparación antes del verde y decidir cuál vale (config: decisiones; en campo se ve rojo igual, decisión 29). Decidido (2026-10-09): manda la tabla del controlador, aunque el diagrama de barras de la página dibuja 0–2 s de preparación; queda sin preparación (decisión 33)"
 INFO,la-vina,P5,todo_rojo_min,Despeje mínimo entre grupos en conflicto: 3 s (G1 → G2)
 INFO,la-vina,,fin_dia,La leyenda termina tramos a las 23:59: se toma como 24:00
 INFO,mercado,,ubicacion,"Reporte: «Calle21 X Carrera12»; planes: «CRUCE 2112, UBICADO EN Calle 20 x Cra 12»"
@@ -51,4 +51,5 @@ AVISO,area-andina,P5,despeje_cero,G1 termina su amarillo o despeje y G5 entra en
 INFO,area-andina,,fin_dia,La leyenda termina tramos a las 23:59: se toma como 24:00
 AVISO,mercado,,matriz_permisiva,La matriz deja a G2 (2) y G6 (22) en verde a la vez aunque sus trayectorias se cruzan; en los planes nunca coinciden
 AVISO,manguitos,,orientacion,B5 (KR 19) es el acceso oeste pero se desvía 42° del eje ideal; confirmar en campo
+AVISO,manguitos,,brazo_sin_acceso,"B3 (KR 19): según OSM se puede entrar por ese brazo, no es acceso de la codificación y ningún grupo lo controla; confirmar en campo"
 AVISO,area-andina,,orientacion,la orientación se apoya en una sola cámara SAST; conviene confirmarla en campo

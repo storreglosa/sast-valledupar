@@ -164,9 +164,10 @@ export function reloj(it, fases) {
       if (cifras.dataset.plan !== p.id) {
         cifras.dataset.plan = p.id;
         const k = claves(p, it.grupos);
-        const nom = it.grupos.find((g) => g.id === k.rojoMaxId)?.nombre || k.rojoMaxId;
+        const nombre = (id) => it.grupos.find((g) => g.id === id)?.nombre || id;
+        const peat = k.rojoPeatMax != null ? ` Peatones: hasta ${k.rojoPeatMax} s (${nombre(k.rojoPeatMaxId)}).` : '';
         cifras.replaceChildren(
-          h('span', { title: `La espera más larga en rojo: ${nom}` }, h('b', {}, `${k.rojoMax} s`), ' rojo máx.'),
+          h('span', { title: `La espera más larga en rojo de un grupo vehicular: ${nombre(k.rojoMaxId)}.${peat}` }, h('b', {}, `${k.rojoMax} s`), ' rojo máx. vehicular'),
           ...(k.verdeProm != null ? [h('span', { title: 'Promedio del verde de los flujos vehiculares (sin flechas ni peatonales)' }, h('b', {}, `${k.verdeProm} s`), ' verde prom.')] : []));
       }
       foco.textContent = enfoque ? `Centro: cuenta regresiva de ${enfoque}` : '';
@@ -229,12 +230,12 @@ export function explicacionMon(it, { alElegirPlan }) {
       const k = r.kpis;
       contenido.append(h('div', { class: 'kpis' },
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${plan.ciclo} s`), h('div', { class: 'e' }, 'dura el ciclo')),
-        h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${r.rojoMax} s`), h('div', { class: 'e' }, 'rojo máximo')),
+        h('div', { class: 'kpi', title: r.rojoPeatMax != null ? `Peatones: hasta ${r.rojoPeatMax} s en rojo` : '' }, h('div', { class: 'v num' }, `${r.rojoMax} s`), h('div', { class: 'e' }, 'rojo máx. vehicular')),
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, r.verdeProm != null ? `${r.verdeProm} s` : '–'), h('div', { class: 'e' }, 'verde promedio')),
         h('div', { class: 'kpi' }, h('div', { class: 'v num' }, `${k.todo_rojo_s} s`), h('div', { class: 'e' }, 'todo rojo por ciclo'))));
       // los mismos cuatro indicadores en una línea: reemplaza a la fila en pantallas bajas (CSS)
       contenido.append(h('p', { class: 'kpis-linea' }, h('b', { class: 'num' }, `${plan.ciclo} s`), ' de ciclo · ',
-        h('b', { class: 'num' }, `${r.rojoMax} s`), ' rojo máximo · ', ...(r.verdeProm != null ? [h('b', { class: 'num' }, `${r.verdeProm} s`), ' verde promedio · '] : []),
+        h('b', { class: 'num' }, `${r.rojoMax} s`), ' rojo máx. vehicular · ', ...(r.verdeProm != null ? [h('b', { class: 'num' }, `${r.verdeProm} s`), ' verde promedio · '] : []),
         h('b', { class: 'num' }, `${k.todo_rojo_s} s`), ' de todo rojo'));
       const ex = h('div', { class: 'expl' }, h('p', { class: 'lead', title: `${r.ciclo} ${r.espera}` }, r.intro, h('span', { class: 'lead-ciclo' }, ` ${r.ciclo}`)));
       const ol = h('ol', { class: 'fases' });

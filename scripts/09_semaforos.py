@@ -22,7 +22,6 @@ import hashlib
 import json
 import os
 import sys
-from datetime import date
 
 import geopandas as gpd
 import pandas as pd
@@ -88,7 +87,8 @@ def main() -> None:
         conf = yaml.safe_load(f)
     archivos = [RAW / "semaforos" / c["archivo"] for c in conf["intersecciones"]]
     ruta_correo = RAW / "semaforos" / "2026-09-29_sttv_correo-planeamientos.pdf"
-    verificar_manifiesto(archivos + [ruta_correo])
+    red = ultimo(RAW / "red_vial", "*_osm_red-vial-valledupar.gpkg")
+    verificar_manifiesto(archivos + [ruta_correo, red])
     if sha256(ruta_correo) != correo.leer()["sha256_pdf"]:
         raise SystemExit("El PDF del correo no es el transcrito en config/semaforos_correo.yaml")
     print(f"poppler: {pdf.version_poppler()}")
@@ -97,7 +97,6 @@ def main() -> None:
     hallazgos = [x for it in inters for x in validar(it)]
 
     # ---------------- geometría OSM y borrador de accesos (decisiones 28 y 30)
-    red = ultimo(RAW / "red_vial", "*_osm_red-vial-valledupar.gpkg")
     vias = gpd.read_file(red, layer="vias").to_crs(CRS_METRICO)
     nodos = gpd.read_file(red, layer="intersecciones").to_crs(CRS_METRICO)
     eq = gpd.read_file(OUTPUTS / "capas" / "equipos_sast.geojson").to_crs(CRS_METRICO)
@@ -107,7 +106,18 @@ def main() -> None:
                 for r in eq[eq["equipo"].isin(it["equipos"])].itertuples()]
         it.update(cruce.armar(it, it, vias, nodos, cams))
         hallazgos += [Hallazgo(n, it["id"], "", cod, txt) for n, cod, txt in it["hallazgos"]]
-    aceptadas = {(d["interseccion"], d["codigo"]) for d in conf.get("decisiones") or []}
+    # decisiones de Santiago (config: decisiones): aceptan un ERROR o cierran un AVISO, acotadas al cruce,
+    # el código y, si se dan, el plan y el grupo; el hallazgo queda en INFO con la decisión al lado
+    decisiones = conf.get("decisiones") or []
+
+    def decision(x):
+        return next((d for d in decisiones if d["interseccion"] == x.interseccion and d["codigo"] == x.codigo
+                     and d.get("plan", x.plan) == x.plan and x.texto.startswith(d.get("grupo", ""))), None)
+    for i, x in enumerate(hallazgos):
+        d = decision(x)
+        if d and x.nivel == "AVISO":
+            hallazgos[i] = Hallazgo("INFO", x.interseccion, x.plan, x.codigo,
+                                    f"{x.texto}. Decidido ({d['fecha']}): {d['decision']}")
 
     # ---------------- reporte en consola
     for it in inters:
@@ -120,7 +130,7 @@ def main() -> None:
     print("\nHallazgos:")
     for x in hallazgos:
         if x.nivel != "INFO":
-            marca = "  (aceptado)" if (x.interseccion, x.codigo) in aceptadas else ""
+            marca = "  (aceptado)" if decision(x) else ""
             print(f"  {x.nivel:5} {x.interseccion:11} {x.plan:3} {x.codigo}: {x.texto}{marca}")
     print(f"  ({sum(x.nivel == 'INFO' for x in hallazgos)} de nivel INFO en semaforos_validacion.csv)")
 
@@ -156,11 +166,17 @@ def main() -> None:
     print(dif.drop(columns="decision").to_string(index=False))
 
     # ---------------- JSON procesado y estados de referencia
+    errores = [x for x in hallazgos if x.nivel == "ERROR" and decision(x) is None]
+    capa_equipos = OUTPUTS / "capas" / "equipos_sast.geojson"
     salida = {
         "esquema": "semaforos-procesado/1",
-        "generado": date.today().isoformat(),
+        # fecha de corte de los insumos (la más reciente de sus nombres), no la de la corrida: así dos
+        # corridas en días distintos dan el mismo archivo
+        "generado": max(a.name[:10] for a in archivos),
         "poppler": pdf.version_poppler(),
-        "fuente": [{"archivo": a.relative_to(RAW).as_posix(), "sha256": sha256(a)} for a in archivos],
+        "fuente": [{"archivo": a.relative_to(RAW).as_posix(), "sha256": sha256(a)} for a in archivos + [red]]
+                  + [{"archivo": capa_equipos.relative_to(RAIZ).as_posix(), "sha256": sha256(capa_equipos)}],
+        "errores_sin_decision": [f"{x.interseccion} {x.plan} {x.codigo}: {x.texto}" for x in errores],
         "intersecciones": [],
     }
     referencia = {}
@@ -183,7 +199,8 @@ def main() -> None:
             "equipos": it["equipos"], "controlador": it["resumen"],
             "cruce_pie": it["planes"][0]["cruce_pie"], "grupos": it["grupos"], "amigos": amigos,
             "planes": planes_json, "horario": it["horario"], "leyenda": it["leyenda_dict"],
-            "geometria": it["geometria"], "borrador": it["borrador"], "asignacion_usada": it["asignacion_usada"]})
+            "geometria": it["geometria"], "borrador": it["borrador"], "config_usada": it["config_usada"],
+            "correcciones_campo": it["correcciones_campo"]})
     PROCESSED.mkdir(parents=True, exist_ok=True)
     with open(PROCESSED / "semaforos.json", "w", encoding="utf-8") as f:
         json.dump(salida, f, ensure_ascii=False, indent=1)
@@ -199,7 +216,6 @@ def main() -> None:
     validacion_html.escribir(salida, dif, por_inter, OUTPUTS / "semaforos_validacion-accesos.html", FIGURAS)
     print(f"\nEscrito data/processed/semaforos.json ({len(inters)} intersecciones) y tablas en outputs/tables/")
 
-    errores = [x for x in hallazgos if x.nivel == "ERROR" and (x.interseccion, x.codigo) not in aceptadas]
     if errores:
         sys.exit(f"{len(errores)} hallazgos de nivel ERROR sin decisión en config/semaforos.yaml")
 

@@ -237,6 +237,11 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
         if any(p["entrante"] for p in a["partes"]) and card not in controlados:
             hallazgos.append(("AVISO", "acceso_sin_grupo", f"El brazo {card} ({a['nomencla'] or 'sin nombre'}) "
                               "recibe tránsito en OSM pero ningún grupo vehicular lo controla"))
+    for a in arms:      # brazos que no son acceso de la codificación pero por los que se puede entrar
+        if not a["cardinal"] and id(a) not in usados and any(p["entrante"] for p in a["partes"]):
+            hallazgos.append(("AVISO", "brazo_sin_acceso", f"{a['id']} ({a['nomencla'] or 'sin nombre'}): según OSM "
+                              "se puede entrar por ese brazo, no es acceso de la codificación y ningún grupo lo "
+                              "controla; confirmar en campo"))
 
     # vías para dibujar: las que forman el cruce y las del contexto cercano
     circulo = c.buffer(r_dib)
@@ -288,6 +293,13 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
         "evidencia": evidencia,
         **({"vista": vista} if vista else {}),
     }
+    validada = (cfg.get("asignacion") or {}).get("validado_por")
+    if validada:     # la propuesta quedó validada en bloque: se dice, sin borrar de dónde salió
+        fecha = cfg["asignacion"].get("fecha")
+        for gid, a in asign.items():
+            if a["confianza"] != "validada":
+                asign[gid] = {"confianza": "validada",
+                              "evidencia": f"Validado por {validada} ({fecha}). Propuesta ({a['confianza']}): {a['evidencia']}"}
     borrador = {}
     for g in grupos:
         m = movs[g["id"]]
@@ -304,5 +316,13 @@ def armar(cfg: dict, inter: dict, vias: gpd.GeoDataFrame, nodos: gpd.GeoDataFram
                              "brazo": brazo, "mitad": m.get("mitad"),
                              "via": (a["nomencla"] or "sin nombre") if a else None,
                              **asign[g["id"]]}
-    huella = json.dumps(cfg.get("asignacion") or {}, sort_keys=True, default=str, ensure_ascii=False)
-    return {"geometria": geo, "borrador": borrador, "hallazgos": hallazgos, "asignacion_usada": huella}
+    return {"geometria": geo, "borrador": borrador, "hallazgos": hallazgos, "config_usada": huella_config(cfg),
+            "correcciones_campo": aj or None}
+
+
+CLAVES_HUELLA = ("asignacion", "geometria", "centro", "senalizacion")
+
+
+def huella_config(cfg: dict) -> str:
+    """Lo que la etapa 9 usa de la config de un cruce. La 10 la compara: si cambió, hay que correr la 9."""
+    return json.dumps({k: cfg.get(k) for k in CLAVES_HUELLA}, sort_keys=True, default=str, ensure_ascii=False)
