@@ -1,0 +1,26 @@
+Asunto: Cargue de la línea base de indicadores SAST en la plataforma ANSV – Valledupar
+
+[Destinatario: nombre y cargo]
+[Dependencia / entidad]
+
+Cordial saludo.
+
+Por medio del presente informo que la Secretaría de Tránsito y Transporte de Valledupar realizó el cargue de la línea base de indicadores de seguridad vial de los Sistemas Automáticos y Semiautomáticos de Detección de Infracciones (SAST) en la plataforma de la Agencia Nacional de Seguridad Vial (fotodeteccion-app.ansv.gov.co).
+
+El cargue comprende los nueve (9) equipos en operación, cada uno con sus tres (3) años de línea base (36 meses previos al inicio de operación del equipo), con los indicadores de fallecidos, lesionados y comparendos impuestos por código de infracción en la zona de influencia de cada equipo:
+
+- Solicitud SOL0000010402: EQUIPO021 y EQUIPO022 (inicio de operación: 2 de septiembre de 2026).
+- Solicitud SOL0000010802: EQUIPO031 y EQUIPO032 (inicio de operación: 27 de agosto de 2026).
+- Solicitud SOL0000010743: EQUIPO041 (inicio de operación: 18 de agosto de 2026) y EQUIPO042 (inicio de operación: 17 de junio de 2026).
+- Solicitud SOL0000010882: EQUIPO051 y EQUIPO052 (inicio de operación: 27 de agosto de 2026).
+- Solicitud SOL0000010785: EQUIPO071 (inicio de operación: 2 de octubre de 2026).
+
+Se adjunta el documento «Soporte_cargue_linea_base_SAST_ANSV.pdf», con los pantallazos de la plataforma tomados el 16 de octubre de 2026, que evidencian la información registrada para cada equipo y año.
+
+Quedo atento a cualquier observación o requerimiento adicional.
+
+Atentamente,
+
+[Nombre]
+[Cargo]
+Secretaría de Tránsito y Transporte de Valledupar
