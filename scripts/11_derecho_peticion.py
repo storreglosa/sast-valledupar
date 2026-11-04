@@ -29,6 +29,7 @@ Salida: outputs/<corte>_sttv_derecho-peticion-num12_siniestros-sast.{docx,xlsx}
 import argparse
 import hashlib
 import json
+import re
 from datetime import date, datetime
 
 import geopandas as gpd
@@ -59,6 +60,15 @@ def fecha_larga(f) -> str:
 
 def n_txt(n: int, singular: str, plural: str) -> str:
     return f"{n} {singular if n == 1 else plural}"
+
+
+def victimas_txt(f: int, l: int) -> str:
+    fa, le = n_txt(f, "fallecido", "fallecidos"), n_txt(l, "lesionado", "lesionados")
+    if f and l:
+        return f"con {fa} y {le}"
+    if f:
+        return f"con {fa} y sin lesionados"
+    return f"sin fallecidos y con {le}" if l else "sin fallecidos ni lesionados"
 
 
 def fecha_corta(f) -> str:
@@ -169,8 +179,9 @@ def _celda(celda, texto, negrita=False, centrado=True, tam=9) -> None:
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 
-def _tabla_word(doc, t: pd.DataFrame, etiqueta: str, filas_etiqueta: list[str], total: bool) -> None:
-    cab1 = [etiqueta, "Inicio de operación", "Antes (5 años previos)", "", "",
+def _tabla_word(doc, t: pd.DataFrame, etiqueta: str, filas_etiqueta: list[str], total: bool,
+                rotulo_inicio: str = "Inicio de operación") -> None:
+    cab1 = [etiqueta, rotulo_inicio, "Antes (5 años previos)", "", "",
             "Después (desde el inicio)", "", ""]
     cab2 = ["", "", "Siniestros con víctimas", "Fallecidos", "Lesionados",
             "Siniestros con víctimas", "Fallecidos", "Lesionados"]
@@ -222,6 +233,49 @@ def _parrafo(doc, texto, negrita=False, cursiva=False, tam=11, alinear=WD_ALIGN_
     return p
 
 
+def _num(n: int) -> str:
+    """Número en letras y cifras para los conteos pequeños del texto («nueve (9)»)."""
+    letras = ["cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez"]
+    return f"{letras[n]} ({n})" if 0 <= n <= 10 else str(n)
+
+
+def _titulo(doc, texto: str) -> None:
+    _parrafo(doc, texto, negrita=True, tam=11, alinear=WD_ALIGN_PARAGRAPH.LEFT)
+
+
+def _rotulo(doc, texto: str) -> None:
+    _parrafo(doc, texto, negrita=True, tam=10, alinear=WD_ALIGN_PARAGRAPH.LEFT)
+
+
+def _tabla_simple(doc, cabecera: list[str], filas: list[list], anchos: list) -> object:
+    w = doc.add_table(rows=1, cols=len(cabecera))
+    w.style = "Table Grid"
+    w.alignment = WD_TABLE_ALIGNMENT.CENTER
+    for i, c in enumerate(cabecera):
+        _celda(w.rows[0].cells[i], c, negrita=True)
+        _sombrear(w.rows[0].cells[i], "D9E2F3")
+    for f in filas:
+        cells = w.add_row().cells
+        for i, v in enumerate(f):
+            _celda(cells[i], v, centrado=i > 0)
+    for fila in w.rows:
+        for c, a in zip(fila.cells, anchos):
+            c.width = a
+    return w
+
+
+def _fusionar_verticales(w, columnas: list[int], grupos: list[int]) -> None:
+    """Fusiona en vertical las celdas de `columnas` para cada grupo de filas (tamaños en `grupos`)."""
+    fila = 1
+    for n in grupos:
+        if n > 1:
+            for c in columnas:
+                texto = w.cell(fila, c).text
+                w.cell(fila, c).merge(w.cell(fila + n - 1, c))
+                _celda(w.cell(fila, c), texto, centrado=c > 0)
+        fila += n
+
+
 def escribir_word(ruta, tp, te, puntos, equipos, descarga) -> None:
     doc = Document()
     cp = doc.core_properties
@@ -237,77 +291,143 @@ def escribir_word(ruta, tp, te, puntos, equipos, descarga) -> None:
     doc.styles["Normal"].font.name = "Arial"
     doc.styles["Normal"].font.size = Pt(11)
 
-    _parrafo(doc, "INSUMO TÉCNICO PARA RESPUESTA A DERECHO DE PETICIÓN — NUMERAL 12",
+    n_p, n_e = len(puntos), len(equipos)
+    ini_min, ini_max = equipos["inicio"].min(), equipos["inicio"].max()
+    tot_a = tp[["antes_siniestros", "antes_fallecidos", "antes_lesionados"]].sum().astype(int)
+    tot_d = tp[["despues_siniestros", "despues_fallecidos", "despues_lesionados"]].sum().astype(int)
+    sv = ("siniestro vial con víctimas", "siniestros viales con víctimas")
+
+    _parrafo(doc, "INSUMO TÉCNICO PARA LA RESPUESTA AL DERECHO DE PETICIÓN — NUMERAL 12",
              negrita=True, tam=12, alinear=WD_ALIGN_PARAGRAPH.CENTER)
     _parrafo(doc, "Secretaría de Tránsito y Transporte de Valledupar", tam=10,
              alinear=WD_ALIGN_PARAGRAPH.CENTER)
-    _parrafo(doc, f"Pregunta: «{PREGUNTA}».", cursiva=True)
+    _parrafo(doc, f"Fecha de corte de la información: {fecha_larga(descarga)}", tam=10,
+             alinear=WD_ALIGN_PARAGRAPH.CENTER)
 
-    _parrafo(doc, "Respuesta", negrita=True)
-    n_puntos, n_equipos = len(puntos), len(equipos)
+    # 1. Pregunta
+    _titulo(doc, "1. Solicitud")
+    _parrafo(doc, f"«{PREGUNTA}».", cursiva=True)
+
+    # 2. Contexto
+    _titulo(doc, "2. Equipos SAST en operación en Valledupar")
     _parrafo(doc, (
-        f"En el municipio de Valledupar operan {n_equipos} equipos de sistemas automáticos, "
-        f"semiautomáticos y otros medios tecnológicos (SAST), ubicados en {n_puntos} puntos. A continuación "
-        "se informa el número de siniestros viales con víctimas, fallecidos y lesionados registrados en la zona de "
-        "influencia de cada punto en dos periodos: antes de la instalación, durante los cinco (5) años "
-        "previos a la fecha de inicio de operación, y después de la instalación, desde la fecha de inicio "
-        f"de operación hasta el {fecha_larga(descarga)}."))
+        f"A la fecha de corte, el municipio de Valledupar cuenta con {_num(n_e)} equipos de sistemas "
+        "automáticos, semiautomáticos y otros medios tecnológicos (SAST) para la detección de infracciones "
+        f"de tránsito, todos en operación, instalados en {_num(n_p)} puntos de la red vial urbana. Cada punto "
+        "corresponde a una solicitud autorizada por la Agencia Nacional de Seguridad Vial (ANSV) y agrupa uno "
+        "o dos equipos, que controlan sentidos de circulación distintos en una misma intersección o en "
+        "intersecciones contiguas."))
     _parrafo(doc, (
-        "Las cifras corresponden a los casos de siniestralidad vial registrados en la zona de influencia "
-        "de cada equipo, según el registro de siniestros viales conocidos por la Secretaría de Tránsito y "
-        "Transporte de Valledupar (capa «Siniestralidad Valledupar», que consolida informes de la Policía "
-        "de Tránsito, reportes de la Secretaría y casos de deceso posterior), con corte al "
+        "Los equipos no iniciaron operación en la misma fecha. La entrada en operación fue escalonada entre "
+        f"el {fecha_larga(ini_min)} y el {fecha_larga(ini_max)}, según las fechas de inicio de operación "
+        "registradas para cada equipo en la plataforma de fotodetección de la ANSV. La Tabla 1 relaciona "
+        "cada equipo con su punto, su código único en la plataforma, la ubicación y el sentido que controla, "
+        "y su fecha de inicio de operación."))
+    _rotulo(doc, "Tabla 1. Equipos SAST en operación, fecha de inicio por equipo y fecha de inicio "
+                 "considerada para el punto")
+    filas, grupos = [], []
+    for p in puntos.itertuples():
+        eqs = equipos[equipos["punto"] == p.punto]
+        grupos.append(len(eqs))
+        for e in eqs.itertuples():
+            filas.append([p.punto.title(), e.equipo, e.codigo_unico, e.direccion_ansv.title(),
+                          fecha_corta(e.inicio), fecha_corta(p.inicio)])
+    w = _tabla_simple(doc, ["Punto", "Equipo", "Código único ANSV", "Ubicación y sentido controlado",
+                            "Inicio de operación del equipo", "Inicio de operación considerado para el punto"],
+                      filas, [Cm(4.0), Cm(2.6), Cm(3.4), Cm(8.0), Cm(2.9), Cm(3.2)])
+    _fusionar_verticales(w, [0, 5], grupos)
+    distintos = [p for p in puntos.itertuples()
+                 if equipos.loc[equipos["punto"] == p.punto, "inicio"].nunique() > 1]
+    texto = ("Para responder por punto se adopta una única fecha de inicio de operación en cada uno: la del "
+             "equipo que entró primero en operación, de modo que el periodo posterior incluya todo el tiempo "
+             "en que el punto ha contado con control SAST.")
+    for p in distintos:
+        eqs = equipos[equipos["punto"] == p.punto].sort_values("inicio")
+        detalle = " y ".join(f"el {e.equipo} el {fecha_corta(e.inicio)}" for e in eqs.itertuples())
+        texto += (f" En {p.punto.title()} las fechas difieren ({detalle}); se toma el "
+                  f"{fecha_corta(p.inicio)}.")
+    iguales = [p.punto.title() for p in puntos.itertuples() if p not in distintos
+               and (equipos["punto"] == p.punto).sum() > 1]
+    if iguales:
+        texto += (f" En {', '.join(iguales[:-1])} y {iguales[-1]} los dos equipos iniciaron el mismo día."
+                  if len(iguales) > 1 else f" En {iguales[0]} los dos equipos iniciaron el mismo día.")
+    _parrafo(doc, texto)
+
+    # 3. Método
+    _titulo(doc, "3. Fuente y método")
+    _parrafo(doc, (
+        "Fuente. Las cifras corresponden a los casos de siniestralidad vial registrados en la zona de "
+        "influencia de cada equipo, según el registro de siniestros viales conocidos por la Secretaría de "
+        "Tránsito y Transporte de Valledupar (capa «Siniestralidad Valledupar», que consolida informes de la "
+        "Policía de Tránsito, reportes de la Secretaría y casos de deceso posterior), con corte al "
         f"{fecha_larga(descarga)}."))
-
-    _parrafo(doc, "Tabla 1. Siniestros viales con víctimas, fallecidos y lesionados por punto SAST, antes y después "
-                  "del inicio de operación", negrita=True, tam=10, alinear=WD_ALIGN_PARAGRAPH.LEFT)
-    etq_p = [f"{r.punto.title()} — {r.direcciones.title()} (equipos {r.equipos})" for r in puntos.itertuples()]
-    _tabla_word(doc, tp, "Punto SAST", etq_p, total=True)
     _parrafo(doc, (
-        "Se cuentan los siniestros con víctimas (con lesionados o fallecidos). Fallecidos y lesionados se "
-        "cuentan como personas. En los puntos con dos equipos, la fecha de inicio "
-        "es la del equipo que inició primero y cada siniestro se cuenta una sola vez."), tam=9)
-    tot_a = tp[["antes_siniestros", "antes_fallecidos", "antes_lesionados"]].sum()
-    tot_d = tp[["despues_siniestros", "despues_fallecidos", "despues_lesionados"]].sum()
+        "Delimitación espacial. Se entiende por «punto donde opera el SAST» la zona de influencia definida "
+        "por la Secretaría para cada equipo, ampliada en 15 metros. La ampliación se calculó en metros, en el "
+        "sistema de referencia MAGNA-SIRGAS Origen Nacional (EPSG:9377), y es la misma delimitación "
+        "utilizada en el reporte de la línea base de los equipos a la ANSV. La zona de un punto es la unión de "
+        "las zonas de sus equipos. Un siniestro se asigna a un punto cuando su ubicación georreferenciada en "
+        "el registro cae dentro de esa zona."))
     _parrafo(doc, (
-        "En total, en los cinco años previos a la instalación se registraron "
-        f"{n_txt(tot_a.iloc[0], 'siniestro vial con víctimas', 'siniestros viales con víctimas')}, con "
-        f"{n_txt(tot_a.iloc[1], 'fallecido', 'fallecidos')} y {n_txt(tot_a.iloc[2], 'lesionado', 'lesionados')}, "
-        f"en las zonas de influencia de los {n_puntos} puntos. Desde el inicio de operación y hasta el "
-        f"{fecha_larga(descarga)} se registró un total de "
-        f"{n_txt(tot_d.iloc[0], 'siniestro vial con víctimas', 'siniestros viales con víctimas')}, con "
-        f"{n_txt(tot_d.iloc[1], 'fallecido', 'fallecidos')} y {n_txt(tot_d.iloc[2], 'lesionado', 'lesionados')}."))
+        "Variables. Se cuentan: (i) los siniestros viales con víctimas, es decir, los registrados con "
+        "gravedad «con heridos» o «con muertos»; (ii) los fallecidos, y (iii) los lesionados. Fallecidos y "
+        "lesionados corresponden al número de personas registradas en cada siniestro, no al número de "
+        "siniestros. En los puntos con dos equipos cada siniestro se cuenta una sola vez, aunque su "
+        "ubicación quede dentro de la zona de ambos equipos."))
+    _parrafo(doc, (
+        "Periodos. El periodo anterior a la instalación comprende los cinco (5) años previos a la fecha de "
+        "inicio de operación considerada para cada punto. El periodo posterior va desde esa fecha hasta la "
+        "fecha de corte, inclusive. Como la entrada en operación fue escalonada, la duración del periodo "
+        "posterior varía entre puntos (Tabla 2)."))
+    _rotulo(doc, "Tabla 2. Periodos de análisis por punto")
+    filas = []
+    for p in tp.itertuples():
+        d_a = (p.inicio - p.antes_desde).days
+        d_d = (p.despues_hasta - p.inicio).days + 1
+        filas.append([p.punto.title(), fecha_corta(p.inicio),
+                      f"{fecha_corta(p.antes_desde)} a {fecha_corta(p.antes_hasta)}", f"{d_a:,}".replace(",", "."),
+                      f"{fecha_corta(p.inicio)} a {fecha_corta(p.despues_hasta)}", str(d_d)])
+    _tabla_simple(doc, ["Punto", "Inicio de operación considerado", "Periodo anterior", "Días",
+                        "Periodo posterior", "Días"],
+                  filas, [Cm(5.0), Cm(3.2), Cm(5.2), Cm(1.8), Cm(5.2), Cm(1.8)])
 
-    _parrafo(doc, "Tabla 2. Periodos considerados por punto", negrita=True, tam=10,
-             alinear=WD_ALIGN_PARAGRAPH.LEFT)
-    w = doc.add_table(rows=1, cols=3)
-    w.style = "Table Grid"
-    w.alignment = WD_TABLE_ALIGNMENT.CENTER
-    for i, c in enumerate(["Punto SAST", "Antes de la instalación", "Después de la instalación"]):
-        _celda(w.rows[0].cells[i], c, negrita=True)
-        _sombrear(w.rows[0].cells[i], "D9E2F3")
+    # 4. Resultados
+    _titulo(doc, "4. Resultados")
+    _rotulo(doc, "Tabla 3. Siniestros viales con víctimas, fallecidos y lesionados por punto SAST, antes y "
+                 "después del inicio de operación")
+    etq_p = [f"{r.punto.title()} (equipo{'s' if ',' in r.equipos else ''} {r.equipos.replace(', ', ' y ')})"
+             for r in puntos.itertuples()]
+    _tabla_word(doc, tp, "Punto SAST", etq_p, total=True, rotulo_inicio="Inicio de operación considerado")
+    _parrafo(doc, (
+        f"En los cinco años previos a la entrada en operación, en las zonas de influencia de los {_num(n_p)} "
+        f"puntos se registraron {n_txt(tot_a.iloc[0], *sv)}, con {n_txt(tot_a.iloc[1], 'fallecido', 'fallecidos')} "
+        f"y {n_txt(tot_a.iloc[2], 'lesionado', 'lesionados')}. Desde la entrada en operación y hasta el "
+        f"{fecha_larga(descarga)} se registró {n_txt(tot_d.iloc[0], *sv)}, "
+        f"{victimas_txt(tot_d.iloc[1], tot_d.iloc[2])}. "
+        "Por punto:"))
     for p, r in zip(puntos.itertuples(), tp.itertuples()):
-        cells = w.add_row().cells
-        _celda(cells[0], p.punto.title(), centrado=False)
-        _celda(cells[1], f"{fecha_corta(r.antes_desde)} a {fecha_corta(r.antes_hasta)}")
-        _celda(cells[2], f"{fecha_corta(r.inicio)} a {fecha_corta(r.despues_hasta)}")
+        a = (f"{n_txt(r.antes_siniestros, *sv)}, {victimas_txt(r.antes_fallecidos, r.antes_lesionados)}"
+             if r.antes_siniestros else "ningún siniestro vial con víctimas")
+        d = (f"{n_txt(r.despues_siniestros, *sv)}, {victimas_txt(r.despues_fallecidos, r.despues_lesionados)}"
+             if r.despues_siniestros else "ningún siniestro vial con víctimas")
+        par = doc.add_paragraph(style="List Bullet")
+        run = par.add_run(f"{p.punto.title()}: ")
+        run.bold = True
+        par.add_run(f"antes de la instalación ({fecha_corta(r.antes_desde)} a {fecha_corta(r.antes_hasta)}), {a}; "
+                    f"después ({fecha_corta(r.inicio)} a {fecha_corta(r.despues_hasta)}), {d}.")
+        par.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
+    # Anexo
     doc.add_page_break()
-    _parrafo(doc, "Anexo. Desglose por equipo SAST", negrita=True)
+    _titulo(doc, "Anexo. Desglose por equipo SAST")
     _parrafo(doc, (
-        "Cada equipo se presenta con su propia fecha de inicio de operación. En los puntos con dos equipos "
-        "las zonas de influencia se superponen, por lo que un mismo siniestro puede aparecer en ambos "
-        "equipos; por esa razón la suma de esta tabla no coincide con el total de la Tabla 1."), tam=10)
-    etq_e = [f"{r.equipo} — {r.direccion.title()} ({r.punto.title()})" for r in equipos.itertuples()]
-    _tabla_word(doc, te, "Equipo SAST", etq_e, total=False)
-
-    _parrafo(doc, "Nota sobre la fuente", negrita=True, tam=10, alinear=WD_ALIGN_PARAGRAPH.LEFT)
-    _parrafo(doc, (
-        "Zona de influencia: polígono definido para cada equipo SAST, ampliado 15 metros (la misma "
-        "delimitación usada en el reporte de la línea base a la Agencia Nacional de Seguridad Vial). "
-        "Se cuenta un siniestro cuando su ubicación registrada cae dentro de la zona. Fechas de inicio "
-        "de operación: plataforma de fotodetección de la ANSV. Registro de siniestros consultado el "
-        f"{fecha_larga(descarga)}."), tam=9)
+        "En este anexo cada equipo se presenta con su propia fecha de inicio de operación y su propia zona de "
+        "influencia. Las zonas de los equipos de un mismo punto se superponen, de modo que un siniestro puede "
+        "aparecer en los dos equipos; por esa razón la suma de esta tabla no coincide con los totales por "
+        "punto de la Tabla 3, que cuentan cada siniestro una sola vez."), tam=10)
+    _rotulo(doc, "Tabla A1. Siniestros viales con víctimas, fallecidos y lesionados por equipo SAST")
+    etq_e = [f"{r.equipo} — {r.direccion_ansv.title()} ({r.punto.title()})" for r in equipos.itertuples()]
+    _tabla_word(doc, te, "Equipo SAST", etq_e, total=False, rotulo_inicio="Inicio de operación del equipo")
     doc.save(ruta)
 
 
@@ -325,7 +445,10 @@ def main() -> None:
     if set(zonas["equipo"]) != set(cfg):
         raise SystemExit(f"Equipos de zonas {sorted(zonas['equipo'])} ≠ config {sorted(cfg)}")
     equipos = (pd.DataFrame(eq.drop(columns="geometry"))[["equipo", "solicitud", "punto", "direccion"]]
-               .assign(inicio=lambda d: d["equipo"].map(lambda e: pd.Timestamp(cfg[e]["fecha_inicio"])))
+               .assign(inicio=lambda d: d["equipo"].map(lambda e: pd.Timestamp(cfg[e]["fecha_inicio"])),
+                       codigo_unico=lambda d: d["equipo"].map(lambda e: cfg[e]["codigo_unico"]),
+                       direccion_ansv=lambda d: d["equipo"].map(
+                           lambda e: re.sub(r"\((?!SENTIDO)", "(SENTIDO ", cfg[e]["direccion_ansv"])))
                .sort_values(["solicitud", "equipo"]).reset_index(drop=True))
     puntos = (equipos.groupby(["solicitud", "punto"], as_index=False)
               .agg(inicio=("inicio", "min"), equipos=("equipo", lambda s: ", ".join(e[-3:] for e in s)),
