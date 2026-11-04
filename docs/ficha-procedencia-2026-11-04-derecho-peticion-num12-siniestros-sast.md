@@ -3,11 +3,15 @@
 - **Resultado:** tabla de respuesta al numeral 12 de un derecho de petición («Informar el número de
   siniestros viales, lesionados y fallecidos registrados en los puntos donde operan los sistemas SAST
   antes y después de su instalación»):
-  - **Tabla 1, por punto** (5 puntos, sin doble conteo): siniestros con víctimas, fallecidos y
-    lesionados en dos periodos.
-  - **Tabla 2:** periodos considerados en cada punto.
-  - **Anexo, por equipo** (9 equipos): las mismas cifras. Las zonas de 021/022 y 041/042 se solapan,
-    así que la suma del anexo no coincide con la Tabla 1.
+  - **Tabla 1, equipos en operación** (9 equipos en 5 puntos): código único ANSV, ubicación y sentido,
+    fecha de inicio de cada equipo y fecha de inicio considerada para el punto (la más temprana).
+  - **Tabla 2:** periodos de análisis por punto y su duración en días (antes: 1.826; después: 34 a 141).
+  - **Tabla 3, por punto** (5 puntos, sin doble conteo): siniestros con víctimas, fallecidos y
+    lesionados en dos periodos, y el mismo resultado en prosa por punto.
+  - **Tabla A1 (anexo), por equipo** (9 equipos): las mismas cifras. Las zonas de 021/022 y 041/042
+    se solapan, así que la suma del anexo no coincide con la Tabla 3.
+  - La redacción del Word se reescribió el 2026-11-04 (commit `1ce4620`) para dar el contexto de los
+    equipos y el método; las cifras no cambiaron.
 
   | Punto (equipos) | Inicio | Antes: siniestros / fallecidos / lesionados | Después: siniestros / fallecidos / lesionados |
   |---|---|---|---|
@@ -66,7 +70,7 @@
      Heridos» y agregó 11 registros. El revisor-datos verificó que nada de eso entra ni sale de las
      zonas, y que el caso de «después» ya estaba en el corte del 06/10.
 - **Script/notebook:** `scripts/11_derecho_peticion.py`
-  - **Commit `24def9e`**
+  - **Commit `1ce4620`** (etapa creada en `24def9e`)
 - **Generado:** 2026-11-04 | **Validado por:** pendiente — persona distinta del autor (decisión 24)
 
 ## Insumos
@@ -85,12 +89,12 @@
 ## Resultados
 | Resultado | Descripción | SHA-256 |
 |---|---|---|
-| `outputs/2026-11-04_sttv_derecho-peticion-num12_siniestros-sast.docx` | Insumo técnico en Word para jurídica: respuesta, Tablas 1–2, anexo por equipo y nota de fuente | `470c3bf2ade09c41b545e014e484d5850e779cff2b06fdbbbfcd006ad82390f5` |
-| `outputs/2026-11-04_sttv_derecho-peticion-num12_siniestros-sast.xlsx` | Mismas tablas (por punto, por equipo) y hoja de procedencia | `087b2487b1937f0a910d23a11fba7060cb8e99654f0c0db03d25261631d6e69f` |
+| `outputs/2026-11-04_sttv_derecho-peticion-num12_siniestros-sast.docx` | Insumo técnico en Word para jurídica: contexto de los equipos, fuente y método, Tablas 1–3 y anexo por equipo | `80d246edca9b76a9fb960387aa832c0c9d6828116b1990a144f06e7e4d4875e5` |
+| `outputs/2026-11-04_sttv_derecho-peticion-num12_siniestros-sast.xlsx` | Mismas tablas (por punto, por equipo) y hoja de procedencia | `88e8042c1eb4310e30dd22d3c6b445fd54c1dd80269cfc1e826917e2a5fbed89` |
 | `outputs/tables/derecho_peticion_siniestros_en_zona.csv` | Detalle registro a registro (codrot, fecha, gravedad, dirección, coordenada). No se versiona (decisión 26) | `e124f3ba8996c6bb3ac8e1b632f0d171102cb588bdbb1f1021e79b66a127c000` |
 
 El .docx y el .xlsx llevan marcas de tiempo, así que su SHA cambia en cada corrida aunque el contenido
-sea el mismo. Las huellas de arriba son las de los archivos versionados en `24def9e`.
+sea el mismo. Las huellas de arriba son las de los archivos versionados en `1ce4620`.
 
 ## Revisión independiente
 - **Auditado por:** revisor-datos, 2026-11-04, con contexto fresco. Auditó la versión que contaba
