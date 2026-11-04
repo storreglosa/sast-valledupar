@@ -26,3 +26,5 @@ outputs/tables/siniestros_contraste_victimas.csv
 # Registros locales de las rondas de decisión de diseño (impeccable)
 .impeccable/questions/
 .impeccable/review/
+# Registro a registro del numeral 12 (no se publica, decisión 26)
+outputs/tables/derecho_peticion_siniestros_en_zona.csv

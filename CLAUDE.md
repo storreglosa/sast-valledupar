@@ -42,6 +42,7 @@ python scripts/07_revision_geocodificacion.py  # listas para revisar la geocodif
 python scripts/08_reporte_ejecutivo.py # informe ejecutivo (gerencia) + Excel para copiar a la plataforma ANSV (+15 m)
 python scripts/09_semaforos.py         # planes semafóricos (PDF SISTRA), validaciones, borrador de accesos y página de validación
 python scripts/10_tablero.py           # datos públicos del tablero (tablero/data/); --borrador = ensayo local
+python scripts/11_derecho_peticion.py  # derecho de petición num. 12: siniestros antes/después por punto SAST (Word)
 python scripts/verificar_tablero.py    # guardia de publicación (la corre también GitHub Actions)
 python -m unittest discover -s tests   # pruebas (las de PDF se saltan si falta data/raw/semaforos/)
 node --test tests/js/*.test.mjs        # pruebas del tablero (modelo = Python, festivos, simulación)
@@ -168,3 +169,14 @@ Decisiones del 2026-10-09, Santiago:
     que el tablero no cambia; el hallazgo pasa de AVISO a INFO. **Procedencia del reporte de
     Universidad Área Andina:** lo descargó Santiago del controlador el 08/10/2026 (no venía en el
     correo del 29/09/2026).
+
+Decisiones del 2026-11-04, Santiago (derecho de petición, numeral 12, `scripts/11_derecho_peticion.py`):
+34. **Siniestros antes/después por punto SAST:** por los 5 puntos sin doble conteo (desglose por
+    equipo en anexo); inicio del punto = equipo que inició primero; antes = 5 años previos al inicio;
+    después = del inicio a la descarga del portal; zona + 15 m. Se cuentan **solo siniestros con
+    víctimas** (Con Heridos / Con Muertos). La respuesta da cifras y fuente, sin interpretar el efecto
+    ni salvedades. Nuevo corte del portal 2026-11-04 (el de 2026-10-06 sigue respaldando la línea base).
+35. **Hallazgos del revisor-datos que se dejan como están:** el único caso «después» (Loperena,
+    19/08/2026, «Diagonal 16 con 16 - 46», coordenada en Cl 16 × Dg 21) cuenta según la coordenada; el
+    posible gemelo del 30/07/2021 en Loperena (IPAT herido / Geoportal muerto a 232 m) no se corrige;
+    la descripción de la fuente del Word se mantiene.
