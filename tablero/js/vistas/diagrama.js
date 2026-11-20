@@ -4,6 +4,7 @@
 // andén) y la microsimulación ilustrativa en canvas.
 import { h, s } from '../util/dom.js';
 import { cabeza } from './cabezas.js';
+import { ubicar, calzada } from '../util/solapes.js';
 import { estado, luz, restanteVisible } from '../nucleo/tiempos.js';
 import { crearSim, trazo, puntoEn } from '../simulacion/trafico.js';
 import { bogota } from '../nucleo/horario.js';
@@ -148,26 +149,30 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
     dpr = Math.min(2, window.devicePixelRatio || 1);
     lienzo.width = Math.round(W * dpr); lienzo.height = Math.round(H * dpr);
     const pos = cabezas.map(ubicarCabeza);
-    // que no se monten: empuje simple entre pares cercanos (p. ej. la Flecha y su flujo, que
-    // comparten línea de pare, quedan uno detrás del otro sobre el mismo andén)
-    for (let it2 = 0; it2 < 6; it2++) {
-      for (let i = 0; i < pos.length; i++) for (let j = i + 1; j < pos.length; j++) {
-        let dx = pos[j][0] - pos[i][0], dy = pos[j][1] - pos[i][1];
-        if (Math.hypot(dx, dy) < 0.5) { dx = pos[j][2][0]; dy = pos[j][2][1]; }
-        const d = Math.hypot(dx, dy) || 1;
-        const min = 30;
-        if (d < min) { const e = (min - d) / 2; pos[i][0] -= (dx / d) * e; pos[i][1] -= (dy / d) * e; pos[j][0] += (dx / d) * e; pos[j][1] += (dy / d) * e; }
-      }
-    }
-    cabezas.forEach((cb, i) => {
-      cb.el.style.left = `${Math.max(24, Math.min(W - 24, pos[i][0]))}px`;
-      cb.el.style.top = `${Math.max(34, Math.min(H - 34, pos[i][1]))}px`;
+    // que no se tapen ni pisen la calzada (Santiago, 2026-11-20): cada cabeza es un rectángulo girado
+    // (caja, contador y etiqueta) que solo se corre por su lado (más afuera, hacia el andén, o más atrás
+    // por su vía) hasta no tocar ninguna calzada dibujada, otra cabeza ni el borde del recuadro.
+    // Eligen primero las vehiculares, en el orden de los grupos.
+    const calzadas = geo.vias.flatMap((v) => calzada(v.p.map(([x, y]) => aPantalla(x, y)),
+      ((v.ctx ? Math.max(4.5, v.ancho * 0.8) : v.ancho) + 0.7) * k));
+    const orden = cabezas.map((cb, i) => i).sort((a, b) => (cabezas[a].g.tipo === 'peatonal') - (cabezas[b].g.tipo === 'peatonal') || a - b);
+    const puestas = ubicar(orden.map((i) => {
+      const [x, y, d, n, giro] = pos[i];
+      return { x, y, d: unit(d), n: unit(n), giro, w: cabezas[i].el.offsetWidth, h: cabezas[i].el.offsetHeight };
+    }), calzadas, { W, H });
+    const sinLugar = [];
+    orden.forEach((i, j) => {
+      cabezas[i].el.style.left = `${puestas[j].x}px`;
+      cabezas[i].el.style.top = `${puestas[j].y}px`;
+      if (!puestas[j].libre) sinLugar.push(cabezas[i].g.id);
     });
+    if (sinLugar.length) console.warn(`${it.nombre}: sin lugar libre para las cabezas ${sinLugar.join(', ')} (quedan sobre la calzada u otra cabeza)`);
     ponerNombres();
   }
 
   /** Orienta la cabeza paralela a su vía (columna o fila, más el giro que falte, ≤ 45°) y devuelve
-   *  [x, y, dirección aguas arriba] en píxeles, sobre el andén derecho y antes de la línea de pare. */
+   *  [x, y, dirección aguas arriba, dirección hacia afuera de la calzada, giro] en píxeles, sobre el
+   *  andén derecho y antes de la línea de pare. */
   function ubicarCabeza(cb) {
     const L = cb.lugar;
     // dirección del eje en pantalla (norte arriba: y de pantalla = −y del mundo)
@@ -187,11 +192,13 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
       const p = puntoEn(L.t, s0);
       const lado = L.medio + 0.8 + (anchoPx / 2) / k;
       const [x, y] = aPantalla(p.x + Math.sin(p.ang) * lado, p.y - Math.cos(p.ang) * lado);
-      return [x, y, [-dx, -dy]];
+      const [xn, yn] = aPantalla(p.x + Math.sin(p.ang) * (lado + 1), p.y - Math.cos(p.ang) * (lado + 1));
+      return [x, y, [-dx, -dy], [xn - x, yn - y], giro];
     }
     const fuera = 0.8 + (anchoPx / 2) / k, atras = (largoPx / 2) / k - 1.0;
     const [x, y] = aPantalla(L.b[0] + L.dir[0] * fuera + L.ur[0] * atras, L.b[1] + L.dir[1] * fuera + L.ur[1] * atras);
-    return [x, y, [dx, dy]];
+    const [xn, yn] = aPantalla(L.b[0] + L.dir[0] * (fuera + 1) + L.ur[0] * atras, L.b[1] + L.dir[1] * (fuera + 1) + L.ur[1] * atras);
+    return [x, y, [dx, dy], [xn - x, yn - y], giro];
   }
 
   /** Un rótulo por vía (la calzada más larga a la vista), sobre su eje, derecho y lejos del cruce. */
@@ -224,6 +231,7 @@ export function diagrama(it, geo, { alAnunciar } = {}) {
         'stroke-width': (3 / k).toFixed(2) }, nom.toUpperCase()));
     }
   }
+  const unit = ([x, y]) => { const n = Math.hypot(x, y) || 1; return [x / n, y / n]; };
   const aPantalla = (x, y) => { const [a, b] = rot(x, y); return [W / 2 + a * k, H / 2 + b * k]; };
   const ro = new ResizeObserver(medir);
   ro.observe(raiz);
