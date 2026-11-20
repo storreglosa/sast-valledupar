@@ -82,19 +82,23 @@ intersecciones:
       accesos: {este: CL 21}
       por_la_red: true
       pare_m: {norte: 58, oeste: 13, este: 77}
-    # movimientos de cada grupo según sus esquemas sobre Google Maps (2026-10-08). Oeste = Carrera 19
-    # hacia el noroccidente; nadie sale por la Carrera 19 al suroriente ni entra a la Calle 21.
-    # La Flecha (G5) queda como en el borrador: giro a la derecha desde el norte. Validado por Santiago
-    # sobre la página de validación y el ensayo del tablero (2026-10-08).
+    # movimientos de cada acceso según los esquemas de Santiago sobre Google Maps (2026-10-08). Oeste =
+    # Carrera 19 hacia el noroccidente; nadie sale por la Carrera 19 al suroriente ni entra a la Calle 21.
+    # EXCEPCIÓN A LA CODIFICACIÓN SDM (decisión 36, Santiago, 2026-11-20): en este cruce el Flujo 1 (G1)
+    # controla el acceso SUR y el Flujo 2 (G2) el NORTE, y la Flecha (G5) está en la Carrera 19 (giro a la
+    # derecha al sur). Lo vio en campo y en el controlador, y lo confirmó el ingeniero que cargó la
+    # programación. Los movimientos de cada acceso no cambian: cambia qué grupo los controla.
+    # (Asignación anterior, 2026-10-08: G1 norte, G2 sur, G5 norte con la «U» a la Carrera 19.)
     asignacion:
       validado_por: Santiago Torreglosa
-      fecha: 2026-10-08
+      fecha: 2026-11-20
       desde_borrador: true
       cambios:
-        G1: {sale_por: [sur, oeste]}     # sigue al sur por la Diagonal 21 o gira en «U» a la Carrera 19
-        G2: {sale_por: [norte, oeste]}   # sigue al norte o gira a la izquierda a la Carrera 19
+        G1: {acceso: sur, sale_por: [norte, oeste]}    # sigue al norte o gira a la izquierda a la Carrera 19
+        G2: {acceso: norte, sale_por: [sur, oeste]}    # sigue al sur por la Diagonal 21 o gira en «U» a la Carrera 19
         G3: {sale_por: [sur, norte]}     # sigue al sur por la Diagonal 21 o gira a la izquierda al norte
         G4: {sale_por: [norte, sur]}     # gira a la derecha al norte o cruza a la calzada que baja
+        G5: {acceso: oeste, sale_por: sur}             # Flecha: giro a la derecha desde la Carrera 19 al sur
 
   - id: loperena
     nombre: Colegio Loperena

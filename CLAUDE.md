@@ -180,3 +180,12 @@ Decisiones del 2026-11-04, Santiago (derecho de petición, numeral 12, `scripts/
     19/08/2026, «Diagonal 16 con 16 - 46», coordenada en Cl 16 × Dg 21) cuenta según la coordenada; el
     posible gemelo del 30/07/2021 en Loperena (IPAT herido / Geoportal muerto a 232 m) no se corrige;
     la descripción de la fuente del Word se mantiene.
+
+Decisión del 2026-11-20, Santiago (tablero de semáforos):
+36. **Los Manguitos es una excepción a la codificación SDM (decisión 30):** el Flujo 1 (G1) controla el
+    acceso sur (Diagonal 21 que sube) y el Flujo 2 (G2) el norte (Diagonal 21 que baja); la Flecha (G5)
+    está en la Carrera 19 y habilita el giro a la derecha al sur. G3 y G4 no cambian. Cada acceso conserva
+    sus movimientos permitidos (decisión 32); cambia el grupo que los controla. Fuente: observación en
+    campo y en el controlador, confirmada por el ingeniero que cargó la programación. Solo aplica a Los
+    Manguitos: no «corregir» de vuelta a la codificación SDM. Reemplaza la asignación de G1, G2 y G5 de
+    la decisión 31.

@@ -4422,6 +4422,120 @@
      "G1": {
       "puntos": [
        [
+        -46.6,
+        -99.5
+       ],
+       [
+        -38.5,
+        -83.9
+       ],
+       [
+        -19.4,
+        -49.6
+       ],
+       [
+        -1.0,
+        -11.8
+       ],
+       [
+        5.1,
+        1.6
+       ],
+       [
+        15.8,
+        23.7
+       ],
+       [
+        22.7,
+        39.8
+       ],
+       [
+        28.7,
+        57.2
+       ],
+       [
+        34.4,
+        76.4
+       ],
+       [
+        41.8,
+        101.7
+       ]
+      ],
+      "s_pare": 98.8,
+      "largo": 220.5,
+      "otras": [
+       {
+        "puntos": [
+         [
+          -46.6,
+          -99.5
+         ],
+         [
+          -38.5,
+          -83.9
+         ],
+         [
+          -19.4,
+          -49.6
+         ],
+         [
+          -1.0,
+          -11.8
+         ],
+         [
+          3.0,
+          -3.1
+         ],
+         [
+          3.5,
+          -1.8
+         ],
+         [
+          3.9,
+          -0.4
+         ],
+         [
+          4.1,
+          1.0
+         ],
+         [
+          4.1,
+          2.3
+         ],
+         [
+          4.0,
+          3.7
+         ],
+         [
+          3.7,
+          5.1
+         ],
+         [
+          3.3,
+          6.5
+         ],
+         [
+          1.0,
+          12.4
+         ],
+         [
+          -15.9,
+          54.1
+         ],
+         [
+          -35.7,
+          103.9
+         ]
+        ],
+        "s_pare": 98.8,
+        "largo": 223.2
+       }
+      ]
+     },
+     "G2": {
+      "puntos": [
+       [
         33.4,
         104.7
        ],
@@ -4570,120 +4684,6 @@
         ],
         "s_pare": 52.0,
         "largo": 192.3
-       }
-      ]
-     },
-     "G2": {
-      "puntos": [
-       [
-        -46.6,
-        -99.5
-       ],
-       [
-        -38.5,
-        -83.9
-       ],
-       [
-        -19.4,
-        -49.6
-       ],
-       [
-        -1.0,
-        -11.8
-       ],
-       [
-        5.1,
-        1.6
-       ],
-       [
-        15.8,
-        23.7
-       ],
-       [
-        22.7,
-        39.8
-       ],
-       [
-        28.7,
-        57.2
-       ],
-       [
-        34.4,
-        76.4
-       ],
-       [
-        41.8,
-        101.7
-       ]
-      ],
-      "s_pare": 98.8,
-      "largo": 220.5,
-      "otras": [
-       {
-        "puntos": [
-         [
-          -46.6,
-          -99.5
-         ],
-         [
-          -38.5,
-          -83.9
-         ],
-         [
-          -19.4,
-          -49.6
-         ],
-         [
-          -1.0,
-          -11.8
-         ],
-         [
-          3.0,
-          -3.1
-         ],
-         [
-          3.5,
-          -1.8
-         ],
-         [
-          3.9,
-          -0.4
-         ],
-         [
-          4.1,
-          1.0
-         ],
-         [
-          4.1,
-          2.3
-         ],
-         [
-          4.0,
-          3.7
-         ],
-         [
-          3.7,
-          5.1
-         ],
-         [
-          3.3,
-          6.5
-         ],
-         [
-          1.0,
-          12.4
-         ],
-         [
-          -15.9,
-          54.1
-         ],
-         [
-          -35.7,
-          103.9
-         ]
-        ],
-        "s_pare": 98.8,
-        "largo": 223.2
        }
       ]
      },
@@ -4982,102 +4982,64 @@
      "G5": {
       "puntos": [
        [
-        33.4,
-        104.7
+        -46.6,
+        99.5
        ],
        [
-        17.6,
-        50.8
+        -44.2,
+        93.2
        ],
        [
-        17.1,
-        49.2
+        -7.4,
+        3.3
        ],
        [
-        16.6,
-        47.5
+        -6.9,
+        1.7
        ],
        [
-        16.0,
-        45.9
+        -6.5,
+        0.2
        ],
        [
-        15.5,
-        44.3
+        -6.4,
+        -1.4
        ],
        [
-        14.8,
-        42.7
+        -6.5,
+        -3.0
        ],
        [
-        14.2,
-        41.1
+        -6.7,
+        -4.5
        ],
        [
-        13.5,
-        39.6
+        -7.2,
+        -6.1
        ],
        [
-        8.7,
-        28.4
+        -7.9,
+        -7.6
        ],
        [
-        3.6,
-        17.8
+        -27.1,
+        -45.9
        ],
        [
-        2.9,
-        16.5
+        -43.0,
+        -75.4
        ],
        [
-        2.2,
-        15.6
-       ],
-       [
-        1.4,
-        15.2
-       ],
-       [
-        0.8,
-        15.2
-       ],
-       [
-        0.1,
-        15.7
-       ],
-       [
-        -0.6,
-        16.6
-       ],
-       [
-        -1.2,
-        18.0
-       ],
-       [
-        -15.9,
-        54.1
-       ],
-       [
-        -35.7,
-        103.9
+        -54.6,
+        -95.4
        ]
       ],
-      "s_pare": 52.0,
-      "largo": 192.3
+      "s_pare": 98.2,
+      "largo": 214.6
      }
     },
     "lineas_pare": {
      "G1": [
-      [
-       22.0,
-       53.9
-      ],
-      [
-       15.6,
-       55.8
-      ]
-     ],
-     "G2": [
       [
        -4.0,
        -10.5
@@ -5085,6 +5047,16 @@
       [
        1.9,
        -13.3
+      ]
+     ],
+     "G2": [
+      [
+       22.0,
+       53.9
+      ],
+      [
+       15.6,
+       55.8
       ]
      ],
      "G3": [
@@ -5109,12 +5081,12 @@
      ],
      "G5": [
       [
-       22.0,
-       53.9
+       -6.5,
+       9.7
       ],
       [
-       15.6,
-       55.8
+       -12.6,
+       7.2
       ]
      ]
     },
@@ -5156,10 +5128,10 @@
      "nombre": "Flujo 1",
      "tipo": "vehicular",
      "codigo": "1",
-     "movimiento": "desde el norte: directo (sale al sur) y giro a la derecha (sale al oeste)",
-     "acceso": "norte",
-     "sale_por": "sur, oeste",
-     "brazo": "norte",
+     "movimiento": "desde el sur: directo (sale al norte) y giro a la izquierda (sale al oeste)",
+     "acceso": "sur",
+     "sale_por": "norte, oeste",
+     "brazo": "sur",
      "mitad": null,
      "via": "DG 21",
      "confianza": "validada",
@@ -5169,10 +5141,10 @@
      "nombre": "Flujo 2",
      "tipo": "vehicular",
      "codigo": "2",
-     "movimiento": "desde el sur: directo (sale al norte) y giro a la izquierda (sale al oeste)",
-     "acceso": "sur",
-     "sale_por": "norte, oeste",
-     "brazo": "sur",
+     "movimiento": "desde el norte: directo (sale al sur) y giro a la derecha (sale al oeste)",
+     "acceso": "norte",
+     "sale_por": "sur, oeste",
+     "brazo": "norte",
      "mitad": null,
      "via": "DG 21",
      "confianza": "validada",
@@ -5208,17 +5180,17 @@
      "nombre": "Flecha",
      "tipo": "flecha",
      "codigo": null,
-     "movimiento": "giro a la derecha desde el norte (sale al oeste)",
-     "acceso": "norte",
-     "sale_por": "oeste",
-     "brazo": "norte",
+     "movimiento": "giro a la derecha desde el oeste (sale al sur)",
+     "acceso": "oeste",
+     "sale_por": "sur",
+     "brazo": "oeste",
      "mitad": null,
-     "via": "DG 21",
+     "via": "KR 19",
      "confianza": "validada",
-     "evidencia": "Validado por Santiago Torreglosa (2026-10-08). Propuesta (baja): Compatible solo con giros que no cruzan a sus amigos; arranca con el acceso norte en 4 de 4 planes. Alternativas: giro a la derecha desde el este (sale al norte). POR CONFIRMAR."
+     "evidencia": "Corregido por Santiago Torreglosa"
     }
    },
-   "config_usada": "{\"asignacion\": {\"cambios\": {\"G1\": {\"sale_por\": [\"sur\", \"oeste\"]}, \"G2\": {\"sale_por\": [\"norte\", \"oeste\"]}, \"G3\": {\"sale_por\": [\"sur\", \"norte\"]}, \"G4\": {\"sale_por\": [\"norte\", \"sur\"]}}, \"desde_borrador\": true, \"fecha\": \"2026-10-08\", \"validado_por\": \"Santiago Torreglosa\"}, \"centro\": {\"ejes\": {\"este_oeste\": [\"KR 19\"], \"norte_sur\": [\"DG 21\"]}, \"nodos_osm\": [986880618, 986889496, 986871555, 986885581], \"nota\": \"DG 21 x KR 19 (calzadas dobles); la KR 19 sigue al SE como vía local y la CL 21 llega del NE, a ~50 m del centro\", \"radio_conexion\": 50}, \"geometria\": {\"accesos\": {\"este\": \"CL 21\"}, \"pare_m\": {\"este\": 77, \"norte\": 58, \"oeste\": 13}, \"por_la_red\": true, \"radio_dibujo\": 110, \"sentidos\": {\"CL 21\": \"entra\"}}, \"senalizacion\": {\"cajon_amarillo\": false, \"cebras_sin_semaforo\": []}}",
+   "config_usada": "{\"asignacion\": {\"cambios\": {\"G1\": {\"acceso\": \"sur\", \"sale_por\": [\"norte\", \"oeste\"]}, \"G2\": {\"acceso\": \"norte\", \"sale_por\": [\"sur\", \"oeste\"]}, \"G3\": {\"sale_por\": [\"sur\", \"norte\"]}, \"G4\": {\"sale_por\": [\"norte\", \"sur\"]}, \"G5\": {\"acceso\": \"oeste\", \"sale_por\": \"sur\"}}, \"desde_borrador\": true, \"fecha\": \"2026-11-20\", \"validado_por\": \"Santiago Torreglosa\"}, \"centro\": {\"ejes\": {\"este_oeste\": [\"KR 19\"], \"norte_sur\": [\"DG 21\"]}, \"nodos_osm\": [986880618, 986889496, 986871555, 986885581], \"nota\": \"DG 21 x KR 19 (calzadas dobles); la KR 19 sigue al SE como vía local y la CL 21 llega del NE, a ~50 m del centro\", \"radio_conexion\": 50}, \"geometria\": {\"accesos\": {\"este\": \"CL 21\"}, \"pare_m\": {\"este\": 77, \"norte\": 58, \"oeste\": 13}, \"por_la_red\": true, \"radio_dibujo\": 110, \"sentidos\": {\"CL 21\": \"entra\"}}, \"senalizacion\": {\"cajon_amarillo\": false, \"cebras_sin_semaforo\": []}}",
    "correcciones_campo": {
     "radio_dibujo": 110,
     "sentidos": {
